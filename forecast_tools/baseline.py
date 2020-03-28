@@ -429,11 +429,10 @@ class Drift(Forecast):
         self._last_value = _train[-1:][0]
         self._t = _train.shape[0]
         self._gradient = ((self._last_value - _train[0]) / (self._t - 1))
-
-        self._fitted = pd.DataFrame(train)
-        self._fitted.columns=['actual']
+        self._fitted = pd.DataFrame(_train)
+        self._fitted.columns = ['actual']
         self._fitted['pred'] = _train[0] + np.arange(1, self._t+1, 
-                                                     float) * self._gradient
+                                            dtype=float) * self._gradient
 
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
         self._resid_std = self._fitted['resid'].std()
