@@ -3,6 +3,7 @@ Contains functions for loading built-in datasets
 '''
 
 import pandas as pd
+import os
 
 PATH_ED = 'data/ed_ts.csv'
 
@@ -16,6 +17,15 @@ def load_emergency_dept():
     -------
         pandas.DataFrame
     '''
-    df = pd.load_csv(PATH_ED, index_col='date', parse_dates=True)
-    df.index.freq = 'MS'
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    path = os.path.join(dir_path, PATH_ED)
+    df = pd.read_csv(path, index_col='date', parse_dates=True, 
+                     dayfirst=True)
+    df.index.freq = 'D'
     return df
+
+if __name__ == '__main__':
+    df = load_emergency_dept()
+    print(df.shape)
+    print(df.index.freq)
+    print(df.head())
