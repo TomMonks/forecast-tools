@@ -242,7 +242,7 @@ def forecast_errors(y_true, y_pred, metrics='all'):
     funcs = _forecast_error_functions()
     errors = {}
     for metric in metrics:
-        errors[metric] = funcs[metric](y_true, y_preds)
+        errors[metric] = funcs[metric](y_true, y_pred)
 
     return errors
 
