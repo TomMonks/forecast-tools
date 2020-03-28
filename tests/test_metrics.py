@@ -1,6 +1,6 @@
 import pytest
 
-from basecast import metrics as m
+from forecast_tools import metrics as m
                               
 @pytest.mark.parametrize("y_true, y_pred, metrics, expected", 
                          [([1], [1], 'all', 6),

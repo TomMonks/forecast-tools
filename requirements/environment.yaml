@@ -1,4 +1,4 @@
-name: basecast_dev
+name: forecast_dev
 channels:
   - defaults
 dependencies:
