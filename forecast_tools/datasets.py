@@ -9,9 +9,12 @@ PATH_ED = 'data/ed_ts.csv'
 
 def load_emergency_dept():
     '''
-    Daily level attendenances at a single
-    emergency department between 22/01/2014 
-    and 31/02/2014 (dates are UK dd/mm/yyyy format)
+    344 simulated daily level attendenances at a single
+    emergency department between 22/01/2017 
+    and 31/02/2017 (dates are UK dd/mm/yyyy format)
+
+    The returned data frame has a DateTimeIndex with
+    freq 'D' and value column 'arrivals' shape = (344, 1)
 
     Returns
     -------
@@ -28,4 +31,5 @@ if __name__ == '__main__':
     df = load_emergency_dept()
     print(df.shape)
     print(df.index.freq)
+    print(type(df.index.freq))
     print(df.head())
