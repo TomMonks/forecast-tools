@@ -3,6 +3,7 @@ Unit test for forecast error functions (point and coverage) in the metrics modul
 '''
 
 import pytest
+import numpy as np
 
 from forecast_tools import metrics as m
                               
@@ -97,7 +98,7 @@ def test_mean_absolute_percentage_error(y_true, y_pred, expected):
                             382.50)])
 def test_mean_squared_error(y_true, y_pred, expected):
     '''
-    test mean error calculation
+    test mean squared error calculation
     '''
     error = m.mean_squared_error(y_true, y_pred)
     assert pytest.approx(expected) == error
@@ -115,7 +116,7 @@ def test_mean_squared_error(y_true, y_pred, expected):
                             19.5576072156079)])
 def test_root_mean_squared_error(y_true, y_pred, expected):
     '''
-    test mean error calculation
+    test root mean squared error calculation
     '''
     error = m.root_mean_squared_error(y_true, y_pred)
     assert pytest.approx(expected) == error
@@ -133,9 +134,39 @@ def test_root_mean_squared_error(y_true, y_pred, expected):
                             13.9526876064932)])
 def test_symmetric_mape(y_true, y_pred, expected):
     '''
-    test mean error calculation
+    test symmetric mean absolute percentage error calculation
     '''
     error = m.symmetric_mean_absolute_percentage_error(y_true, y_pred)
+    assert pytest.approx(expected) == error
+
+
+@pytest.mark.parametrize("y_true, y_intervals, expected", 
+                         [([10, 20, 30, 40, 50], 
+                          [[5, 15, 25, 35, 45], 
+                           [15, 25, 35, 45, 55]], 
+                          1.0),
+                          ([20, 20, 30, 40, 50], 
+                          [[5, 15, 25, 35, 45], 
+                           [15, 25, 35, 45, 55]], 
+                          0.8),
+                          ([20, 30, 30, 40, 50], 
+                          [[5, 15, 25, 35, 45], 
+                           [15, 25, 35, 45, 55]], 
+                          0.6),
+                          ([20, 20, 30, 40, 30], 
+                          [[5, 15, 25, 35, 45], 
+                           [15, 25, 35, 45, 55]], 
+                          0.6),
+                          ([100, 100, 100, 100, 100], 
+                          [[5, 15, 25, 35, 45], 
+                           [15, 25, 35, 45, 55]], 
+                          0.0)])
+def test_coverage(y_true, y_intervals, expected):
+    '''
+    test prediction interval coverage
+    '''
+    y_intervals = np.array(y_intervals).T
+    error = m.coverage(y_true, y_intervals)
     assert pytest.approx(expected) == error
 
 
