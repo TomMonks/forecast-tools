@@ -275,6 +275,7 @@ class SNaive(Forecast):
         elif isinstance(train, (pd.DataFrame)):
             self._f = train.to_numpy().T[0][-self._period:]
 
+        #bug here if pass in numpy array...
         self._fitted = pd.DataFrame(train.to_numpy(), index=train.index)
         self._fitted.columns=['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(self._period)
