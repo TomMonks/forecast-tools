@@ -193,7 +193,8 @@ class Naive1(Forecast):
         Parameters:
         --------
         train - array-like, 
-            vector, series, or dataframe of the time series used for training
+            vector, series, or dataframe of the time series used for training.
+            Values should be floats and not contain any np.nan or np.inf
         '''
 
         self.validate_training_data(train)
@@ -318,9 +319,10 @@ class SNaive(Forecast):
 
         Parameters:
         --------
-        train - array-like,
-            pd.DataFrame or pd.Series containing the time series used 
-            for training
+        train: array-like.
+            vector, pd.DataFrame or pd.Series containing the time series used 
+            for training. Values should be floats and not contain any np.nan or np.inf
+
         '''
 
         self.validate_training_data(train, min_length=self._period)
@@ -416,7 +418,10 @@ class Average(Forecast):
 
         Parameters:
         --------
-        train - pd.series, pd.DataFrame, of the time series used for training
+        train:  arraylike 
+                vector, pd.series, pd.DataFrame, 
+                Time series used for training.  Values should be floats 
+                and not contain any np.nan or np.inf
         '''
         
         self.validate_training_data(train)
@@ -492,7 +497,10 @@ class Drift(Forecast):
 
         Parameters:
         --------
-        train - pd.DataFrame or pd.Series, the time series used for training
+        train:  arraylike 
+                vector, pd.series, pd.DataFrame, 
+                Time series used for training.  Values should be floats 
+                and not contain any np.nan or np.inf
         
         '''
 
@@ -559,6 +567,16 @@ class EnsembleNaive(object):
                             }
        
     def fit(self, train):
+        '''
+        Parameters: 
+        --------
+        
+        train:  arraylike 
+                vector, pd.series, pd.DataFrame, 
+                Time series used for training.  Values should be floats 
+                and not contain any np.nan or np.inf
+        '''
+        
         for _, estimator in self._estimators.items():
             estimator.fit(train)
         
