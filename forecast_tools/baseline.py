@@ -355,12 +355,21 @@ class Average(Forecast):
         train - pd.series, pd.DataFrame, of the time series used for training
         '''
         
-        _train = train.to_numpy()
-        self._t = len(train)
-        self._pred = train.mean()
-        self._resid_std = (train - self._pred).std()
-        self._fitted = pd.DataFrame(_train, index=train.index)
+        if isinstance(train, (pd.DataFrame)):
+            _train = train.copy()[train.columns[0]].to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
+        elif isinstance(train, (pd.Series)):
+            _train = train.to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
+        else:
+            _train = train.copy()
+            self._fitted = pd.DataFrame(train)
+        
         self._fitted.columns=['actual']
+
+        self._t = len(train)
+        self._pred = _train.mean()
+        self._resid_std = (_train - self._pred).std()
         self._fitted['pred'] = self._pred
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
 
@@ -423,7 +432,9 @@ class Drift(Forecast):
         #if dataframe convert to series for compatability with 
         #proc (for convenience of passing the dataframe rather than a series)
         if isinstance(train, (pd.DataFrame)):
-            _train = train.copy()[train.columns[0]]
+            _train = train.copy()[train.columns[0]].to_numpy()
+        elif isinstance(train, (pd.Series)):
+            _train = train.to_numpy()
         else:
             _train = train.copy()
 
