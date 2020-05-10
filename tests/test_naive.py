@@ -1,5 +1,20 @@
 '''
 Tests for Naive benchmark classes
+
+Test types:
+
+1. Forecast horizons
+2. Allowable input types: np.ndarray, pd.DataFrame, pd.Series
+3. Failure paths for abnormal input
+4. Predictions
+    - naive1 - carries forward last value
+    - snaive - carries forward previous h values (to do)
+    - average - flat forecast of average
+    - drift - previous value + gradient (to do)
+
+5. Prediction intervals
+    - horizon (to do)
+    - width (to do - benchmark against R?)
 '''
 
 import pytest
