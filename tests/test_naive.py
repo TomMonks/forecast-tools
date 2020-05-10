@@ -8,7 +8,7 @@ Test types:
 3. Failure paths for abnormal input
 4. Predictions
     - naive1 - carries forward last value
-    - snaive - carries forward previous h values (to do)
+    - snaive - carries forward previous h values
     - average - flat forecast of average
     - drift - previous value + gradient (to do)
 
@@ -332,6 +332,8 @@ def test_average_forecast_output_longer_horizon(data, period, expected):
 
 
 
+
+
 @pytest.mark.parametrize("data, exception", 
                          [(np.array([]), ValueError),
                           (1.0, TypeError),
@@ -474,4 +476,23 @@ def test_naive_pi_set_number(model, data, horizon, alphas, expected):
     #point forecasts only
     preds, intervals = model.predict(horizon, return_predict_int=True, alphas=alphas)
     assert len(intervals) == expected
+
+
+@pytest.mark.parametrize("data, period, expected", 
+                         [(np.arange(1, 7), 6, np.arange(7, 13)),
+                          (pd.Series(np.arange(1, 7)), 6, np.arange(7, 13)),
+                          (pd.DataFrame(np.arange(1, 7)), 6, np.arange(7, 13)),
+                          (pd.DataFrame(np.arange(1.0, 7.0, dtype=np.float64)), 6, 
+                            np.arange(7.0, 13.0, dtype=np.float64))
+                          ])
+def test_drift_forecast_output_longer_horizon(data, period, expected):
+    '''
+    test naive1 carries forward the last value in the series
+    '''
+    model = b.Drift()
+    model.fit(data)
+    #point forecasts only
+    preds = model.predict(period)
+    assert np.array_equal(preds, expected)
+
 
