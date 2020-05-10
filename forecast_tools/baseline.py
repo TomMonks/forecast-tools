@@ -270,6 +270,8 @@ class SNaive(Forecast):
             pd.DataFrame or pd.Series containing the time series used 
             for training
         '''
+
+        #could refactor this to be more like Naive1's simpler implementation.
         if isinstance(train, (pd.Series)):
             self._f = np.asarray(train)[-self._period:]
             _train = train.to_numpy()
@@ -288,7 +290,7 @@ class SNaive(Forecast):
         self._fitted['pred'] = self._fitted['actual'].shift(self._period)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
         self._resid_std = self._fitted['resid'].std()
-        
+
         #testing
         lower = np.percentile(self._fitted['resid'].dropna(), 5)
         upper = np.percentile(self._fitted['resid'].dropna(), 95)

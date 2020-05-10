@@ -229,6 +229,7 @@ def test_drift_forecast_input_series(data, horizon, expected):
     assert len(preds) == expected
 
 
+
 @pytest.mark.parametrize("data, horizon, expected", 
                          [([1, 2, 3, 4, 5], 12, 12),
                           ([1, 2, 3, 4, 5], 24, 24),
@@ -276,3 +277,5 @@ def test_naive1_forecast_output(data, expected):
     #point forecasts only
     preds = model.predict(1)
     assert preds[0] == expected
+
+
