@@ -270,7 +270,7 @@ def test_average_forecast_output(data, expected):
                           ])
 def test_naive1_forecast_output(data, expected):
     '''
-    test the correct number of error metric functions are returned.
+    test naive1 carries forward the last value in the series
     '''
     model = b.Naive1()
     model.fit(pd.DataFrame(data))
@@ -287,7 +287,7 @@ def test_naive1_forecast_output(data, expected):
                           (np.array([1, 2, 3, 4, np.Inf, 5, 6]), TypeError)])
 def test_naive1_abnormal_input(data, exception):
     '''
-    test the correct number of error metric functions are returned.
+    test naive1 raises correct exceptions on abnormal input
     '''
     model = b.Naive1()
     with pytest.raises(exception):
@@ -302,7 +302,7 @@ def test_naive1_abnormal_input(data, exception):
                           ])
 def test_snaive_abnormal_input(data, exception):
     '''
-    test the correct number of error metric functions are returned.
+    test snaive raises correct exceptions on abnormal input
     '''
     model = b.SNaive(1)
     with pytest.raises(exception):
@@ -316,7 +316,7 @@ def test_snaive_abnormal_input(data, exception):
                           (np.array([1, 2, 3, 4, np.Inf, 5, 6]), TypeError)])
 def test_average_abnormal_input(data, exception):
     '''
-    test the correct number of error metric functions are returned.
+    test average raises correct exceptions on abnormal input
     '''
     model = b.Average()
     with pytest.raises(exception):
@@ -330,7 +330,7 @@ def test_average_abnormal_input(data, exception):
                           (np.array([1, 2, 3, 4, np.Inf, 5, 6]), TypeError)])
 def test_drift_abnormal_input(data, exception):
     '''
-    test the correct number of error metric functions are returned.
+    test drift raises correct exceptions on abnormal input
     '''
     model = b.Drift()
     with pytest.raises(exception):
