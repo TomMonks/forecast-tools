@@ -283,7 +283,7 @@ def test_naive1_forecast_output(data, expected):
                          [(np.array([]), ValueError),
                           (1.0, TypeError),
                           (np.array(['foo', 'bar', 'spam', 'eggs']), TypeError),
-                          (np.array([1, 2, 3, 4, 5, 6, np.nan]), TypeError),
+                          (np.array([1, 2, 3, 4, 5, 6, np.NAN]), TypeError),
                           (np.array([1, 2, 3, 4, np.Inf, 5, 6]), TypeError)])
 def test_naive1_abnormal_input(data, exception):
     '''

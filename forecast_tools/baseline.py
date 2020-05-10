@@ -83,15 +83,20 @@ class Forecast(ABC):
             minimum length of the time series.
 
         '''
+
+
         if not isinstance(train, (pd.Series, pd.DataFrame, np.ndarray)):
             raise TypeError('Training data must be pd.Series, pd.DataFrame or np.ndarray')
-            
-
         elif len(train) < min_length:
             raise ValueError('Training data is empty')
-
         elif not is_numeric(train):
             raise TypeError('Training data must be numeric')
+
+        elif np.isnan(np.asarray(train)).any():
+            raise TypeError('Training data contains at least one NaN. Data myst all be floats')
+        elif np.isinf(np.asarray(train)).any():
+            raise TypeError('Training data contains at least one Infinite value (np.Inf). Data myst all be floats')
+
 
     @abstractmethod
     def predict(self, horizon, return_predict_int=False, alphas=None):
@@ -570,7 +575,7 @@ class EnsembleNaive(object):
         '''
         Parameters: 
         --------
-        
+
         train:  arraylike 
                 vector, pd.series, pd.DataFrame, 
                 Time series used for training.  Values should be floats 
