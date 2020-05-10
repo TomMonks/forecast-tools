@@ -272,15 +272,23 @@ class SNaive(Forecast):
         '''
         if isinstance(train, (pd.Series)):
             self._f = np.asarray(train)[-self._period:]
+            _train = train.to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
         elif isinstance(train, (pd.DataFrame)):
             self._f = train.to_numpy().T[0][-self._period:]
+            _train = train.copy()[train.columns[0]].to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
+        else:
+            self._f = train[-self._period:]
+            _train = train.copy()
+            self._fitted = pd.DataFrame(_train)
 
-        #bug here if pass in numpy array...
-        self._fitted = pd.DataFrame(train.to_numpy(), index=train.index)
+
         self._fitted.columns=['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(self._period)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
         self._resid_std = self._fitted['resid'].std()
+        
         #testing
         lower = np.percentile(self._fitted['resid'].dropna(), 5)
         upper = np.percentile(self._fitted['resid'].dropna(), 95)
