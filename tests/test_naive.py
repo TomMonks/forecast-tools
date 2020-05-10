@@ -201,15 +201,49 @@ def test_snaive_forecast_input_dataframe(data, horizon, expected):
                           ([1, 2, 3, 4, 5], 24, 24),
                           ([1, 2, 3], 8, 8)
                           ])
-def test_snaive_forecast_input_numpy(data, horizon, expected):
+def test_drift_forecast_input_numpy(data, horizon, expected):
     '''
     test the correct number of error metric functions are returned.
     '''
-    model = b.SNaive(1)
+    model = b.Drift()
     model.fit(np.array(data))
     #point forecasts only
     preds = model.predict(horizon)
     assert len(preds) == expected
+
+
+
+@pytest.mark.parametrize("data, horizon, expected", 
+                         [([1, 2, 3, 4, 5], 12, 12),
+                          ([1, 2, 3, 4, 5], 24, 24),
+                          ([1, 2, 3], 8, 8)
+                          ])
+def test_drift_forecast_input_series(data, horizon, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.Drift()
+    model.fit(pd.Series(data))
+    #point forecasts only
+    preds = model.predict(horizon)
+    assert len(preds) == expected
+
+
+@pytest.mark.parametrize("data, horizon, expected", 
+                         [([1, 2, 3, 4, 5], 12, 12),
+                          ([1, 2, 3, 4, 5], 24, 24),
+                          ([1, 2, 3], 8, 8)
+                          ])
+def test_drift_forecast_input_dataframe(data, horizon, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.Drift()
+    model.fit(pd.DataFrame(data))
+    #point forecasts only
+    preds = model.predict(horizon)
+    assert len(preds) == expected
+
 
 
 @pytest.mark.parametrize("data, expected", 
