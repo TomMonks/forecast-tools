@@ -300,6 +300,38 @@ def test_naive1_forecast_output(data, expected):
     assert preds[0] == expected
 
 
+@pytest.mark.parametrize("data, period, expected", 
+                         [(np.resize(np.arange(12), 24), 12, np.arange(12)),
+                          (np.resize(np.arange(24), 48), 24, np.arange(24)),
+                          (pd.Series(np.resize(np.arange(12), 24)), 12, pd.Series(np.arange(12)))
+                          ])
+def test_snaive_forecast_output(data, period, expected):
+    '''
+    test naive1 carries forward the last value in the series
+    '''
+    model = b.SNaive(period)
+    model.fit(data)
+    #point forecasts only
+    preds = model.predict(period)
+    assert np.array_equal(preds, expected)
+
+@pytest.mark.parametrize("data, period, expected", 
+                         [(np.resize(np.arange(12), 24), 12, np.full(12, np.arange(12).mean())),
+                          (np.resize(np.arange(24), 48), 24, np.full(24, np.arange(24).mean())),
+                          (pd.Series(np.resize(np.arange(12), 24)), 12, np.full(12, np.arange(12).mean()))
+                          ])
+def test_average_forecast_output_longer_horizon(data, period, expected):
+    '''
+    test naive1 carries forward the last value in the series
+    '''
+    model = b.Average()
+    model.fit(data)
+    #point forecasts only
+    preds = model.predict(period)
+    assert np.array_equal(preds, expected)
+
+
+
 @pytest.mark.parametrize("data, exception", 
                          [(np.array([]), ValueError),
                           (1.0, TypeError),
