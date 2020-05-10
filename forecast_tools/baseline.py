@@ -44,6 +44,27 @@ class Forecast(ABC):
     def fit(self, train):
         pass
 
+    def validate_training_data(self, train, min_length=1):
+        '''
+        Checks the validity of training data for forecasting
+        and raises exceptions if required.
+
+        1. check is instance of pd.Series, pd.DataFrame or np.ndarray
+        2. check len is > min_length
+
+        Parameters:
+        ---------
+        min_length: int optional (default=0)
+            minimum length of the time series.
+
+        '''
+        if not isinstance(train, (pd.Series, pd.DataFrame, np.ndarray)):
+            raise TypeError('Training data must be pd.Series, pd.DataFrame or np.ndarray')
+            
+
+        elif len(train) < min_length:
+            raise ValueError('Training data is empty')
+
     @abstractmethod
     def predict(self, horizon, return_predict_int=False, alphas=None):
         pass
@@ -146,6 +167,9 @@ class Naive1(Forecast):
         train - array-like, 
             vector, series, or dataframe of the time series used for training
         '''
+
+        self.validate_training_data(train)
+
         _train = np.asarray(train)
         self._pred = _train[-1]
         self._fitted = pd.DataFrame(_train)
