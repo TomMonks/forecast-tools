@@ -115,3 +115,35 @@ def test_average_forecast_input_dataframe(data, horizon, expected):
     #point forecasts only
     preds = model.predict(horizon)
     assert len(preds) == expected
+
+
+@pytest.mark.parametrize("data, expected", 
+                         [([1, 2, 3, 4, 5], 3.0),
+                          ([139,  32,  86, 123,  61,  51, 108, 137,  33,  25], 79.5),
+                          ([1, 2, 3], 2.0)
+                          ])
+def test_average_forecast_output(data, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.Average()
+    model.fit(pd.DataFrame(data))
+    #point forecasts only
+    preds = model.predict(1)
+    assert preds[0] == expected
+
+
+@pytest.mark.parametrize("data, expected", 
+                         [([1, 2, 3, 4, 5], 5.0),
+                          ([139,  32,  86, 123,  61,  51, 108, 137,  33,  25], 25.0),
+                          ([1, 2, 3], 3.0)
+                          ])
+def test_naive1_forecast_output(data, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.Naive1()
+    model.fit(pd.DataFrame(data))
+    #point forecasts only
+    preds = model.predict(1)
+    assert preds[0] == expected
