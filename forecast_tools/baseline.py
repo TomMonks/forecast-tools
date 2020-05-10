@@ -23,6 +23,31 @@ import pandas as pd
 from scipy.stats import norm
 from abc import ABC, abstractmethod
 
+# Boolean, unsigned integer, signed integer, float, complex.
+_NUMERIC_KINDS = set('buifc')
+
+def is_numeric(array):
+    """Determine whether the argument has a numeric datatype, when
+    converted to a NumPy array.
+
+    Booleans, unsigned integers, signed integers, floats and complex
+    numbers are the kinds of numeric datatype.
+
+    source: https://codereview.stackexchange.com/questions/128032/check-if-a-numpy-array-contains-numerical-data
+
+    Parameters
+    ----------
+    array : array-like
+        The array to check.
+
+    Returns
+    -------
+    is_numeric : `bool`
+        True if the array has a numeric datatype, False if not.
+
+    """
+    return np.asarray(array).dtype.kind in _NUMERIC_KINDS
+
 def interval_multipler(level):
     return norm.ppf(1-(1-level)/2)
 
@@ -64,6 +89,9 @@ class Forecast(ABC):
 
         elif len(train) < min_length:
             raise ValueError('Training data is empty')
+
+        elif not is_numeric(train):
+            raise TypeError('Training data must be numeric')
 
     @abstractmethod
     def predict(self, horizon, return_predict_int=False, alphas=None):
@@ -295,6 +323,8 @@ class SNaive(Forecast):
             for training
         '''
 
+        self.validate_training_data(train, min_length=self._period)
+
         #could refactor this to be more like Naive1's simpler implementation.
         if isinstance(train, (pd.Series)):
             self._f = np.asarray(train)[-self._period:]
@@ -389,6 +419,8 @@ class Average(Forecast):
         train - pd.series, pd.DataFrame, of the time series used for training
         '''
         
+        self.validate_training_data(train)
+
         if isinstance(train, (pd.DataFrame)):
             _train = train.copy()[train.columns[0]].to_numpy()
             self._fitted = pd.DataFrame(_train, index=train.index)
@@ -463,6 +495,9 @@ class Drift(Forecast):
         train - pd.DataFrame or pd.Series, the time series used for training
         
         '''
+
+        self.validate_training_data(train)
+
         #if dataframe convert to series for compatability with 
         #proc (for convenience of passing the dataframe rather than a series)
         if isinstance(train, (pd.DataFrame)):
@@ -494,7 +529,7 @@ class Drift(Forecast):
         ------
         np.array, vector of predictions. length=horizon
         '''
-
+        
         if self._fitted is None:
             raise UnboundLocalError('Must call fit() prior to predict()')
         
@@ -634,4 +669,7 @@ def _drop_na_from_series(data):
         return data.dropna().to_numpy()
     else:
         return data[~np.isnan(data)]
+
+
+
 

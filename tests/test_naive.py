@@ -282,7 +282,7 @@ def test_naive1_forecast_output(data, expected):
 @pytest.mark.parametrize("data, exception", 
                          [(np.array([]), ValueError),
                           (1.0, TypeError),
-                          (np.array(['foo', 'bar', 'spam', 'eggs']), ValueError)])
+                          (np.array(['foo', 'bar', 'spam', 'eggs']), TypeError)])
 def test_naive1_abnormal_input(data, exception):
     '''
     test the correct number of error metric functions are returned.
@@ -294,7 +294,7 @@ def test_naive1_abnormal_input(data, exception):
 @pytest.mark.parametrize("data, exception", 
                          [(np.array([]), ValueError),
                           (1.0, TypeError),
-                          (np.array(['foo', 'bar', 'spam', 'eggs']), ValueError)])
+                          (np.array(['foo', 'bar', 'spam', 'eggs']), TypeError)])
 def test_snaive_abnormal_input(data, exception):
     '''
     test the correct number of error metric functions are returned.
@@ -306,7 +306,7 @@ def test_snaive_abnormal_input(data, exception):
 @pytest.mark.parametrize("data, exception", 
                          [(np.array([]), ValueError),
                           (1.0, TypeError),
-                          (np.array(['foo', 'bar', 'spam', 'eggs']), ValueError)])
+                          (np.array(['foo', 'bar', 'spam', 'eggs']), TypeError)])
 def test_average_abnormal_input(data, exception):
     '''
     test the correct number of error metric functions are returned.
@@ -318,7 +318,7 @@ def test_average_abnormal_input(data, exception):
 @pytest.mark.parametrize("data, exception", 
                          [(np.array([]), ValueError),
                           (1.0, TypeError),
-                          (np.array(['foo', 'bar', 'spam', 'eggs']), ValueError)])
+                          (np.array(['foo', 'bar', 'spam', 'eggs']), TypeError)])
 def test_drift_abnormal_input(data, exception):
     '''
     test the correct number of error metric functions are returned.
