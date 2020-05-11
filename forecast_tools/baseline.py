@@ -222,7 +222,7 @@ class Naive1(Forecast):
         self._fitted.columns=['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(periods=1)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
-        self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
+        #self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
         self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
 
     def predict(self, horizon, return_predict_int=False, alphas=None):
@@ -363,14 +363,8 @@ class SNaive(Forecast):
         self._fitted['pred'] = self._fitted['actual'].shift(self._period)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
         
-        self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
-        
-
-        #testing
-        lower = np.percentile(self._fitted['resid'].dropna(), 5)
-        upper = np.percentile(self._fitted['resid'].dropna(), 95)
-        self._resid_std = self._fitted['resid'].clip(lower, upper).std()
-        
+        #self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
+        self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
         
     def predict(self, horizon, return_predict_int=False, alphas=None):
         '''

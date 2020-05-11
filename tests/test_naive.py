@@ -491,7 +491,6 @@ def test_drift_forecast_output_longer_horizon(data, period, expected):
     assert np.array_equal(preds, expected)
 
 
-
 def test_naive1_prediction_interval_low():
     '''
     test naive 80% lower prediction interval 
@@ -580,7 +579,7 @@ def test_average_prediction_interval_low():
     assert pytest.approx(intervals[0].T[0]) == low
 
 def test_naive1_prediction_interval_95_high():
-        '''
+    '''
     test naive1 95% upper prediction interval 
     '''
 
@@ -610,5 +609,81 @@ def test_naive1_prediction_interval_95_low():
     model.fit(train)
     preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
     
-    print(intervals[0].T[1])
+    print(intervals[0].T[0])
     assert pytest.approx(intervals[0].T[0], rel=1e-6, abs=0.1) == low
+
+
+def test_snaive_prediction_interval_80_low():
+    '''
+    test snaive 80% lower prediction interval 
+    intervals are matched from R forecast package
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [32.00420, 57.00420, 49.00420, 30.00420, 26.62116]
+    high = [57.99580, 82.99580, 74.99580, 55.99580, 63.37884]
+
+    #quarterly data
+    model = b.SNaive(period=4)
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    
+    print(intervals[0].T[0])
+    assert pytest.approx(intervals[0].T[0]) == low
+
+def test_snaive_prediction_interval_80_high():
+    '''
+    test snaive 80% upper prediction interval 
+    intervals are matched from R forecast package
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [32.00420, 57.00420, 49.00420, 30.00420, 26.62116]
+    high = [57.99580, 82.99580, 74.99580, 55.99580, 63.37884]
+
+    #quarterly data
+    model = b.SNaive(period=4)
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    
+    print(intervals[0].T[1])
+    assert pytest.approx(intervals[0].T[1]) == high
+
+
+def test_snaive_prediction_interval_95_high():
+    '''
+    test snaive 95% upper prediction interval 
+    intervals are matched from R forecast package
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [25.12464, 50.12464, 42.12464, 23.12464, 16.89199]
+    high = [64.87536, 89.87536, 81.87536, 62.87536, 73.10801]
+
+    #quarterly data
+    model = b.SNaive(period=4)
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+    
+    print(intervals[0].T[1])
+    assert pytest.approx(intervals[0].T[1]) == high
+
+def test_snaive_prediction_interval_95_low():
+    '''
+    test snaive 95% lower prediction interval 
+    intervals are matched from R forecast package
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [25.12464, 50.12464, 42.12464, 23.12464, 16.89199]
+    high = [64.87536, 89.87536, 81.87536, 62.87536, 73.10801]
+
+    #quarterly data
+    model = b.SNaive(period=4)
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+    
+    print(intervals[0].T[0])
+    assert pytest.approx(intervals[0].T[0]) == low
+
+
