@@ -15,7 +15,7 @@ Tests currently cover:
 5. Prediction intervals
     - horizon 
     - sets i.e. 2 sets of intervals (0.8 and 0.95)
-    - width (to do - benchmark against R?)
+    - width
     - bootstrapped prediction intervals (to do - need to think carefully about test)
 
 6. Fitted values (to do)
