@@ -493,6 +493,9 @@ def test_drift_forecast_output_longer_horizon(data, period, expected):
 
 
 def test_naive1_prediction_interval_low():
+    '''
+    test naive 80% lower prediction interval 
+    '''
 
     np.random.seed(1066)
     train = np.random.poisson(lam=50, size=100)
@@ -507,6 +510,9 @@ def test_naive1_prediction_interval_low():
 
 
 def test_naive1_prediction_interval_high():
+    '''
+    test naive 80% upper prediction interval 
+    '''
 
     np.random.seed(1066)
     train = np.random.poisson(lam=50, size=100)
@@ -537,6 +543,9 @@ def test_naive1_se():
     assert pytest.approx(model._resid_std) == expected
 
 def test_average_prediction_interval_high():
+    '''
+    test average 80% upper prediction interval 
+    '''
 
     np.random.seed(1066)
     train = np.random.poisson(lam=50, size=100)
@@ -554,7 +563,9 @@ def test_average_prediction_interval_high():
 
 
 def test_average_prediction_interval_low():
-
+    '''
+    test average 80% lower prediction interval 
+    '''
     np.random.seed(1066)
     train = np.random.poisson(lam=50, size=100)
     low = [40.97369, 40.97369, 40.97369, 40.97369, 40.97369]
@@ -569,6 +580,9 @@ def test_average_prediction_interval_low():
     assert pytest.approx(intervals[0].T[0]) == low
 
 def test_naive1_prediction_interval_95_high():
+        '''
+    test naive1 95% upper prediction interval 
+    '''
 
     np.random.seed(1066)
     train = np.random.poisson(lam=50, size=100)
@@ -583,6 +597,9 @@ def test_naive1_prediction_interval_95_high():
     assert pytest.approx(intervals[0].T[1], rel=1e-6, abs=0.1) == high
 
 def test_naive1_prediction_interval_95_low():
+    '''
+    test naive1 95% lower prediction interval 
+    '''
 
     np.random.seed(1066)
     train = np.random.poisson(lam=50, size=100)
@@ -595,5 +612,3 @@ def test_naive1_prediction_interval_95_low():
     
     print(intervals[0].T[1])
     assert pytest.approx(intervals[0].T[0], rel=1e-6, abs=0.1) == low
-
-
