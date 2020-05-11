@@ -1,16 +1,16 @@
 '''
 Tests for Naive benchmark classes
 
-Test types:
+Tests currently cover:
 
 1. Forecast horizons
 2. Allowable input types: np.ndarray, pd.DataFrame, pd.Series
-3. Failure paths for abnormal input
+3. Failure paths for abnormal input such as np.nan, non numeric, empty arrays and np.Inf
 4. Predictions
     - naive1 - carries forward last value
     - snaive - carries forward previous h values
     - average - flat forecast of average
-    - drift - previous value + gradient (to do)
+    - drift - previous value + gradient 
 
 5. Prediction intervals
     - horizon 
@@ -19,8 +19,6 @@ Test types:
     - bootstrapped prediction intervals (to do - need to think carefully about test)
 
 6. Fitted values (to do)
-
-
 '''
 
 import pytest
@@ -331,9 +329,6 @@ def test_average_forecast_output_longer_horizon(data, period, expected):
     assert np.array_equal(preds, expected)
 
 
-
-
-
 @pytest.mark.parametrize("data, exception", 
                          [(np.array([]), ValueError),
                           (1.0, TypeError),
@@ -487,12 +482,78 @@ def test_naive_pi_set_number(model, data, horizon, alphas, expected):
                           ])
 def test_drift_forecast_output_longer_horizon(data, period, expected):
     '''
-    test naive1 carries forward the last value in the series
+    test drift forecast predictions
     '''
     model = b.Drift()
     model.fit(data)
     #point forecasts only
     preds = model.predict(period)
     assert np.array_equal(preds, expected)
+
+
+
+# def test_naive1_prediction_interval_low():
+
+#     np.random.seed(1066)
+#     train = np.random.poisson(lam=50, size=100)
+#     low = [29.56885, 24.005, 19.73657, 16.13770, 12.96704]
+#     high = [56.43115, 61.99451, 66.26343, 69.86230, 73.03296]
+
+#     model = b.Naive1()
+#     model.fit(train)
+#     preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    
+#     print(intervals[0].T[0])
+#     assert np.array_equal(intervals[0].T[0], low)
+
+
+# def test_naive1_prediction_interval_high():
+
+#     np.random.seed(1066)
+#     train = np.random.poisson(lam=50, size=100)
+#     print(train)
+#     low = [29.56885, 24.005, 19.73657, 16.13770, 12.96704]
+#     high = [56.43115, 61.99451, 66.26343, 69.86230, 73.03296]
+
+#     model = b.Naive1()
+#     model.fit(train)
+#     preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    
+#     print(intervals[0].T[1])
+#     assert np.array_equal(intervals[0].T[1], high)
+
+
+def test_average_prediction_interval_high():
+
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [40.97369, 40.97369, 40.97369, 40.97369, 40.97369]
+    high = [59.34631, 59.34631, 59.34631, 59.34631, 59.34631]
+
+    model = b.Average()
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    
+    print(intervals[0].T[1])
+    #assert np.array_equal(intervals[0].T[1], high)
+    assert pytest.approx(intervals[0].T[1]) == high
+
+
+def test_average_prediction_interval_low():
+
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [40.97369, 40.97369, 40.97369, 40.97369, 40.97369]
+    high = [59.34631, 59.34631, 59.34631, 59.34631, 59.34631]
+
+    model = b.Average()
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    
+    print(intervals[0].T[1])
+    #assert np.array_equal(intervals[0].T[1], high)
+    assert pytest.approx(intervals[0].T[0]) == low
+
+
 
 

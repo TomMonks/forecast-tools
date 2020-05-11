@@ -20,7 +20,7 @@ Drift:
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
+from scipy.stats import norm, t
 from abc import ABC, abstractmethod
 
 # Boolean, unsigned integer, signed integer, float, complex.
@@ -48,8 +48,10 @@ def is_numeric(array):
     """
     return np.asarray(array).dtype.kind in _NUMERIC_KINDS
 
-def interval_multipler(level):
-    return norm.ppf(1-(1-level)/2)
+def interval_multiplier(level, dof):
+    x = t.ppf((1 - level) / 2, dof)
+    return np.abs(x)
+
 
 class Forecast(ABC):
     '''
@@ -142,9 +144,9 @@ class Forecast(ABC):
         '''
 
         if alphas is None:
-            alphas = [0.20, 0.10]
+            alphas = [0.20, 0.05]
 
-        zs = [interval_multipler(1-alpha) for alpha in alphas]
+        zs = [interval_multiplier(1-alpha, self._t - 1) for alpha in alphas]
         
         pis = []
 
@@ -211,6 +213,7 @@ class Naive1(Forecast):
         if isinstance(train, (pd.DataFrame, pd.Series)):
             self._fitted.index = train.index
 
+        self._t = len(_train)
         self._fitted.columns=['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(periods=1)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
@@ -347,6 +350,7 @@ class SNaive(Forecast):
             self._fitted = pd.DataFrame(_train)
 
 
+        self._t = len(_train)
         self._fitted.columns=['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(self._period)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
@@ -443,9 +447,11 @@ class Average(Forecast):
         
         self._fitted.columns=['actual']
 
-        self._t = len(train)
+        self._t = len(_train)
         self._pred = _train.mean()
-        self._resid_std = (_train - self._pred).std()
+        #ddof set to get sample mean
+        self._resid_std = (_train - self._pred).std(ddof=1)
+        print(self._resid_std)
         self._fitted['pred'] = self._pred
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
 
