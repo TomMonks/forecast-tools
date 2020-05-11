@@ -568,6 +568,32 @@ def test_average_prediction_interval_low():
     #assert np.array_equal(intervals[0].T[1], high)
     assert pytest.approx(intervals[0].T[0]) == low
 
+def test_naive1_prediction_interval_95_high():
 
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [22.458831, 13.950400, 7.421651, 1.917662, -2.931450]
+    high = [63.54117, 72.04960, 78.57835, 84.08234, 88.93145]
+
+    model = b.Naive1()
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+    
+    print(intervals[0].T[1])
+    assert pytest.approx(intervals[0].T[1], rel=1e-6, abs=0.1) == high
+
+def test_naive1_prediction_interval_95_low():
+
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [22.458831, 13.950400, 7.421651, 1.917662, -2.931450]
+    high = [63.54117, 72.04960, 78.57835, 84.08234, 88.93145]
+
+    model = b.Naive1()
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+    
+    print(intervals[0].T[1])
+    assert pytest.approx(intervals[0].T[0], rel=1e-6, abs=0.1) == low
 
 
