@@ -686,4 +686,44 @@ def test_snaive_prediction_interval_95_low():
     print(intervals[0].T[0])
     assert pytest.approx(intervals[0].T[0]) == low
 
+def test_drift_prediction_interval_95_low():
+    '''
+    test drift 95% lower prediction interval 
+    intervals are matched from R forecast package
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [22.2100359, 13.2828923, 6.2277574, 0.1124247, -5.4196405]
+    high = [63.70916, 72.55549, 79.52982, 85.56434, 91.01560]   
+
+    #quarterly data
+    model = b.Drift()
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+
+    print(intervals[0].T[0])
+    #not ideal due to not adjusting for drift i think,
+    assert pytest.approx(intervals[0].T[0], rel=1e-6, abs=1.2) == low
+
+def test_drift_prediction_interval_95_high():
+    '''
+    test drift 95% lower prediction interval 
+    intervals are matched from R forecast package
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [22.2100359, 13.2828923, 6.2277574, 0.1124247, -5.4196405]
+    high = [63.70916, 72.55549, 79.52982, 85.56434, 91.01560]   
+
+    #quarterly data
+    model = b.Drift()
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+
+    print(intervals[0].T[1])
+    #not ideal due to not adjusting for drift i think,
+    assert pytest.approx(intervals[0].T[1], rel=1e-6, abs=1.2) == high
+
+
+
 

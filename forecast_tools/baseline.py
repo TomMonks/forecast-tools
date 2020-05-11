@@ -23,6 +23,9 @@ import pandas as pd
 from scipy.stats import norm, t
 from abc import ABC, abstractmethod
 
+
+
+
 # Boolean, unsigned integer, signed integer, float, complex.
 _NUMERIC_KINDS = set('buifc')
 
@@ -513,13 +516,18 @@ class Drift(Forecast):
     
     https://otexts.com/fpp2/simple-methods.html
 
+    Note.  The current implementation has a standard error of the forecast 
+    that is the same as for the naive1 se.  This could be adjusted for drift.
+    The following link suggests this is minor and benchmark with R is v.similar.
+    https://www.coursehero.com/file/p12k3ln/For-the-random-walk-with-drift-model-the-1-step-ahead-forecast-standard-error/
+
     '''
     def __init__(self):
         self._fitted = None
     
     def fit(self, train):
         '''
-        Train the naive model
+        Train the naive with drift model
 
         Parameters:
         --------
@@ -546,12 +554,19 @@ class Drift(Forecast):
         self._gradient = ((self._last_value - _train[0]) / (self._t - 1))
         self._fitted = pd.DataFrame(_train)
         self._fitted.columns = ['actual']
-        self._fitted['pred'] = _train[0] + np.arange(1, self._t+1, 
+
+        #could show fitted as line from first to last point. 
+        #unclear if should use this or naive1 method.
+        self._fitted['gradient_fit'] = _train[0] + np.arange(1, self._t+1, 
                                             dtype=float) * self._gradient
 
+        #1 step carry forward naive1 fitted values.
+        self._fitted['pred'] = self._fitted['actual'].shift(periods=1)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
-        self._resid_std = self._fitted['resid'].std()
 
+        #standard error is not adjusted for drift - how much of an issue?
+        self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
+    
 
     def predict(self, horizon, return_predict_int=False, alphas=None):
         '''
