@@ -492,36 +492,49 @@ def test_drift_forecast_output_longer_horizon(data, period, expected):
 
 
 
-# def test_naive1_prediction_interval_low():
+def test_naive1_prediction_interval_low():
 
-#     np.random.seed(1066)
-#     train = np.random.poisson(lam=50, size=100)
-#     low = [29.56885, 24.005, 19.73657, 16.13770, 12.96704]
-#     high = [56.43115, 61.99451, 66.26343, 69.86230, 73.03296]
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [29.56885, 24.005, 19.73657, 16.13770, 12.96704]
+    high = [56.43115, 61.99451, 66.26343, 69.86230, 73.03296]
 
-#     model = b.Naive1()
-#     model.fit(train)
-#     preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    model = b.Naive1()
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    print(intervals[0].T[0])
+    assert pytest.approx(intervals[0].T[0], rel=1e-6, abs=0.1) == low
+
+
+def test_naive1_prediction_interval_high():
+
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [29.56885, 24.005, 19.73657, 16.13770, 12.96704]
+    high = [56.43115, 61.99451, 66.26343, 69.86230, 73.03296]
+
+    model = b.Naive1()
+    model.fit(train)
+    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
     
-#     print(intervals[0].T[0])
-#     assert np.array_equal(intervals[0].T[0], low)
+    print(intervals[0].T[1])
+    assert pytest.approx(intervals[0].T[1], rel=1e-6, abs=0.1) == high
 
+def test_naive1_se():
+    '''
+    standard error of naive1 is root mean squared.
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [29.56885, 24.005, 19.73657, 16.13770, 12.96704]
+    high = [56.43115, 61.99451, 66.26343, 69.86230, 73.03296]
 
-# def test_naive1_prediction_interval_high():
+    model = b.Naive1()
+    model.fit(train)
 
-#     np.random.seed(1066)
-#     train = np.random.poisson(lam=50, size=100)
-#     print(train)
-#     low = [29.56885, 24.005, 19.73657, 16.13770, 12.96704]
-#     high = [56.43115, 61.99451, 66.26343, 69.86230, 73.03296]
+    expected = 10.48038
 
-#     model = b.Naive1()
-#     model.fit(train)
-#     preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
-    
-#     print(intervals[0].T[1])
-#     assert np.array_equal(intervals[0].T[1], high)
-
+    assert pytest.approx(model._resid_std) == expected
 
 def test_average_prediction_interval_high():
 
@@ -537,6 +550,7 @@ def test_average_prediction_interval_high():
     print(intervals[0].T[1])
     #assert np.array_equal(intervals[0].T[1], high)
     assert pytest.approx(intervals[0].T[1]) == high
+
 
 
 def test_average_prediction_interval_low():

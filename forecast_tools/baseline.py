@@ -48,9 +48,6 @@ def is_numeric(array):
     """
     return np.asarray(array).dtype.kind in _NUMERIC_KINDS
 
-def interval_multiplier(level, dof):
-    x = t.ppf((1 - level) / 2, dof)
-    return np.abs(x)
 
 
 class Forecast(ABC):
@@ -146,7 +143,7 @@ class Forecast(ABC):
         if alphas is None:
             alphas = [0.20, 0.05]
 
-        zs = [interval_multiplier(1-alpha, self._t - 1) for alpha in alphas]
+        zs = [self.interval_multiplier(1-alpha, self._t - 1) for alpha in alphas]
         
         pis = []
 
@@ -158,6 +155,14 @@ class Forecast(ABC):
                                  self.predict(horizon) + hw]).T)
             
         return pis
+
+    def interval_multiplier(self, level, dof):
+        '''
+        inverse of normal distribution
+        can be overridden if needed.
+        '''
+        x = norm.ppf((1 - level) / 2)
+        return np.abs(x)
 
     @abstractmethod
     def _std_h(self, horizon):
@@ -217,7 +222,8 @@ class Naive1(Forecast):
         self._fitted.columns=['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(periods=1)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
-        self._resid_std = self._fitted['resid'].std()
+        self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
+        self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
 
     def predict(self, horizon, return_predict_int=False, alphas=None):
         '''
@@ -230,7 +236,7 @@ class Naive1(Forecast):
 
         where 
 
-        std_h = resid_std * sqrt(h
+        std_h = resid_std * sqrt(h)
 
         resid_std = standard deviation of in-sample residuals
 
@@ -245,11 +251,11 @@ class Naive1(Forecast):
         horizon - int, 
 		forecast horizon. 
 
-        return_predict_int - bool, 
+        return_predict_int: bool, optional
 		if True calculate 100(1-alpha) prediction
         	intervals for the forecast. (default=False)
 
-        alphas - list of floats, 
+        alphas: list of floats, optional (default=None)
             controls set of prediction intervals returned and the width of 
             each. 
             
@@ -295,8 +301,10 @@ class Naive1(Forecast):
                       fill_value=self._resid_std,
                       dtype=np.float) 
 
-        std *= indexes
-        return std
+        std_h = std * indexes
+        return std_h
+
+
 
         
 class SNaive(Forecast):
@@ -354,7 +362,9 @@ class SNaive(Forecast):
         self._fitted.columns=['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(self._period)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
-        self._resid_std = self._fitted['resid'].std()
+        
+        self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
+        
 
         #testing
         lower = np.percentile(self._fitted['resid'].dropna(), 5)
@@ -396,11 +406,15 @@ class SNaive(Forecast):
         else:
             return preds
 
+
+
     def _std_h(self, horizon):
         h = np.arange(1, horizon+1)
         #need to query if should be +1 or not.
         return self._resid_std * \
                 np.sqrt(((h - 1) / self._period).astype(np.int)+1)
+
+    
         
 
 class Average(Forecast):
@@ -481,6 +495,13 @@ class Average(Forecast):
             return preds, self._prediction_interval(horizon, alphas)
         else:
             return preds
+
+    def interval_multiplier(self, level, dof):
+        '''
+        inverse of student t distribution
+        '''
+        x = t.ppf((1 - level) / 2, dof)
+        return np.abs(x)
 
     def _std_h(self, horizon):
         std = self._resid_std * np.sqrt(1 + (1/self._t))
@@ -567,6 +588,8 @@ class Drift(Forecast):
         
         h = np.arange(1, horizon+1)
         return self._resid_std * np.sqrt(h * (1 + (h / self._t)))
+
+
 
 
 class EnsembleNaive(object):
