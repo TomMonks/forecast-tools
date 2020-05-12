@@ -24,8 +24,6 @@ from scipy.stats import norm, t
 from abc import ABC, abstractmethod
 
 
-
-
 # Boolean, unsigned integer, signed integer, float, complex.
 _NUMERIC_KINDS = set('buifc')
 
@@ -544,15 +542,17 @@ class Drift(Forecast):
         #proc (for convenience of passing the dataframe rather than a series)
         if isinstance(train, (pd.DataFrame)):
             _train = train.copy()[train.columns[0]].to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
         elif isinstance(train, (pd.Series)):
             _train = train.to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
         else:
             _train = train.copy()
+            self._fitted = pd.DataFrame(train)
 
         self._last_value = _train[-1:][0]
         self._t = _train.shape[0]
         self._gradient = ((self._last_value - _train[0]) / (self._t - 1))
-        self._fitted = pd.DataFrame(_train)
         self._fitted.columns = ['actual']
 
         #could show fitted as line from first to last point. 
