@@ -16,7 +16,9 @@ Tests currently cover:
     - horizon 
     - sets i.e. 2 sets of intervals (0.8 and 0.95)
     - width
-    - bootstrapped prediction intervals (to do - need to think carefully about test)
+    - bootstrapped prediction intervals
+        - length of horizon
+        - number of sets of intervals returned.
 
 6. Fitted values (to do)
 '''
@@ -723,6 +725,54 @@ def test_drift_prediction_interval_95_high():
     print(intervals[0].T[1])
     #not ideal due to not adjusting for drift i think,
     assert pytest.approx(intervals[0].T[1], rel=1e-6, abs=1.2) == high
+
+
+def test_bootstrap_prediction_interval_length():
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [22.2100359, 13.2828923, 6.2277574, 0.1124247, -5.4196405]
+    high = [63.70916, 72.55549, 79.52982, 85.56434, 91.01560]   
+
+    #quarterly data
+    model = b.Naive1()
+    model.fit(train)
+    preds = model.predict(horizon=5)
+    
+    expected = 5
+
+    y_intervals = b.boot_prediction_intervals(preds, model.resid, 
+                                              horizon=expected, 
+                                              levels=[0.8], boots=10)
+
+    assert expected == len(y_intervals[0])
+
+
+@pytest.mark.parametrize("intervals, expected", 
+                         [([0.8, 0.90, 0.95], 3),
+                          ([0.8, 0.90], 2),
+                          ([0.8], 1),
+                          ([0.7, 0.8, 0.9, 0.95], 4)
+                          ])
+def test_bootstrap_prediction_interval_sets_returned(intervals, expected):
+    '''
+    Test the number of bootstrap prediction intervals returned
+
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=100)
+    low = [22.2100359, 13.2828923, 6.2277574, 0.1124247, -5.4196405]
+    high = [63.70916, 72.55549, 79.52982, 85.56434, 91.01560]   
+
+    #quarterly data
+    model = b.Naive1()
+    model.fit(train)
+    preds = model.predict(horizon=5)
+    horizon = 5
+    y_intervals = b.boot_prediction_intervals(preds, model.resid, 
+                                              horizon=horizon, 
+                                              levels=intervals, boots=10)
+
+    assert expected == len(y_intervals)
 
 
 
