@@ -20,11 +20,36 @@ Drift:
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
+from scipy.stats import norm, t
 from abc import ABC, abstractmethod
 
-def interval_multipler(level):
-    return norm.ppf(1-(1-level)/2)
+
+# Boolean, unsigned integer, signed integer, float, complex.
+_NUMERIC_KINDS = set('buifc')
+
+def is_numeric(array):
+    """Determine whether the argument has a numeric datatype, when
+    converted to a NumPy array.
+
+    Booleans, unsigned integers, signed integers, floats and complex
+    numbers are the kinds of numeric datatype.
+
+    source: https://codereview.stackexchange.com/questions/128032/check-if-a-numpy-array-contains-numerical-data
+
+    Parameters
+    ----------
+    array : array-like
+        The array to check.
+
+    Returns
+    -------
+    is_numeric : `bool`
+        True if the array has a numeric datatype, False if not.
+
+    """
+    return np.asarray(array).dtype.kind in _NUMERIC_KINDS
+
+
 
 class Forecast(ABC):
     '''
@@ -43,6 +68,35 @@ class Forecast(ABC):
     @abstractmethod
     def fit(self, train):
         pass
+
+    def validate_training_data(self, train, min_length=1):
+        '''
+        Checks the validity of training data for forecasting
+        and raises exceptions if required.
+
+        1. check is instance of pd.Series, pd.DataFrame or np.ndarray
+        2. check len is > min_length
+
+        Parameters:
+        ---------
+        min_length: int optional (default=0)
+            minimum length of the time series.
+
+        '''
+
+
+        if not isinstance(train, (pd.Series, pd.DataFrame, np.ndarray)):
+            raise TypeError('Training data must be pd.Series, pd.DataFrame or np.ndarray')
+        elif len(train) < min_length:
+            raise ValueError('Training data is empty')
+        elif not is_numeric(train):
+            raise TypeError('Training data must be numeric')
+
+        elif np.isnan(np.asarray(train)).any():
+            raise TypeError('Training data contains at least one NaN. Data myst all be floats')
+        elif np.isinf(np.asarray(train)).any():
+            raise TypeError('Training data contains at least one Infinite value (np.Inf). Data myst all be floats')
+
 
     @abstractmethod
     def predict(self, horizon, return_predict_int=False, alphas=None):
@@ -88,9 +142,9 @@ class Forecast(ABC):
         '''
 
         if alphas is None:
-            alphas = [0.20, 0.10]
+            alphas = [0.20, 0.05]
 
-        zs = [interval_multipler(1-alpha) for alpha in alphas]
+        zs = [self.interval_multiplier(1-alpha, self._t - 1) for alpha in alphas]
         
         pis = []
 
@@ -102,6 +156,14 @@ class Forecast(ABC):
                                  self.predict(horizon) + hw]).T)
             
         return pis
+
+    def interval_multiplier(self, level, dof):
+        '''
+        inverse of normal distribution
+        can be overridden if needed.
+        '''
+        x = norm.ppf((1 - level) / 2)
+        return np.abs(x)
 
     @abstractmethod
     def _std_h(self, horizon):
@@ -144,8 +206,12 @@ class Naive1(Forecast):
         Parameters:
         --------
         train - array-like, 
-            vector, series, or dataframe of the time series used for training
+            vector, series, or dataframe of the time series used for training.
+            Values should be floats and not contain any np.nan or np.inf
         '''
+
+        self.validate_training_data(train)
+
         _train = np.asarray(train)
         self._pred = _train[-1]
         self._fitted = pd.DataFrame(_train)
@@ -153,10 +219,12 @@ class Naive1(Forecast):
         if isinstance(train, (pd.DataFrame, pd.Series)):
             self._fitted.index = train.index
 
+        self._t = len(_train)
         self._fitted.columns=['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(periods=1)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
-        self._resid_std = self._fitted['resid'].std()
+        #self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
+        self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
 
     def predict(self, horizon, return_predict_int=False, alphas=None):
         '''
@@ -169,7 +237,7 @@ class Naive1(Forecast):
 
         where 
 
-        std_h = resid_std * sqrt(h
+        std_h = resid_std * sqrt(h)
 
         resid_std = standard deviation of in-sample residuals
 
@@ -184,11 +252,11 @@ class Naive1(Forecast):
         horizon - int, 
 		forecast horizon. 
 
-        return_predict_int - bool, 
+        return_predict_int: bool, optional
 		if True calculate 100(1-alpha) prediction
         	intervals for the forecast. (default=False)
 
-        alphas - list of floats, 
+        alphas: list of floats, optional (default=None)
             controls set of prediction intervals returned and the width of 
             each. 
             
@@ -234,8 +302,10 @@ class Naive1(Forecast):
                       fill_value=self._resid_std,
                       dtype=np.float) 
 
-        std *= indexes
-        return std
+        std_h = std * indexes
+        return std_h
+
+
 
         
 class SNaive(Forecast):
@@ -266,26 +336,36 @@ class SNaive(Forecast):
 
         Parameters:
         --------
-        train - array-like,
-            pd.DataFrame or pd.Series containing the time series used 
-            for training
+        train: array-like.
+            vector, pd.DataFrame or pd.Series containing the time series used 
+            for training. Values should be floats and not contain any np.nan or np.inf
+
         '''
+
+        self.validate_training_data(train, min_length=self._period)
+
+        #could refactor this to be more like Naive1's simpler implementation.
         if isinstance(train, (pd.Series)):
             self._f = np.asarray(train)[-self._period:]
+            _train = train.to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
         elif isinstance(train, (pd.DataFrame)):
             self._f = train.to_numpy().T[0][-self._period:]
+            _train = train.copy()[train.columns[0]].to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
+        else:
+            self._f = train[-self._period:]
+            _train = train.copy()
+            self._fitted = pd.DataFrame(_train)
 
-        #bug here if pass in numpy array...
-        self._fitted = pd.DataFrame(train.to_numpy(), index=train.index)
+
+        self._t = len(_train)
         self._fitted.columns=['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(self._period)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
-        self._resid_std = self._fitted['resid'].std()
-        #testing
-        lower = np.percentile(self._fitted['resid'].dropna(), 5)
-        upper = np.percentile(self._fitted['resid'].dropna(), 95)
-        self._resid_std = self._fitted['resid'].clip(lower, upper).std()
         
+        #self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
+        self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
         
     def predict(self, horizon, return_predict_int=False, alphas=None):
         '''
@@ -321,11 +401,15 @@ class SNaive(Forecast):
         else:
             return preds
 
+
+
     def _std_h(self, horizon):
         h = np.arange(1, horizon+1)
         #need to query if should be +1 or not.
         return self._resid_std * \
                 np.sqrt(((h - 1) / self._period).astype(np.int)+1)
+
+    
         
 
 class Average(Forecast):
@@ -352,15 +436,31 @@ class Average(Forecast):
 
         Parameters:
         --------
-        train - pd.series, pd.DataFrame, of the time series used for training
+        train:  arraylike 
+                vector, pd.series, pd.DataFrame, 
+                Time series used for training.  Values should be floats 
+                and not contain any np.nan or np.inf
         '''
         
-        _train = train.to_numpy()
-        self._t = len(train)
-        self._pred = train.mean()
-        self._resid_std = (train - self._pred).std()
-        self._fitted = pd.DataFrame(_train, index=train.index)
+        self.validate_training_data(train)
+
+        if isinstance(train, (pd.DataFrame)):
+            _train = train.copy()[train.columns[0]].to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
+        elif isinstance(train, (pd.Series)):
+            _train = train.to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
+        else:
+            _train = train.copy()
+            self._fitted = pd.DataFrame(train)
+        
         self._fitted.columns=['actual']
+
+        self._t = len(_train)
+        self._pred = _train.mean()
+        #ddof set to get sample mean
+        self._resid_std = (_train - self._pred).std(ddof=1)
+        print(self._resid_std)
         self._fitted['pred'] = self._pred
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
 
@@ -391,6 +491,13 @@ class Average(Forecast):
         else:
             return preds
 
+    def interval_multiplier(self, level, dof):
+        '''
+        inverse of student t distribution
+        '''
+        x = t.ppf((1 - level) / 2, dof)
+        return np.abs(x)
+
     def _std_h(self, horizon):
         std = self._resid_std * np.sqrt(1 + (1/self._t))
         return np.full(shape=horizon, fill_value=std, dtype=np.float)
@@ -407,37 +514,62 @@ class Drift(Forecast):
     
     https://otexts.com/fpp2/simple-methods.html
 
+    Note.  The current implementation has a standard error of the forecast 
+    that is the same as for the naive1 se.  This could be adjusted for drift.
+    The following link suggests this is minor and benchmark with R is v.similar.
+    https://www.coursehero.com/file/p12k3ln/For-the-random-walk-with-drift-model-the-1-step-ahead-forecast-standard-error/
+
     '''
     def __init__(self):
         self._fitted = None
+
+    def _get_fitted_gradient(self):
+        return self._fitted['gradient_fit']
     
     def fit(self, train):
         '''
-        Train the naive model
+        Train the naive with drift model
 
         Parameters:
         --------
-        train - pd.DataFrame or pd.Series, the time series used for training
+        train:  arraylike 
+                vector, pd.series, pd.DataFrame, 
+                Time series used for training.  Values should be floats 
+                and not contain any np.nan or np.inf
         
         '''
+
+        self.validate_training_data(train)
+
         #if dataframe convert to series for compatability with 
         #proc (for convenience of passing the dataframe rather than a series)
         if isinstance(train, (pd.DataFrame)):
-            _train = train.copy()[train.columns[0]]
+            _train = train.copy()[train.columns[0]].to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
+        elif isinstance(train, (pd.Series)):
+            _train = train.to_numpy()
+            self._fitted = pd.DataFrame(_train, index=train.index)
         else:
             _train = train.copy()
+            self._fitted = pd.DataFrame(train)
 
         self._last_value = _train[-1:][0]
         self._t = _train.shape[0]
         self._gradient = ((self._last_value - _train[0]) / (self._t - 1))
-        self._fitted = pd.DataFrame(_train)
         self._fitted.columns = ['actual']
-        self._fitted['pred'] = _train[0] + np.arange(1, self._t+1, 
+
+        #could show fitted as line from first to last point. 
+        #unclear if should use this or naive1 method.
+        self._fitted['gradient_fit'] = _train[0] + np.arange(1, self._t+1, 
                                             dtype=float) * self._gradient
 
+        #1 step carry forward naive1 fitted values.
+        self._fitted['pred'] = self._fitted['actual'].shift(periods=1)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
-        self._resid_std = self._fitted['resid'].std()
 
+        #standard error is not adjusted for drift - how much of an issue?
+        self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
+    
 
     def predict(self, horizon, return_predict_int=False, alphas=None):
         '''
@@ -449,7 +581,7 @@ class Drift(Forecast):
         ------
         np.array, vector of predictions. length=horizon
         '''
-
+        
         if self._fitted is None:
             raise UnboundLocalError('Must call fit() prior to predict()')
         
@@ -469,6 +601,10 @@ class Drift(Forecast):
         h = np.arange(1, horizon+1)
         return self._resid_std * np.sqrt(h * (1 + (h / self._t)))
 
+    fitted_gradient = property(_get_fitted_gradient)
+
+
+
 
 class EnsembleNaive(object):
     def __init__(self, seasonal_period):
@@ -479,6 +615,16 @@ class EnsembleNaive(object):
                             }
        
     def fit(self, train):
+        '''
+        Parameters: 
+        --------
+
+        train:  arraylike 
+                vector, pd.series, pd.DataFrame, 
+                Time series used for training.  Values should be floats 
+                and not contain any np.nan or np.inf
+        '''
+        
         for _, estimator in self._estimators.items():
             estimator.fit(train)
         
@@ -524,22 +670,26 @@ def boot_prediction_intervals(preds, resid, horizon, levels=None, boots=1000):
     '''
     Constructs bootstrap prediction intervals for forecasting.
 
+    This procedure makes no assumptions about the distribution of errors 
+    e.g if they are normally distributed, but does assumes that no significant 
+    autocorrelation exists in residuals.
+
     Parameters:
     -----------
 
-    preds - array-like, 
+    preds: array-like, 
         predictions over forecast horizon
 
-    resid - array-like, 
+    resid: array-like, 
         in-sample prediction residuals
 
-    horizon - int, 
+    horizon: int, 
         forecast horizon (e.g. 12 months or 7 days)
 
-    levels - list of floats, 
+    levels: list of floats, 
         prediction interval precisions (default=[0.80, 0.95])
 
-    boots - int, 
+    boots: int, 
         number of bootstrap datasets to construct (default = 1000)
 
     Returns:
@@ -560,13 +710,18 @@ def boot_prediction_intervals(preds, resid, horizon, levels=None, boots=1000):
     data = preds + sample
 
     pis = []
-
     for level in levels:
-        upper = np.percentile(data, level*100, interpolation='higher', 
+
+        alpha = (1 - level) / 2
+        q_upper = level + alpha
+        q_lower = (1 - level) - alpha
+
+        upper = np.percentile(data, q_upper*100, interpolation='higher', 
                               axis=0)
-        lower = np.percentile(data, 100-(level*100), interpolation='higher', 
+        lower = np.percentile(data, q_lower*100, interpolation='higher', 
                               axis=0)
-        pis.append(np.array([lower, upper]))
+
+        pis.append(np.array([lower, upper]).T)
        
     return pis
 
@@ -589,4 +744,7 @@ def _drop_na_from_series(data):
         return data.dropna().to_numpy()
     else:
         return data[~np.isnan(data)]
+
+
+
 
