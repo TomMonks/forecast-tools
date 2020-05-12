@@ -665,22 +665,26 @@ def boot_prediction_intervals(preds, resid, horizon, levels=None, boots=1000):
     '''
     Constructs bootstrap prediction intervals for forecasting.
 
+    This procedure makes no assumptions about the distribution of errors 
+    e.g if they are normally distributed, but does assumes that no significant 
+    autocorrelation exists in residuals.
+
     Parameters:
     -----------
 
-    preds - array-like, 
+    preds: array-like, 
         predictions over forecast horizon
 
-    resid - array-like, 
+    resid: array-like, 
         in-sample prediction residuals
 
-    horizon - int, 
+    horizon: int, 
         forecast horizon (e.g. 12 months or 7 days)
 
-    levels - list of floats, 
+    levels: list of floats, 
         prediction interval precisions (default=[0.80, 0.95])
 
-    boots - int, 
+    boots: int, 
         number of bootstrap datasets to construct (default = 1000)
 
     Returns:
@@ -701,13 +705,18 @@ def boot_prediction_intervals(preds, resid, horizon, levels=None, boots=1000):
     data = preds + sample
 
     pis = []
-
     for level in levels:
-        upper = np.percentile(data, level*100, interpolation='higher', 
+
+        alpha = (1 - level) / 2
+        q_upper = level + alpha
+        q_lower = (1 - level) - alpha
+
+        upper = np.percentile(data, q_upper*100, interpolation='higher', 
                               axis=0)
-        lower = np.percentile(data, 100-(level*100), interpolation='higher', 
+        lower = np.percentile(data, q_lower*100, interpolation='higher', 
                               axis=0)
-        pis.append(np.array([lower, upper]))
+
+        pis.append(np.array([lower, upper]).T)
        
     return pis
 
