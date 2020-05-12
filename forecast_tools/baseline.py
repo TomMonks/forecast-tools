@@ -522,6 +522,9 @@ class Drift(Forecast):
     '''
     def __init__(self):
         self._fitted = None
+
+    def _get_fitted_gradient(self):
+        return self._fitted['gradient_fit']
     
     def fit(self, train):
         '''
@@ -597,6 +600,8 @@ class Drift(Forecast):
         
         h = np.arange(1, horizon+1)
         return self._resid_std * np.sqrt(h * (1 + (h / self._t)))
+
+    fitted_gradient = property(_get_fitted_gradient)
 
 
 
