@@ -11,6 +11,7 @@ Tests currently cover:
     - snaive - carries forward previous h values
     - average - flat forecast of average
     - drift - previous value + gradient 
+    - ensemble naive - the average of all of the methods
 
 5. Prediction intervals
     - horizon 
@@ -267,6 +268,67 @@ def test_drift_forecast_input_dataframe(data, horizon, expected):
     #point forecasts only
     preds = model.predict(horizon)
     assert len(preds) == expected
+
+
+@pytest.mark.parametrize("data, horizon, expected", 
+                         [([1, 2, 3, 4, 5], 12, 12),
+                          ([1, 2, 3, 4, 5], 24, 24),
+                          ([1, 2, 3], 8, 8)
+                          ])
+def test_ensemble_forecast_input_dataframe(data, horizon, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.EnsembleNaive(2)
+    model.fit(pd.DataFrame(data))
+    #point forecasts only
+    preds = model.predict(horizon)
+    assert len(preds) == expected
+
+@pytest.mark.parametrize("data, horizon, expected", 
+                         [([1, 2, 3, 4, 5], 12, 12),
+                          ([1, 2, 3, 4, 5], 24, 24),
+                          ([1, 2, 3], 8, 8)
+                          ])
+def test_ensemble_forecast_input_series(data, horizon, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.EnsembleNaive(2)
+    model.fit(pd.Series(data))
+    #point forecasts only
+    preds = model.predict(horizon)
+    assert len(preds) == expected
+
+@pytest.mark.parametrize("data, horizon, expected", 
+                         [([1, 2, 3, 4, 5], 12, 12),
+                          ([1, 2, 3, 4, 5], 24, 24),
+                          ([1, 2, 3], 8, 8)
+                          ])
+def test_ensemble_forecast_input_numpy(data, horizon, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.EnsembleNaive(2)
+    model.fit(np.array(data))
+    #point forecasts only
+    preds = model.predict(horizon)
+    assert len(preds) == expected
+
+
+@pytest.mark.parametrize("data, exception", 
+                         [(np.array([]), ValueError),
+                          (1.0, TypeError),
+                          (np.array(['foo', 'bar', 'spam', 'eggs']), TypeError),
+                          (np.array([1, 2, 3, 4, 5, 6, np.NAN]), TypeError),
+                          (np.array([1, 2, 3, 4, np.Inf, 5, 6]), TypeError)])
+def test_ensemble_abnormal_input(data, exception):
+    '''
+    test naive1 raises correct exceptions on abnormal input
+    '''
+    model = b.EnsembleNaive(2)
+    with pytest.raises(exception):
+        model.fit(data)
 
 
 
@@ -940,6 +1002,9 @@ def test_average_fitted_values_nan_length():
     n_nan = np.isnan(model.fittedvalues).sum()
     
     assert n_nan == expected
+
+
+
 
 
 
