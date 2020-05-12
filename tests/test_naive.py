@@ -20,7 +20,9 @@ Tests currently cover:
         - length of horizon
         - number of sets of intervals returned.
 
-6. Fitted values (to do)
+6. Fitted values 
+    - expected length
+    - count of NaN
 '''
 
 import pytest
@@ -773,6 +775,171 @@ def test_bootstrap_prediction_interval_sets_returned(intervals, expected):
                                               levels=intervals, boots=10)
 
     assert expected == len(y_intervals)
+
+
+
+@pytest.mark.parametrize("training_length",
+                         [(100),
+                          (999),
+                          (1000),
+                          (10),
+                          (20000)
+                          ])
+def test_drift_fitted_values_length(training_length):
+    '''
+    test drift .fittedvalues 
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=training_length)
+
+    model = b.Drift()
+    model.fit(train)
+
+    expected = training_length
+    
+    assert len(model.fittedvalues) == expected
+
+
+@pytest.mark.parametrize("training_length",
+                         [(100),
+                          (999),
+                          (1000),
+                          (10),
+                          (20000)
+                          ])
+def test_naive1_fitted_values_length(training_length):
+    '''
+    test naive1 .fittedvalues length is as expected
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=training_length)
+
+    model = b.Naive1()
+    model.fit(train)
+
+    expected = training_length
+    
+    assert len(model.fittedvalues) == expected
+
+
+@pytest.mark.parametrize("training_length",
+                         [(100),
+                          (999),
+                          (1000),
+                          (10),
+                          (20000)
+                          ])
+def test_snaive_fitted_values_length(training_length):
+    '''
+    test SNaive .fittedvalues length is as expected
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=training_length)
+
+    model = b.SNaive(7)
+    model.fit(train)
+
+    expected = training_length
+    
+    assert len(model.fittedvalues) == expected
+
+
+@pytest.mark.parametrize("training_length",
+                         [(100),
+                          (999),
+                          (1000),
+                          (10),
+                          (20000)
+                          ])
+def test_average_fitted_values_length(training_length):
+    '''
+    test Average forecaster .fittedvalues length is as expected
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=training_length)
+
+    model = b.Average()
+    model.fit(train)
+
+    expected = training_length
+    
+    assert len(model.fittedvalues) == expected
+
+
+
+@pytest.mark.parametrize("period",
+                         [(7),
+                          (14),
+                          (24),
+                          (1),
+                          (12),
+                          (4)
+                          ])
+def test_snaive_fitted_values_nan_length(period):
+    '''
+    test SNaive .fittedvalues has the correct number of NaNs
+    i.e. = to the seasonal period.
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=200)
+
+    model = b.SNaive(period)
+    model.fit(train)
+
+    expected = period
+    n_nan = np.isnan(model.fittedvalues).sum()
+    
+    assert n_nan == expected
+
+
+def test_naive1_fitted_values_nan_length():
+    '''
+    test Naive1 .fittedvalues has the correct number of NaNs
+    i.e. = 1
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=200)
+
+    model = b.Naive1()
+    model.fit(train)
+
+    expected = 1
+    n_nan = np.isnan(model.fittedvalues).sum()
+    
+    assert n_nan == expected
+
+def test_drift_fitted_values_nan_length():
+    '''
+    test Drift .fittedvalues has the correct number of NaNs
+    i.e. = 1
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=200)
+
+    model = b.Drift()
+    model.fit(train)
+
+    expected = 1
+    n_nan = np.isnan(model.fittedvalues).sum()
+    
+    assert n_nan == expected
+
+
+def test_average_fitted_values_nan_length():
+    '''
+    test Average forecast .fittedvalues has the correct number of NaNs
+    i.e. = 1
+    '''
+    np.random.seed(1066)
+    train = np.random.poisson(lam=50, size=200)
+
+    model = b.Average()
+    model.fit(train)
+
+    expected = 0
+    n_nan = np.isnan(model.fittedvalues).sum()
+    
+    assert n_nan == expected
 
 
 
