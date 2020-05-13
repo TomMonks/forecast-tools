@@ -12,6 +12,8 @@ coverage - prediction interval coverage
 '''
 import numpy as np
 
+from forecast_tools import Naive1, SNaive
+
 def as_arrays(y_true, y_pred):
     '''
     Returns ground truth and predict
@@ -199,6 +201,51 @@ def coverage(y_true, pred_intervals):
     return cover / len(y_true)
 
 
+def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
+    '''
+    Mean absolute scaled error (MASE)
+
+    MASE = MAE / MAE_{insample, naive}
+
+    For definition: https://otexts.com/fpp2/accuracy.html
+
+    Parameters:
+    --------
+    y_true: array-like
+        actual observations from time series
+
+    y_pred: array-like
+        the predictions to evaluate
+
+    y_train: array-like
+        the training data the produced the predictions
+    
+    period: int or None
+        if None then out of sample MAE is scaled by 1-step in-sample Naive1 
+        MAE.  If = int then SNaive is used as the scaler.
+≈
+    Returns:
+    -------
+    float, 
+        scalar value representing the MASE
+
+    '''
+
+    if period is None:
+        in_sample = Naive1()
+        in_sample.fit(y_train)
+
+    else:
+        in_sample = SNaive(period=period)
+        in_sample.fit(y_train)
+        y_train = y_train[period:]
+
+    mae_insample = mean_absolute_error(y_train, in_sample.fittedvalues.dropna())
+    return mean_absolute_error(y_true, y_pred) / mae_insample
+
+
+
+
 def forecast_errors(y_true, y_pred, metrics='all'):
     '''
     Convenience function for return a multiple
@@ -276,3 +323,4 @@ if __name__ == '__main__':
 
     metrics = forecast_errors(y_true, y_preds, metrics=['mape', 'smape'])
     print(metrics)
+
