@@ -211,7 +211,7 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
 
     Parameters:
     --------
-    y_true: array-like
+    y_true: array-like 
         actual observations from time series
 
     y_pred: array-like
@@ -220,15 +220,14 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
     y_train: array-like
         the training data the produced the predictions
     
-    period: int or None
+    period: int or None, optional (default = None)
         if None then out of sample MAE is scaled by 1-step in-sample Naive1 
         MAE.  If = int then SNaive is used as the scaler.
-≈
+
     Returns:
     -------
     float, 
         scalar value representing the MASE
-
     '''
 
     if period is None:
