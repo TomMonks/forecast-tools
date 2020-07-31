@@ -12,7 +12,7 @@ coverage - prediction interval coverage
 '''
 import numpy as np
 
-from forecast_tools import Naive1, SNaive
+from forecast_tools.baseline import Naive1, SNaive
 
 def as_arrays(y_true, y_pred):
     '''
