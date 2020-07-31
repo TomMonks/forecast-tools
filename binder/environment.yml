@@ -16,4 +16,5 @@ dependencies:
   - statsmodels=0.11.0
   - pip:
     - sklearn==0.0
+    - joiblib==0.14.1
 
