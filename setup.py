@@ -12,7 +12,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="forecast-tools", 
-    version="0.1.3",
+    version="0.1.3.2",
     author="Thomas Monks",
     author_email="forecast_tools@gmail.com",
     license="The MIT License (MIT)",
