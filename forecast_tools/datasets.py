@@ -26,10 +26,3 @@ def load_emergency_dept():
                      dayfirst=True)
     df.index.freq = 'D'
     return df
-
-if __name__ == '__main__':
-    df = load_emergency_dept()
-    print(df.shape)
-    print(df.index.freq)
-    print(type(df.index.freq))
-    print(df.head())
