@@ -5,8 +5,9 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="forecast-tools-TomMonks", 
-    version="0.0.1",
+    version="0.1.2",
     author="Thomas Monks",
+    license="The MIT License (MIT)",
     description="Tools to support the forecasting process in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
