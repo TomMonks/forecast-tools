@@ -19,6 +19,14 @@ In particular tools that support cross validation.
     Uses a train, test split generator, a model and a forecast error metric to 
     return statistics on a models prediction performance.
 
+Dev notes:
+--------
+
+At the moment coverage is not included.  I have handled this in practical 
+projects by including a function that returns all of the predictions within a
+split/fold. A seperate function then handles coverage.  
+
+
 '''
 
 import numpy as np
