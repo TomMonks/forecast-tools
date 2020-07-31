@@ -18,4 +18,5 @@ dependencies:
     - sklearn==0.0
     - joblib==0.14.1
     - pytest-cov==2.10.0
+    - forecast-tools==0.1.3
 
