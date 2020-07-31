@@ -58,6 +58,7 @@ class Forecast(ABC):
     '''
     def __init__(self):
         self._fitted = None
+        self._t = None
 
     def _get_fitted(self):
         return self._fitted['pred']
