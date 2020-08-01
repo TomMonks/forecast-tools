@@ -12,6 +12,7 @@ Tests currently cover:
     - average - flat forecast of average
     - drift - previous value + gradient 
     - ensemble naive - the average of all of the methods
+    - Test fit_predict()
 
 5. Prediction intervals
     - horizon 
@@ -47,6 +48,21 @@ def test_naive1_forecast_horizon(data, horizon, expected):
     preds = model.predict(horizon)
     assert len(preds) == expected
 
+
+@pytest.mark.parametrize("data, horizon, expected", 
+                         [([1, 2, 3, 4, 5], 12, 12),
+                          ([1, 2, 3, 4, 5], 24, 24),
+                          ([1, 2, 3], 8, 8)
+                          ])
+def test_naive1_fit_predict(data, horizon, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.Naive1()
+    #fit_predict for point forecasts only
+    preds = model.fit_predict(pd.Series(data), horizon)
+    assert len(preds) == expected
+
 @pytest.mark.parametrize("data, horizon, expected", 
                          [([1, 2, 3, 4, 5], 12, 12),
                           ([1, 2, 3, 4, 5], 24, 24),
@@ -60,6 +76,21 @@ def test_snaive_forecast_horizon(data, horizon, expected):
     model.fit(pd.Series(data))
     #point forecasts only
     preds = model.predict(horizon)
+    assert len(preds) == expected
+
+
+@pytest.mark.parametrize("data, horizon, expected", 
+                         [([1, 2, 3, 4, 5], 12, 12),
+                          ([1, 2, 3, 4, 5], 24, 24),
+                          ([1, 2, 3], 8, 8)
+                          ])
+def test_snaive_fit_predict(data, horizon, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.SNaive(1)
+    #fit_predict for point forecasts only
+    preds = model.fit_predict(pd.Series(data), horizon)
     assert len(preds) == expected
 
 
@@ -84,6 +115,21 @@ def test_drift_forecast_horizon(data, horizon, expected):
                           ([1, 2, 3, 4, 5], 24, 24),
                           ([1, 2, 3], 8, 8)
                           ])
+def test_drift_fit_predict(data, horizon, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.Drift()
+    #fit_predict for point forecasts only
+    preds = model.fit_predict(pd.Series(data), horizon)
+    assert len(preds) == expected
+
+
+@pytest.mark.parametrize("data, horizon, expected", 
+                         [([1, 2, 3, 4, 5], 12, 12),
+                          ([1, 2, 3, 4, 5], 24, 24),
+                          ([1, 2, 3], 8, 8)
+                          ])
 def test_average_forecast_horizon(data, horizon, expected):
     '''
     test the correct number of error metric functions are returned.
@@ -92,6 +138,21 @@ def test_average_forecast_horizon(data, horizon, expected):
     model.fit(pd.Series(data))
     #point forecasts only
     preds = model.predict(horizon)
+    assert len(preds) == expected
+
+
+@pytest.mark.parametrize("data, horizon, expected", 
+                         [([1, 2, 3, 4, 5], 12, 12),
+                          ([1, 2, 3, 4, 5], 24, 24),
+                          ([1, 2, 3], 8, 8)
+                          ])
+def test_average_fit_predict(data, horizon, expected):
+    '''
+    test the correct number of error metric functions are returned.
+    '''
+    model = b.Average()
+    #fit_predict for point forecasts only
+    preds = model.fit_predict(pd.Series(data), horizon)
     assert len(preds) == expected
 
 
@@ -1004,6 +1065,25 @@ def test_average_fitted_values_nan_length():
     assert n_nan == expected
 
 
+
+def test_snaive_call_predict_before_fit():
+    '''
+    test SNaive raises correct exceptions when
+    predict is called before fit
+    '''
+    model = b.SNaive(7)
+    with pytest.raises(UnboundLocalError):
+        model.predict(10)
+
+
+def test_drift_call_predict_before_fit():
+    '''
+    test Drift raises correct exceptions when
+    predict is called before fit
+    '''
+    model = b.Drift()
+    with pytest.raises(UnboundLocalError):
+        model.predict(10)
 
 
 
