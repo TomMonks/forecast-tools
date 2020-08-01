@@ -285,7 +285,7 @@ class Naive1(Forecast):
 		    forecast horizon. 
 
         return_predict_int: bool, optional
-		if True calculate 100(1-alpha) prediction
+		    if True calculate 100(1-alpha) prediction
         	intervals for the forecast. (default=False)
 
         alpha: list of floats, optional (default=None)
@@ -407,10 +407,31 @@ class SNaive(Forecast):
         horizon - int, 
             forecast horizon. 
 
+        return_predict_int: bool, optional
+		    if True calculate 100(1-alpha) prediction
+        	intervals for the forecast. (default=False)
+
+        alpha: list of floats, optional (default=None)
+            controls set of prediction intervals returned and the width of 
+            each. 
+            
+            Intervals are 100(1-alpha) in width. e.g. [0.2, 0.1] 
+            would return the 80% and 90% prediction intervals of the forecast 
+            distribution.  default=None.  When return_predict_int = True the
+            default behaviour is to return 80 and 90% intervals.
+
         Returns:
-        ------
-            np.array, 
-            vector of predictions. length=horizon
+        --------
+
+        if return_predict_int = False
+
+        np.array, vector of predictions. length=horizon
+
+        if return_predict_int = True then returns a tuple.
+
+        0. np.array, vector of predictions. length=horizon
+        1. list of numpy.array[lower_pi, upper_pi]. 
+            One for each prediction interval.
         '''
 
         if self._fitted is None:
@@ -504,9 +525,32 @@ class Average(Forecast):
         --------
         horizon - int, forecast horizon. 
 
+        return_predict_int: bool, optional
+		    if True calculate 100(1-alpha) prediction
+        	intervals for the forecast. (default=False)
+
+        alpha: list of floats, optional (default=None)
+            controls set of prediction intervals returned and the width of 
+            each. 
+            
+            Intervals are 100(1-alpha) in width. e.g. [0.2, 0.1] 
+            would return the 80% and 90% prediction intervals of the forecast 
+            distribution.  default=None.  When return_predict_int = True the
+            default behaviour is to return 80 and 90% intervals.
+
+
         Returns:
-        ------
+        --------
+
+        if return_predict_int = False
+
         np.array, vector of predictions. length=horizon
+
+        if return_predict_int = True then returns a tuple.
+
+        0. np.array, vector of predictions. length=horizon
+        1. list of numpy.array[lower_pi, upper_pi]. 
+            One for each prediction interval.
         '''
 
         if self._fitted is None:
@@ -608,9 +652,32 @@ class Drift(Forecast):
         --------
         horizon - int, forecast horizon. 
 
+        return_predict_int: bool, optional
+		    if True calculate 100(1-alpha) prediction
+        	intervals for the forecast. (default=False)
+
+        alpha: list of floats, optional (default=None)
+            controls set of prediction intervals returned and the width of 
+            each. 
+            
+            Intervals are 100(1-alpha) in width. e.g. [0.2, 0.1] 
+            would return the 80% and 90% prediction intervals of the forecast 
+            distribution.  default=None.  When return_predict_int = True the
+            default behaviour is to return 80 and 90% intervals.
+
+
         Returns:
-        ------
+        --------
+
+        if return_predict_int = False
+
         np.array, vector of predictions. length=horizon
+
+        if return_predict_int = True then returns a tuple.
+
+        0. np.array, vector of predictions. length=horizon
+        1. list of numpy.array[lower_pi, upper_pi]. 
+            One for each prediction interval.
         '''
         
         if self._fitted is None:
