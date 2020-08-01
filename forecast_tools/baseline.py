@@ -70,6 +70,37 @@ class Forecast(ABC):
     def fit(self, train):
         pass
 
+    def fit_predict(self, train, horizon, return_predict_int=False, alpha=None):
+        '''
+        Convenience method.  Fit model and predict with one call.
+
+        Parameters:
+        ---------
+
+        train: array-like, 
+            vector, series, or dataframe of the time series used for training.
+            Values should be floats and not contain any np.nan or np.inf
+
+        horizon: int, 
+            forecast horizon. 
+
+        return_predict_int: bool, optional (default=False)
+            If True function will return a Tuple
+            0: point forecasts (mean)
+            1: matrix of intervals.
+
+        alpha: None, or list of floats, optional (default=None)
+            List of floats between 0 and 1. If return_predict_int == True this 
+            specifies the 100(1-alpha) prediction intervals to return.
+
+        Returns:
+        ------
+        np.array, vector of predictions. length=horizon
+
+        '''
+        self.fit(train)
+        return self.predict(horizon, return_predict_int=return_predict_int, alpha=alpha)
+
     def validate_training_data(self, train, min_length=1):
         '''
         Checks the validity of training data for forecasting
@@ -100,10 +131,10 @@ class Forecast(ABC):
 
 
     @abstractmethod
-    def predict(self, horizon, return_predict_int=False, alphas=None):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         pass
 
-    def _prediction_interval(self, horizon, alphas=None):
+    def _prediction_interval(self, horizon, alpha=None):
         '''
         Prediction intervals for naive forecast 1 (NF1)
 
@@ -142,10 +173,10 @@ class Forecast(ABC):
 
         '''
 
-        if alphas is None:
-            alphas = [0.20, 0.05]
+        if alpha is None:
+            alpha = [0.20, 0.05]
 
-        zs = [self.interval_multiplier(1-alpha, self._t - 1) for alpha in alphas]
+        zs = [self.interval_multiplier(1-a, self._t - 1) for a in alpha]
         
         pis = []
 
@@ -227,7 +258,7 @@ class Naive1(Forecast):
         #self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
         self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
 
-    def predict(self, horizon, return_predict_int=False, alphas=None):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         '''
         Forecast and optionally produce 100(1-alpha) prediction intervals.
 
@@ -251,13 +282,13 @@ class Naive1(Forecast):
         Parameters:
         --------
         horizon - int, 
-		forecast horizon. 
+		    forecast horizon. 
 
         return_predict_int: bool, optional
-		if True calculate 100(1-alpha) prediction
+		    if True calculate 100(1-alpha) prediction
         	intervals for the forecast. (default=False)
 
-        alphas: list of floats, optional (default=None)
+        alpha: list of floats, optional (default=None)
             controls set of prediction intervals returned and the width of 
             each. 
             
@@ -283,13 +314,13 @@ class Naive1(Forecast):
         if self._fitted is None:
             raise UnboundLocalError('Must call fit() prior to predict()')
 
-        if alphas is None:
-            alphas = [0.2, 0.1]
+        if alpha is None:
+            alpha = [0.2, 0.1]
     
         preds =  np.full(shape=horizon, fill_value=self._pred, dtype=float)
 
         if return_predict_int:
-            return preds, self._prediction_interval(horizon, alphas)
+            return preds, self._prediction_interval(horizon, alpha)
         else:
             return preds
 
@@ -340,7 +371,6 @@ class SNaive(Forecast):
         train: array-like.
             vector, pd.DataFrame or pd.Series containing the time series used 
             for training. Values should be floats and not contain any np.nan or np.inf
-
         '''
 
         self.validate_training_data(train, min_length=self._period)
@@ -368,7 +398,7 @@ class SNaive(Forecast):
         #self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
         self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
         
-    def predict(self, horizon, return_predict_int=False, alphas=None):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         '''
         Predict time series over a horizon
 
@@ -377,17 +407,38 @@ class SNaive(Forecast):
         horizon - int, 
             forecast horizon. 
 
+        return_predict_int: bool, optional
+		    if True calculate 100(1-alpha) prediction
+        	intervals for the forecast. (default=False)
+
+        alpha: list of floats, optional (default=None)
+            controls set of prediction intervals returned and the width of 
+            each. 
+            
+            Intervals are 100(1-alpha) in width. e.g. [0.2, 0.1] 
+            would return the 80% and 90% prediction intervals of the forecast 
+            distribution.  default=None.  When return_predict_int = True the
+            default behaviour is to return 80 and 90% intervals.
+
         Returns:
-        ------
-            np.array, 
-            vector of predictions. length=horizon
+        --------
+
+        if return_predict_int = False
+
+        np.array, vector of predictions. length=horizon
+
+        if return_predict_int = True then returns a tuple.
+
+        0. np.array, vector of predictions. length=horizon
+        1. list of numpy.array[lower_pi, upper_pi]. 
+            One for each prediction interval.
         '''
 
         if self._fitted is None:
             raise UnboundLocalError('Must call fit() prior to predict()')
         
-        if alphas is None:
-            alphas = [0.2, 0.1]
+        if alpha is None:
+            alpha = [0.2, 0.1]
     
         preds = np.array([], dtype=float)
         
@@ -398,7 +449,7 @@ class SNaive(Forecast):
                                axis=0)
         
         if return_predict_int:
-            return preds, self._prediction_interval(horizon, alphas)
+            return preds, self._prediction_interval(horizon, alpha)
         else:
             return preds
 
@@ -466,7 +517,7 @@ class Average(Forecast):
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
 
         
-    def predict(self, horizon, return_predict_int=False, alphas=None):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         '''
         Predict time series over a horizon
 
@@ -474,21 +525,44 @@ class Average(Forecast):
         --------
         horizon - int, forecast horizon. 
 
+        return_predict_int: bool, optional
+		    if True calculate 100(1-alpha) prediction
+        	intervals for the forecast. (default=False)
+
+        alpha: list of floats, optional (default=None)
+            controls set of prediction intervals returned and the width of 
+            each. 
+            
+            Intervals are 100(1-alpha) in width. e.g. [0.2, 0.1] 
+            would return the 80% and 90% prediction intervals of the forecast 
+            distribution.  default=None.  When return_predict_int = True the
+            default behaviour is to return 80 and 90% intervals.
+
+
         Returns:
-        ------
+        --------
+
+        if return_predict_int = False
+
         np.array, vector of predictions. length=horizon
+
+        if return_predict_int = True then returns a tuple.
+
+        0. np.array, vector of predictions. length=horizon
+        1. list of numpy.array[lower_pi, upper_pi]. 
+            One for each prediction interval.
         '''
 
         if self._fitted is None:
             raise UnboundLocalError('Must call fit() prior to predict()')
         
-        if alphas is None:
-            alphas = [0.2, 0.1]
+        if alpha is None:
+            alpha = [0.2, 0.1]
 
         preds =  np.full(shape=horizon, fill_value=self._pred, dtype=float)
 
         if return_predict_int:
-            return preds, self._prediction_interval(horizon, alphas)
+            return preds, self._prediction_interval(horizon, alpha)
         else:
             return preds
 
@@ -572,28 +646,51 @@ class Drift(Forecast):
         self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
     
 
-    def predict(self, horizon, return_predict_int=False, alphas=None):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         '''
         Parameters:
         --------
         horizon - int, forecast horizon. 
 
+        return_predict_int: bool, optional
+		    if True calculate 100(1-alpha) prediction
+        	intervals for the forecast. (default=False)
+
+        alpha: list of floats, optional (default=None)
+            controls set of prediction intervals returned and the width of 
+            each. 
+            
+            Intervals are 100(1-alpha) in width. e.g. [0.2, 0.1] 
+            would return the 80% and 90% prediction intervals of the forecast 
+            distribution.  default=None.  When return_predict_int = True the
+            default behaviour is to return 80 and 90% intervals.
+
+
         Returns:
-        ------
+        --------
+
+        if return_predict_int = False
+
         np.array, vector of predictions. length=horizon
+
+        if return_predict_int = True then returns a tuple.
+
+        0. np.array, vector of predictions. length=horizon
+        1. list of numpy.array[lower_pi, upper_pi]. 
+            One for each prediction interval.
         '''
         
         if self._fitted is None:
             raise UnboundLocalError('Must call fit() prior to predict()')
         
-        if alphas is None:
-            alphas = [0.2, 0.1]
+        if alpha is None:
+            alpha = [0.2, 0.1]
 
         preds = np.arange(1, horizon+1, dtype=float) * self._gradient
         preds += self._last_value
 
         if return_predict_int:
-            return preds, self._prediction_interval(horizon, alphas)
+            return preds, self._prediction_interval(horizon, alpha)
         else:
             return preds
 
