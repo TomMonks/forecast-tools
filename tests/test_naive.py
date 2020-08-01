@@ -514,12 +514,12 @@ def test_drift_abnormal_input(data, exception):
         model.fit(data)
 
 
-@pytest.mark.parametrize("data, horizon, alphas, expected", 
+@pytest.mark.parametrize("data, horizon, alpha, expected", 
                          [([1, 2, 3, 4, 5], 12, [0.2, 0.05], 12),
                           ([1, 2, 3, 4, 5], 24, [0.2, 0.10, 0.05], 24),
                           ([1, 2, 3], 8, [0.8], 8)
                           ])
-def test_naive1_pi_horizon(data, horizon, alphas, expected):
+def test_naive1_pi_horizon(data, horizon, alpha, expected):
     '''
     test the correct forecast horizon is returned for prediction interval
     for Naive1
@@ -527,56 +527,56 @@ def test_naive1_pi_horizon(data, horizon, alphas, expected):
     model = b.Naive1()
     model.fit(pd.Series(data))
     #point forecasts only
-    preds, intervals = model.predict(horizon, return_predict_int=True, alphas=alphas)
+    preds, intervals = model.predict(horizon, return_predict_int=True, alpha=alpha)
     assert len(intervals[0]) == expected
 
 
-@pytest.mark.parametrize("data, horizon, alphas, expected", 
+@pytest.mark.parametrize("data, horizon, alpha, expected", 
                          [([1, 2, 3, 4, 5], 12, [0.2, 0.05], 12),
                           ([1, 2, 3, 4, 5], 24, [0.2, 0.10, 0.05], 24),
                           ([1, 2, 3], 8, [0.8], 8)
                           ])
-def test_snaive_pi_horizon(data, horizon, alphas, expected):
+def test_snaive_pi_horizon(data, horizon, alpha, expected):
     '''
     test the correct forecast horizon is returned for prediction interval for SNaive
     '''
     model = b.SNaive(1)
     model.fit(pd.Series(data))
     #point forecasts only
-    preds, intervals = model.predict(horizon, return_predict_int=True, alphas=alphas)
+    preds, intervals = model.predict(horizon, return_predict_int=True, alpha=alpha)
     assert len(intervals[0]) == expected
 
-@pytest.mark.parametrize("data, horizon, alphas, expected", 
+@pytest.mark.parametrize("data, horizon, alpha, expected", 
                          [([1, 2, 3, 4, 5], 12, [0.2, 0.05], 12),
                           ([1, 2, 3, 4, 5], 24, [0.2, 0.10, 0.05], 24),
                           ([1, 2, 3], 8, [0.8], 8)
                           ])
-def test_drift_pi_horizon(data, horizon, alphas, expected):
+def test_drift_pi_horizon(data, horizon, alpha, expected):
     '''
     test the correct forecast horizon is returned for prediction interval for Drift
     '''
     model = b.Drift()
     model.fit(pd.Series(data))
     #point forecasts only
-    preds, intervals = model.predict(horizon, return_predict_int=True, alphas=alphas)
+    preds, intervals = model.predict(horizon, return_predict_int=True, alpha=alpha)
     assert len(intervals[0]) == expected
 
-@pytest.mark.parametrize("data, horizon, alphas, expected", 
+@pytest.mark.parametrize("data, horizon, alpha, expected", 
                          [([1, 2, 3, 4, 5], 12, [0.2, 0.05], 12),
                           ([1, 2, 3, 4, 5], 24, [0.2, 0.10, 0.05], 24),
                           ([1, 2, 3], 8, [0.8], 8)
                           ])
-def test_average_pi_horizon(data, horizon, alphas, expected):
+def test_average_pi_horizon(data, horizon, alpha, expected):
     '''
     test the correct forecast horizon is returned for prediction interval for Average
     '''
     model = b.Average()
     model.fit(pd.Series(data))
     #point forecasts only
-    preds, intervals = model.predict(horizon, return_predict_int=True, alphas=alphas)
+    preds, intervals = model.predict(horizon, return_predict_int=True, alpha=alpha)
     assert len(intervals[0]) == expected
 
-@pytest.mark.parametrize("model, data, horizon, alphas, expected", 
+@pytest.mark.parametrize("model, data, horizon, alpha, expected", 
                          [(b.Naive1(), [1, 2, 3, 4, 5], 12, [0.2, 0.05], 2),
                           (b.Naive1(), [1, 2, 3, 4, 5], 24, [0.2, 0.10, 0.05], 3),
                           (b.SNaive(1), [1, 2, 3], 8, [0.8], 1),
@@ -589,14 +589,14 @@ def test_average_pi_horizon(data, horizon, alphas, expected):
                           (b.Drift(), [1, 2, 3], 8, None, 2),
                           (b.Average(), [1, 2, 3, 4, 5], 24, [0.2, 0.10, 0.05], 3)
                           ])
-def test_naive_pi_set_number(model, data, horizon, alphas, expected):
+def test_naive_pi_set_number(model, data, horizon, alpha, expected):
     '''
     test the correct number of Prediction intervals are
     returned for prediction interval for all Naive forecasting classes
     '''
     model.fit(pd.Series(data))
     #point forecasts only
-    preds, intervals = model.predict(horizon, return_predict_int=True, alphas=alphas)
+    preds, intervals = model.predict(horizon, return_predict_int=True, alpha=alpha)
     assert len(intervals) == expected
 
 
@@ -630,7 +630,7 @@ def test_naive1_prediction_interval_low():
 
     model = b.Naive1()
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.2])
     print(intervals[0].T[0])
     assert pytest.approx(intervals[0].T[0], rel=1e-6, abs=0.1) == low
 
@@ -647,7 +647,7 @@ def test_naive1_prediction_interval_high():
 
     model = b.Naive1()
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.2])
     
     print(intervals[0].T[1])
     assert pytest.approx(intervals[0].T[1], rel=1e-6, abs=0.1) == high
@@ -680,7 +680,7 @@ def test_average_prediction_interval_high():
 
     model = b.Average()
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.2])
     
     print(intervals[0].T[1])
     #assert np.array_equal(intervals[0].T[1], high)
@@ -699,7 +699,7 @@ def test_average_prediction_interval_low():
 
     model = b.Average()
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.2])
     
     print(intervals[0].T[1])
     #assert np.array_equal(intervals[0].T[1], high)
@@ -717,7 +717,7 @@ def test_naive1_prediction_interval_95_high():
 
     model = b.Naive1()
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.05])
     
     print(intervals[0].T[1])
     assert pytest.approx(intervals[0].T[1], rel=1e-6, abs=0.1) == high
@@ -734,7 +734,7 @@ def test_naive1_prediction_interval_95_low():
 
     model = b.Naive1()
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.05])
     
     print(intervals[0].T[0])
     assert pytest.approx(intervals[0].T[0], rel=1e-6, abs=0.1) == low
@@ -753,7 +753,7 @@ def test_snaive_prediction_interval_80_low():
     #quarterly data
     model = b.SNaive(period=4)
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.2])
     
     print(intervals[0].T[0])
     assert pytest.approx(intervals[0].T[0]) == low
@@ -771,7 +771,7 @@ def test_snaive_prediction_interval_80_high():
     #quarterly data
     model = b.SNaive(period=4)
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.2])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.2])
     
     print(intervals[0].T[1])
     assert pytest.approx(intervals[0].T[1]) == high
@@ -790,7 +790,7 @@ def test_snaive_prediction_interval_95_high():
     #quarterly data
     model = b.SNaive(period=4)
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.05])
     
     print(intervals[0].T[1])
     assert pytest.approx(intervals[0].T[1]) == high
@@ -808,7 +808,7 @@ def test_snaive_prediction_interval_95_low():
     #quarterly data
     model = b.SNaive(period=4)
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.05])
     
     print(intervals[0].T[0])
     assert pytest.approx(intervals[0].T[0]) == low
@@ -826,7 +826,7 @@ def test_drift_prediction_interval_95_low():
     #quarterly data
     model = b.Drift()
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.05])
 
     print(intervals[0].T[0])
     #not ideal due to not adjusting for drift i think,
@@ -845,7 +845,7 @@ def test_drift_prediction_interval_95_high():
     #quarterly data
     model = b.Drift()
     model.fit(train)
-    preds, intervals = model.predict(5, return_predict_int=True, alphas=[0.05])
+    preds, intervals = model.predict(5, return_predict_int=True, alpha=[0.05])
 
     print(intervals[0].T[1])
     #not ideal due to not adjusting for drift i think,

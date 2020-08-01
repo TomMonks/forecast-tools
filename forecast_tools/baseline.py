@@ -99,7 +99,7 @@ class Forecast(ABC):
 
         '''
         self.fit(train)
-        return self.predict(horizon, return_predict_int=return_predict_int, alphas=alpha)
+        return self.predict(horizon, return_predict_int=return_predict_int, alpha=alpha)
 
     def validate_training_data(self, train, min_length=1):
         '''
@@ -131,10 +131,10 @@ class Forecast(ABC):
 
 
     @abstractmethod
-    def predict(self, horizon, return_predict_int=False, alphas=None):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         pass
 
-    def _prediction_interval(self, horizon, alphas=None):
+    def _prediction_interval(self, horizon, alpha=None):
         '''
         Prediction intervals for naive forecast 1 (NF1)
 
@@ -173,10 +173,10 @@ class Forecast(ABC):
 
         '''
 
-        if alphas is None:
-            alphas = [0.20, 0.05]
+        if alpha is None:
+            alpha = [0.20, 0.05]
 
-        zs = [self.interval_multiplier(1-alpha, self._t - 1) for alpha in alphas]
+        zs = [self.interval_multiplier(1-a, self._t - 1) for a in alpha]
         
         pis = []
 
@@ -258,7 +258,7 @@ class Naive1(Forecast):
         #self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
         self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
 
-    def predict(self, horizon, return_predict_int=False, alphas=None):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         '''
         Forecast and optionally produce 100(1-alpha) prediction intervals.
 
@@ -282,13 +282,13 @@ class Naive1(Forecast):
         Parameters:
         --------
         horizon - int, 
-		forecast horizon. 
+		    forecast horizon. 
 
         return_predict_int: bool, optional
 		if True calculate 100(1-alpha) prediction
         	intervals for the forecast. (default=False)
 
-        alphas: list of floats, optional (default=None)
+        alpha: list of floats, optional (default=None)
             controls set of prediction intervals returned and the width of 
             each. 
             
@@ -314,13 +314,13 @@ class Naive1(Forecast):
         if self._fitted is None:
             raise UnboundLocalError('Must call fit() prior to predict()')
 
-        if alphas is None:
-            alphas = [0.2, 0.1]
+        if alpha is None:
+            alpha = [0.2, 0.1]
     
         preds =  np.full(shape=horizon, fill_value=self._pred, dtype=float)
 
         if return_predict_int:
-            return preds, self._prediction_interval(horizon, alphas)
+            return preds, self._prediction_interval(horizon, alpha)
         else:
             return preds
 
@@ -398,7 +398,7 @@ class SNaive(Forecast):
         #self._resid_std = self._fitted['resid'].std(ddof=1, skipna=True)
         self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
         
-    def predict(self, horizon, return_predict_int=False, alphas=None):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         '''
         Predict time series over a horizon
 
@@ -416,8 +416,8 @@ class SNaive(Forecast):
         if self._fitted is None:
             raise UnboundLocalError('Must call fit() prior to predict()')
         
-        if alphas is None:
-            alphas = [0.2, 0.1]
+        if alpha is None:
+            alpha = [0.2, 0.1]
     
         preds = np.array([], dtype=float)
         
@@ -428,7 +428,7 @@ class SNaive(Forecast):
                                axis=0)
         
         if return_predict_int:
-            return preds, self._prediction_interval(horizon, alphas)
+            return preds, self._prediction_interval(horizon, alpha)
         else:
             return preds
 
@@ -496,7 +496,7 @@ class Average(Forecast):
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
 
         
-    def predict(self, horizon, return_predict_int=False, alphas=None):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         '''
         Predict time series over a horizon
 
@@ -512,13 +512,13 @@ class Average(Forecast):
         if self._fitted is None:
             raise UnboundLocalError('Must call fit() prior to predict()')
         
-        if alphas is None:
-            alphas = [0.2, 0.1]
+        if alpha is None:
+            alpha = [0.2, 0.1]
 
         preds =  np.full(shape=horizon, fill_value=self._pred, dtype=float)
 
         if return_predict_int:
-            return preds, self._prediction_interval(horizon, alphas)
+            return preds, self._prediction_interval(horizon, alpha)
         else:
             return preds
 
@@ -602,7 +602,7 @@ class Drift(Forecast):
         self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
     
 
-    def predict(self, horizon, return_predict_int=False, alphas=None):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         '''
         Parameters:
         --------
@@ -616,14 +616,14 @@ class Drift(Forecast):
         if self._fitted is None:
             raise UnboundLocalError('Must call fit() prior to predict()')
         
-        if alphas is None:
-            alphas = [0.2, 0.1]
+        if alpha is None:
+            alpha = [0.2, 0.1]
 
         preds = np.arange(1, horizon+1, dtype=float) * self._gradient
         preds += self._last_value
 
         if return_predict_int:
-            return preds, self._prediction_interval(horizon, alphas)
+            return preds, self._prediction_interval(horizon, alpha)
         else:
             return preds
 
