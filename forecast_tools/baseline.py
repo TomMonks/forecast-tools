@@ -70,6 +70,37 @@ class Forecast(ABC):
     def fit(self, train):
         pass
 
+    def fit_predict(self, train, horizon, return_predict_int=False, alpha=None):
+        '''
+        Convenience method.  Fit model and predict with one call.
+
+        Parameters:
+        ---------
+
+        train: array-like, 
+            vector, series, or dataframe of the time series used for training.
+            Values should be floats and not contain any np.nan or np.inf
+
+        horizon: int, 
+            forecast horizon. 
+
+        return_predict_int: bool, optional (default=False)
+            If True function will return a Tuple
+            0: point forecasts (mean)
+            1: matrix of intervals.
+
+        alpha: None, or list of floats, optional (default=None)
+            List of floats between 0 and 1. If return_predict_int == True this 
+            specifies the 100(1-alpha) prediction intervals to return.
+
+        Returns:
+        ------
+        np.array, vector of predictions. length=horizon
+
+        '''
+        self.fit(train)
+        return self.predict(horizon, return_predict_int=return_predict_int, alphas=alpha)
+
     def validate_training_data(self, train, min_length=1):
         '''
         Checks the validity of training data for forecasting
@@ -340,7 +371,6 @@ class SNaive(Forecast):
         train: array-like.
             vector, pd.DataFrame or pd.Series containing the time series used 
             for training. Values should be floats and not contain any np.nan or np.inf
-
         '''
 
         self.validate_training_data(train, min_length=self._period)
