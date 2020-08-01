@@ -20,7 +20,9 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/TomMonks/forecast-tools",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(),    
+    include_package_data=True,
+    package_data={"": ["forecast_tools/data/*"]},
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
