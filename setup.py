@@ -11,7 +11,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="forecast-tools", 
+    name="forecast-tools",
     version="0.1.4",
     author="Thomas Monks",
     author_email="forecast_tools@gmail.com",
@@ -20,9 +20,9 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/TomMonks/forecast-tools",
-    packages=setuptools.find_packages(),    
+    packages=setuptools.find_packages(),
     include_package_data=True,
-    package_data={"": ["forecast_tools/data/*"]},
+    package_data={"": ["forecast_tools/data/*.csv"]},
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
