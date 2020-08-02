@@ -239,6 +239,18 @@ class Naive1(Forecast):
         '''
         self._fitted = None
 
+    def __repr__(self):
+        '''
+        String representation of object
+        '''
+        return f'Naive1()'
+
+    def __str__(self):
+        '''
+        Print/str representation of object
+        '''
+        return f'Naive1()'
+
     def fit(self, train):
         '''
         Train the naive model
@@ -368,6 +380,18 @@ class SNaive(Forecast):
         self._period = period
         self._fitted = None
 
+    def __repr__(self):
+        '''
+        String representation of object
+        '''
+        return f'SNaive1(period={self._period})'
+
+    def __str__(self):
+        '''
+        Print/str representation of object
+        '''
+        return f'SNaive1(period={self._period})'
+
     def fit(self, train):
         '''
         Seasonal naive forecast - train the model
@@ -479,6 +503,18 @@ class Average(Forecast):
         self._pred = None
         self._fitted = None
 
+    def __repr__(self):
+        '''
+        String representation of object
+        '''
+        return f'Average()'
+
+    def __str__(self):
+        '''
+        Print/str representation of object
+        '''
+        return f'Average()'
+
     def _get_fitted(self):
         return self._fitted['pred']
 
@@ -515,7 +551,6 @@ class Average(Forecast):
         self._pred = _train.mean()
         # ddof set to get sample mean
         self._resid_std = (_train - self._pred).std(ddof=1)
-        print(self._resid_std)
         self._fitted['pred'] = self._pred
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
 
@@ -598,6 +633,18 @@ class Drift(Forecast):
 
     def __init__(self):
         self._fitted = None
+
+    def __repr__(self):
+        '''
+        String representation of object
+        '''
+        return f'Drift()'
+
+    def __str__(self):
+        '''
+        Print/str representation of object
+        '''
+        return f'Drift()'
 
     def _get_fitted_gradient(self):
         return self._fitted['gradient_fit']
@@ -709,6 +756,20 @@ class EnsembleNaive(object):
                             'Average': Average(),
                             'Drift': Drift()
                             }
+
+    def __repr__(self):
+        '''
+        String representation of object
+        '''
+        p = self._estimators['SNaive']._period
+        return f'EnsembleNaive(seasonal_period={p})'
+
+    def __str__(self):
+        '''
+        Print/str representation of object
+        '''
+        p = self._estimators['SNaive']._period
+        return f'EnsembleNaive(seasonal_period={p})'
 
     def fit(self, train):
         '''
