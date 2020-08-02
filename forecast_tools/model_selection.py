@@ -134,7 +134,7 @@ def forecast_accuracy(model, train, test, horizons, metric):
     return h_accuracy
 
 
-def cross_validation_score(model, train, cv, metric, horizons=None,
+def cross_validation_score(model, cv, metric, horizons=None,
                            n_jobs=-1):
     '''
     Calculate cross validation scores
@@ -143,9 +143,6 @@ def cross_validation_score(model, train, cv, metric, horizons=None,
     ----------
     model: object
         forecast model
-
-    train: array-like
-        training data
 
     metric: func(y_true, y_pred)
         forecast error metric
