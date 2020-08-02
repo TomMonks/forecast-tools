@@ -13,7 +13,7 @@ dependencies:
   - scipy=1.4.1
   - seaborn=0.10.0
   - spyder=4.0.1
-  - statsmodels=0.11.0
+  - statsmodels=0.11.1
   - pip:
     - sklearn==0.0
     - joblib==0.14.1
