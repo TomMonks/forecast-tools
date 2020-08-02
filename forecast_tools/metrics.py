@@ -1,5 +1,5 @@
 '''
-Metrics to measure forecast error 
+Metrics to measure forecast error
 
 ME - mean error
 MAE - mean absolute error
@@ -14,6 +14,7 @@ import numpy as np
 
 from forecast_tools.baseline import Naive1, SNaive
 
+
 def as_arrays(y_true, y_pred):
     '''
     Returns ground truth and predict
@@ -24,13 +25,14 @@ def as_arrays(y_true, y_pred):
     y_true -- array-like
         actual observations from time series
     y_pred -- array-like
-        the predictions 
+        the predictions
 
     Returns:
     -------
-    Tuple(np.array np.array), 
+    Tuple(np.array np.array)
     '''
     return np.asarray(y_true), np.asarray(y_pred)
+
 
 def mean_error(y_true, y_pred):
     '''
@@ -45,13 +47,14 @@ def mean_error(y_true, y_pred):
 
     Returns:
     -------
-    float, 
+    float
         scalar value representing the ME
     '''
     y_true, y_pred = as_arrays(y_true, y_pred)
     return np.mean(y_true - y_pred)
 
-def mean_absolute_percentage_error(y_true, y_pred): 
+
+def mean_absolute_percentage_error(y_true, y_pred):
     '''
     Mean Absolute Percentage Error (MAPE).
 
@@ -62,7 +65,7 @@ def mean_absolute_percentage_error(y_true, y_pred):
     1. When the ground true value is close to zero MAPE is inflated.
 
     2. MAPE is not symmetric.  MAPE produces smaller forecast
-    errors when underforecasting.  
+    errors when underforecasting.
 
     Parameters:
     --------
@@ -73,7 +76,7 @@ def mean_absolute_percentage_error(y_true, y_pred):
 
     Returns:
     -------
-    float, 
+    float,
         scalar value representing the MAPE (0-100)
     '''
     y_true, y_pred = as_arrays(y_true, y_pred)
@@ -93,7 +96,7 @@ def mean_absolute_error(y_true, y_pred):
 
     Returns:
     -------
-    float, 
+    float,
         scalar value representing the MAE
     '''
     y_true, y_pred = as_arrays(y_true, y_pred)
@@ -113,7 +116,7 @@ def mean_squared_error(y_true, y_pred):
 
     Returns:
     -------
-    float, 
+    float,
         scalar value representing the MSE
     '''
     y_true, y_pred = as_arrays(y_true, y_pred)
@@ -135,7 +138,7 @@ def root_mean_squared_error(y_true, y_pred):
 
     Returns:
     -------
-    float, 
+    float,
         scalar value representing the RMSE
     '''
     y_true, y_pred = as_arrays(y_true, y_pred)
@@ -148,11 +151,11 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred):
 
     A proposed improvement./replacement for MAPE.  (But still not symmetric).
 
-    Computation based on Hyndsight blog: 
+    Computation based on Hyndsight blog:
     https://robjhyndman.com/hyndsight/smape/
 
     Limitations of sMAPE:
-    
+
     1. When the ground true value is close to zero MAPE is inflated.
     2. Like MAPE it is not symmetric.
 
@@ -165,7 +168,7 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred):
 
     Returns:
     -------
-    float, 
+    float,
         scalar value representing the RMSE
     '''
     y_true, y_pred = as_arrays(y_true, y_pred)
@@ -174,18 +177,17 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(100 * (numerator / denominator))
 
 
-
 def coverage(y_true, pred_intervals):
     '''
-    Calculates the proportion of the true 
+    Calculates the proportion of the true
     values are that are covered by the lower
     and upper bounds of the prediction intervals
 
     Parameters:
     -------
-    y_true -- array-like, 
+    y_true -- array-like,
         actual observations
-    
+
     pred_intervals -- np.array, matrix (hx2)
         prediction intervals
 
@@ -196,7 +198,7 @@ def coverage(y_true, pred_intervals):
     y_true = np.asarray(y_true)
     lower = np.asarray(pred_intervals.T[0])
     upper = np.asarray(pred_intervals.T[1])
-    
+
     cover = len(np.where((y_true > lower) & (y_true < upper))[0])
     return cover / len(y_true)
 
@@ -211,7 +213,7 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
 
     Parameters:
     --------
-    y_true: array-like 
+    y_true: array-like
         actual observations from time series
 
     y_pred: array-like
@@ -219,14 +221,14 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
 
     y_train: array-like
         the training data the produced the predictions
-    
+
     period: int or None, optional (default = None)
-        if None then out of sample MAE is scaled by 1-step in-sample Naive1 
+        if None then out of sample MAE is scaled by 1-step in-sample Naive1
         MAE.  If = int then SNaive is used as the scaler.
 
     Returns:
     -------
-    float, 
+    float,
         scalar value representing the MASE
     '''
 
@@ -239,16 +241,15 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
         in_sample.fit(y_train)
         y_train = y_train[period:]
 
-    mae_insample = mean_absolute_error(y_train, in_sample.fittedvalues.dropna())
+    mae_insample = mean_absolute_error(
+        y_train, in_sample.fittedvalues.dropna())
     return mean_absolute_error(y_true, y_pred) / mae_insample
-
-
 
 
 def forecast_errors(y_true, y_pred, metrics='all'):
     '''
     Convenience function for return a multiple
-    forecast errors 
+    forecast errors
 
     Parameters:
     --------
@@ -265,7 +266,7 @@ def forecast_errors(y_true, y_pred, metrics='all'):
 
     Returns:
     -------
-    dict, 
+    dict,
         forecast error metrics
 
     Example:
@@ -311,8 +312,7 @@ def _forecast_error_functions():
     funcs['smape'] = symmetric_mean_absolute_percentage_error
     return funcs
 
-    
-    
+
 if __name__ == '__main__':
     y_true = [45, 60, 23, 45]
     y_preds = [50, 50, 50, 50]
@@ -322,4 +322,3 @@ if __name__ == '__main__':
 
     metrics = forecast_errors(y_true, y_preds, metrics=['mape', 'smape'])
     print(metrics)
-
