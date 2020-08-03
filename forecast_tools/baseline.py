@@ -749,7 +749,7 @@ class Drift(Forecast):
     fitted_gradient = property(_get_fitted_gradient)
 
 
-class EnsembleNaive(object):
+class EnsembleNaive(Forecast):
     def __init__(self, seasonal_period):
         self._estimators = {'NF1': Naive1(),
                             'SNaive': SNaive(period=seasonal_period),
@@ -785,13 +785,20 @@ class EnsembleNaive(object):
         for _, estimator in self._estimators.items():
             estimator.fit(train)
 
-    def predict(self, horizon):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         preds = []
         for _, estimator in self._estimators.items():
             model_preds = estimator.predict(horizon)
             preds.append(model_preds)
 
         return np.array(preds).mean(axis=0)
+
+    def _std_h(self, horizon):
+        '''
+        Calculate the standard error of the residuals over
+        a forecast horizon.  This is method specific.
+        '''
+        pass
 
 
 def baseline_estimators(seasonal_period):

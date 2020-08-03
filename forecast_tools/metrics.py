@@ -7,6 +7,7 @@ MSE - mean squared error
 RMSE - root mean squared error
 MAPE - mean absolute percentage error
 sMAPE - symmetric MAPE.
+MASE - mean absolute scaled error
 
 coverage - prediction interval coverage
 '''
@@ -179,6 +180,8 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred):
 
 def coverage(y_true, pred_intervals):
     '''
+    Prediction Interval Coverage
+    
     Calculates the proportion of the true
     values are that are covered by the lower
     and upper bounds of the prediction intervals
