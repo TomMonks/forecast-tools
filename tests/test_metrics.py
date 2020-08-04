@@ -169,3 +169,5 @@ def test_coverage(y_true, y_intervals, expected):
     y_intervals = np.array(y_intervals).T
     error = m.coverage(y_true, y_intervals)
     assert pytest.approx(expected) == error
+
+

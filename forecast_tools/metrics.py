@@ -181,7 +181,7 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred):
 def coverage(y_true, pred_intervals):
     '''
     Prediction Interval Coverage
-    
+
     Calculates the proportion of the true
     values are that are covered by the lower
     and upper bounds of the prediction intervals
@@ -238,14 +238,14 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
     if period is None:
         in_sample = Naive1()
         in_sample.fit(y_train)
-
+        period = 1
     else:
         in_sample = SNaive(period=period)
         in_sample.fit(y_train)
-        y_train = y_train[period:]
 
-    mae_insample = mean_absolute_error(
-        y_train, in_sample.fittedvalues.dropna())
+    mae_insample = mean_absolute_error(y_train[period:],
+                                       in_sample.fittedvalues.dropna())
+
     return mean_absolute_error(y_true, y_pred) / mae_insample
 
 
