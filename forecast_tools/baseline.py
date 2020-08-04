@@ -617,8 +617,10 @@ class Average(Forecast):
 
 class Drift(Forecast):
     '''
-    Naive1 with drift: Carry the last value foreward across a
-    forecast horizon but allow for upwards of downwards drift.
+    Naive1 with drift
+
+    Carry the last value foreward across a forecast horizon but
+     allow for upwards of downwards drift.
 
     Drift = average change in the historical data.
 
