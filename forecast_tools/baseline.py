@@ -227,7 +227,6 @@ class Naive1(Forecast):
     https://otexts.com/fpp2/simple-methods.html
 
     '''
-
     def __init__(self):
         '''
         Constructor method

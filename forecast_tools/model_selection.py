@@ -96,7 +96,7 @@ def sliding_window(train, window_size, horizon, step=1):
 def forecast_accuracy(model, train, test, horizons, metric):
     '''
     Forecast accuracy of a model over multiple horizons
-    
+
     Returns forecast accuracy of model fit on
     training data and compared against a test set
     with a given metric.
@@ -186,8 +186,8 @@ def cross_validation_score(model, cv, metric, horizons=None,
 
 def forecast(model, train, test, horizon):
     '''
-    h-step prediction of a model 
-    
+    h-step prediction of a model
+
     Returns a tuple of (y_preds, y_train, y_true) of model fit
     to training data
 
@@ -209,7 +209,7 @@ def forecast(model, train, test, horizon):
     Returns:
     --------
     tuple (y_pred, y_train, y_true)
-    '''    
+    '''
     y_pred = model.fit_predict(train, horizon)
     return train, test, y_pred
 
@@ -222,11 +222,11 @@ def cross_validation_folds(model, cv, n_jobs=-1):
     ----------
     model: object
         forecast model
-        
+
     cv: object
-        cross validation generator 
+        cross validation generator
         i.e. rolling_forecast_origin or sliding_window
-        
+
     n_jobs: int, optional (default=-1)
         when -1 runs across all cores
         set = 1 to run each cross validation seperately.
@@ -237,13 +237,12 @@ def cross_validation_folds(model, cv, n_jobs=-1):
     np.ndarray of tuples
     each tuple is (cv_train, cv_test, cv_y_pred)
     '''
-    
+
     cv_folds = \
         Parallel(n_jobs=n_jobs)(delayed(forecast)(model,
                                                   cv_train,
                                                   cv_test,
                                                   len(cv_test))
                                 for cv_train, cv_test in cv)
-    
 
     return np.array(cv_folds)

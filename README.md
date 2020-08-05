@@ -1,4 +1,4 @@
-# forecast-tools
+# forecast-tools: fundamental tools to support the forecasting process in python.
 
 [![DOI](https://zenodo.org/badge/250494795.svg)](https://zenodo.org/badge/latestdoi/250494795)
 [![PyPI version fury.io](https://badge.fury.io/py/forecast-tools.svg)](https://pypi.python.org/pypi/forecast-tools/)
@@ -6,11 +6,9 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomMonks/forecast-tools/master)
 [![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360+/)
 
- **Fundamental tools to support the forecasting process in python.**
-
  forecast-tools has been developed to support forecasting education and applied forecasting research.  It is MIT licensed and freely available to practitioners, students and researchers via PyPi.  There is a long term plan to make forecast-tools available via conda-forge.
 
-## Two ways to checkout forecast-tools
+## Two simple ways to explore forecast-tools
 
 1. `pip install forecast-tools`
 2. Click on the launch-binder at the top of this readme. This will open example Jupyter notebooks in the cloud via Binder.

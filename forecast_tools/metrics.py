@@ -13,7 +13,7 @@ coverage - prediction interval coverage
 '''
 import numpy as np
 
-from forecast_tools.baseline import Naive1, SNaive
+from forecast_tools.baseline import SNaive
 
 
 def as_arrays(y_true, y_pred):
@@ -234,14 +234,13 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
     float,
         scalar value representing the MASE
     '''
+    y_true, y_pred = as_arrays(y_true, y_pred)
 
     if period is None:
-        in_sample = Naive1()
-        in_sample.fit(y_train)
         period = 1
-    else:
-        in_sample = SNaive(period=period)
-        in_sample.fit(y_train)
+
+    in_sample = SNaive(period=period)
+    in_sample.fit(y_train)
 
     mae_insample = mean_absolute_error(y_train[period:],
                                        in_sample.fittedvalues.dropna())

@@ -171,3 +171,32 @@ def test_coverage(y_true, y_intervals, expected):
     assert pytest.approx(expected) == error
 
 
+@pytest.mark.parametrize("y_train, y_pred, y_true, expected",
+                         [(np.arange(10), [1, 2, 3, 4, 5, 6],
+                          [1, 2, 3, 4, 5, 6], 0.0),
+                          (np.arange(1, 21), np.arange(21, 26),
+                           np.full(5, 10), 13)])
+def test_mase_naive(y_train, y_true, y_pred, expected):
+    '''
+    test mean absolute scaled error calculation using naive as scaler.
+
+    test calcs produced using libre office calc.
+    '''
+    error = m.mean_absolute_scaled_error(y_true, y_pred, y_train, period=None)
+    assert pytest.approx(expected) == error
+
+
+@pytest.mark.parametrize("y_train, y_pred, y_true, expected",
+                         [(np.arange(1, 21), [1, 2, 3, 4, 5, 6],
+                          [1, 2, 3, 4, 5, 6], 0.0),
+
+                          (np.arange(1, 21), np.arange(21, 26),
+                           np.full(5, 10), 1.85714286)])
+def test_mase_snaive(y_train, y_true, y_pred, expected):
+    '''
+    test mean absolute scaled error calculation using SNaive as scaler
+
+    test calcs produced using libre office calc.
+    '''
+    error = m.mean_absolute_scaled_error(y_true, y_pred, y_train, period=7)
+    assert pytest.approx(expected) == error
