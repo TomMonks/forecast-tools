@@ -26,7 +26,6 @@ import pandas as pd
 from scipy.stats import norm, t
 from abc import ABC, abstractmethod
 
-
 # Boolean, unsigned integer, signed integer, float, complex.
 _NUMERIC_KINDS = set('buifc')
 

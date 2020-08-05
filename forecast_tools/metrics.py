@@ -273,14 +273,14 @@ def forecast_errors(y_true, y_pred, metrics='all'):
 
     Example:
     ---------
-    y_true = [45, 60, 23, 45]
-    y_preds = [50, 50, 50, 50]
+    >>> y_true = [45, 60, 23, 45]
+    >>> y_preds = [50, 50, 50, 50]
 
-    metrics = forecast_errors(y_true, y_preds)
-    print(metrics)
+    >>> metrics = forecast_errors(y_true, y_preds)
+    >>> print(metrics)
 
-    metrics = forecast_errors(y_true, y_preds, metrics=['mape', 'smape'])
-    print(metrics)
+    >>> metrics = forecast_errors(y_true, y_preds, metrics=['mape', 'smape'])
+    >>> print(metrics)
 
     '''
     y_true, y_pred = as_arrays(y_true, y_pred)

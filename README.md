@@ -53,4 +53,8 @@ Development environment:
 
 * `conda activate forecast_dev`
 
-Unit tests are provided and can be run from the command `pytest`.   All contributions are welcome and must include unit tests!
+Unit tests are provided and can be run from the command `pytest` and its coverage extension.  Run the following in the terminal.
+
+* `pytest --cov=forecast_tools tests/`
+
+**All contributions are welcome and must include unit tests!**

@@ -248,3 +248,28 @@ def test_rfo_number_of_folds_pd(train_size, min_train_size, horizon, step,
         actual += 1
 
     assert expected == actual
+
+
+@pytest.mark.parametrize("train_size, min_train_size, horizon, step, expected",
+                         [(10, 3, 1, 1, 7),
+                          (10, 3, 2, 1, 6),
+                          (10, 3, 1, 2, 4),
+                          (10, 3, 2, 2, 3)])
+def test_mase_cv_number_of_folds(train_size, min_train_size, horizon, step,
+                                 expected):
+    '''
+    check that the number of folds returned from rolling origin
+    is as expected when data source is a pandas.DataFrame
+    '''
+    train = np.arange(train_size)
+    cv = ms.rolling_forecast_origin(train, min_train_size=min_train_size,
+                                    horizon=horizon, step=step)
+
+    scores = ms.scaled_cross_validation_score(b.Naive1(), cv)
+
+    print(expected, len(scores))
+    print(scores)
+    assert expected == len(scores)
+
+
+
