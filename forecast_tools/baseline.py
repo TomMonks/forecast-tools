@@ -222,7 +222,23 @@ class Naive1(Forecast):
     Naive forecast 1 or NF1: Carry the last value foreward across a
     forecast horizon
 
-    For details see [1]
+    For details and theory see [1]
+
+    Attributes
+    ----------
+    fittedvalues: pd.Series
+        In-sample predictions of training data
+    resid: pd.Series
+        In-sample residuals
+
+    Methods
+    -------
+    fit(train)
+        fit the model to training data
+    predict(horizon, return_predict_int=False, alpha=None)
+        Predict h-steps ahead
+    fit_predict(train, horizons, return_predict_int=False, alpha=None)
+        convenience method.  combine fit() and predict()
 
     See Also
     --------
@@ -272,11 +288,18 @@ class Naive1(Forecast):
 
 
     Fitted values (one step in-sample predictions)
-    >>> y_train = np.arange(10)
+    .fittedvalue returns a pandas.Series called pred
+
+    >>> y_train = np.arange(5)
     >>> model = Naive1()
     >>> model.fit(y_train)
     >>> model.fittedvalues
-
+    0    NaN
+    1    0.0
+    2    1.0
+    3    2.0
+    4    3.0
+    Name: pred, dtype: float64
 
     '''
     def __init__(self):
@@ -368,7 +391,7 @@ class Naive1(Forecast):
             default behaviour is to return 80 and 90% intervals.
 
         Returns:
-        ------
+        -------
 
         if return_predict_int = False
 
@@ -416,6 +439,22 @@ class SNaive(Forecast):
     same season of the year (e.g., the same month of the previous year).
 
     SNF is useful for highly seasonal data. See [1]
+
+    Attributes
+    ----------
+    fittedvalues: pd.Series
+        In-sample predictions of training data
+    resid: pd.Series
+        In-sample residuals
+
+    Methods
+    -------
+    fit(train)
+        fit the model to training data
+    predict(horizon, return_predict_int=False, alpha=None)
+        Predict h-steps ahead
+    fit_predict(train, horizons, return_predict_int=False, alpha=None)
+        convenience method.  combine fit() and predict()
 
     See Also
     --------
@@ -553,7 +592,25 @@ class SNaive(Forecast):
 class Average(Forecast):
     '''
     Average forecast.  Forecast is set to the average
-    of the historical data. See [1]
+    of the historical data.
+
+    See for discussion of the average as a forecat measure [1]
+
+    Attributes
+    ----------
+    fittedvalues: pd.Series
+        In-sample predictions of training data
+    resid: pd.Series
+        In-sample residuals
+
+    Methods
+    -------
+    fit(train)
+        fit the model to training data
+    predict(horizon, return_predict_int=False, alpha=None)
+        Predict h-steps ahead
+    fit_predict(train, horizons, return_predict_int=False, alpha=None)
+        convenience method.  combine fit() and predict()
 
     See Also
     --------
@@ -697,6 +754,22 @@ class Drift(Forecast):
     The following link suggests this is minor and benchmark with R is v.similar
     [2]
 
+    Attributes
+    ----------
+    fittedvalues: pd.Series
+        In-sample predictions of training data
+    resid: pd.Series
+        In-sample residuals
+
+    Methods
+    -------
+    fit(train)
+        fit the model to training data
+    predict(horizon, return_predict_int=False, alpha=None)
+        Predict h-steps ahead
+    fit_predict(train, horizons, return_predict_int=False, alpha=None)
+        convenience method.  combine fit() and predict()
+
     See Also
     --------
     forecast_tools.baseline.Naive1
@@ -830,6 +903,33 @@ class Drift(Forecast):
 
 
 class EnsembleNaive(Forecast):
+    '''
+    An ensemble of all naive forecast methods.
+
+    Attributes
+    ----------
+    fittedvalues: pd.Series
+        In-sample predictions of training data
+    resid: pd.Series
+        In-sample residuals
+
+    Methods
+    -------
+    fit(train)
+        fit the model to training data
+    predict(horizon, return_predict_int=False, alpha=None)
+        Predict h-steps ahead
+    fit_predict(train, horizons, return_predict_int=False, alpha=None)
+        convenience method.  combine fit() and predict()
+
+    See Also
+    --------
+    forecast_tools.baseline.Naive1
+    forecast_tools.baseline.SNaive
+    forecast_tools.baseline.Average
+    forecast_tools.baseline.Drift
+    '''
+
     def __init__(self, seasonal_period):
         self._estimators = {'NF1': Naive1(),
                             'SNaive': SNaive(period=seasonal_period),
