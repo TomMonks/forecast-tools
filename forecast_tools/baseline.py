@@ -1,5 +1,5 @@
 '''
-Contains classes for creating simple baseline/benchmark forecasts
+Tools for simple baseline/benchmark forecasts
 
 These methods might serve as the forecast themselves, but are more likely
 to be used as a baseline to evaluate if more complex models offer a sufficient
@@ -16,6 +16,9 @@ Average: np.sqrt(((h - 1) / self._period).astype(np.int)+1)
 
 Drift:
     Carry forward last time period, but allow for upwards/downwards drift.
+
+EnsembleNaive:
+    An unweighted average of all of the Naive forecasting methods.
 '''
 
 import numpy as np
