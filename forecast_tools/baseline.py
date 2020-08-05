@@ -269,6 +269,15 @@ class Naive1(Forecast):
     >>> y_intervals[1]
     array([[ 7.35514637, 10.64485363],
            [ 6.67382569, 11.32617431]])
+
+
+    Fitted values (one step in-sample predictions)
+    >>> y_train = np.arange(10)
+    >>> model = Naive1()
+    >>> model.fit(y_train)
+    >>> model.fittedvalues
+
+
     '''
     def __init__(self):
         '''
