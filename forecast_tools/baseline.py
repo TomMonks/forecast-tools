@@ -219,13 +219,56 @@ class Forecast(ABC):
 
 class Naive1(Forecast):
     '''
-    Naive1 or NF1: Carry the last value foreward across a
+    Naive forecast 1 or NF1: Carry the last value foreward across a
     forecast horizon
 
-    See Makridakis, Wheelwright and Hyndman (1998) and
-    Hyndman:
-    https://otexts.com/fpp2/simple-methods.html
+    For details see [1]
 
+    See Also
+    --------
+    forecast_tools.baseline.SNaive
+    forecast_tools.baseline.Drift
+    forecast_tools.baseline.Average
+    forecast_tools.baseline.EnsembleNaive
+
+    References:
+    ----------
+    [1]. https://otexts.com/fpp2/simple-methods.html
+
+    Examples:
+    --------
+
+    Basic fitting and prediction
+
+    >>> y_train = np.arange(10)
+    >>> model = Naive1()
+    >>> model.fit(y_train)
+    >>> model.predict(horizon=7)
+    array([9., 9., 9., 9., 9., 9., 9.]
+
+    fit_predict() convenience method
+
+    >>> y_train = np.arange(10)
+    >>> model = Naive1()
+    >>> model.fit_predict(y_train, horizon=7)
+    array([9., 9., 9., 9., 9., 9., 9.]
+
+    80 and 95% prediction intervals
+
+    >>> y_train = np.arange(10)
+    >>> model = Naive1()
+    >>> model.fit(y_train)
+    >>> y_pred, y_intervals = model.predict(horizon=2,
+                                            return_pred_interval=True,
+                                            alpha=[0.1, 0.05])
+    >>> y_pred
+    array([9., 9.]
+    >>> y_intervals[0]
+    array([[ 7.71844843, 10.28155157],
+           [ 7.1876124 , 10.8123876 ]])
+    >>> y_intervals[1]
+    array([[ 7.35514637, 10.64485363],
+           [ 6.67382569, 11.32617431]])
     '''
     def __init__(self):
         '''
@@ -363,9 +406,18 @@ class SNaive(Forecast):
     Each forecast to be equal to the last observed value from the
     same season of the year (e.g., the same month of the previous year).
 
-    SNF is useful for highly seasonal data.
+    SNF is useful for highly seasonal data. See [1]
 
-    See Hyndman: https://otexts.com/fpp2/simple-methods.html
+    See Also
+    --------
+    forecast_tools.baseline.Naive1
+    forecast_tools.baseline.Drift
+    forecast_tools.baseline.Average
+    forecast_tools.baseline.EnsembleNaive
+
+    References:
+    -----------
+    [1]. https://otexts.com/fpp2/simple-methods.html
 
     '''
 
@@ -492,10 +544,18 @@ class SNaive(Forecast):
 class Average(Forecast):
     '''
     Average forecast.  Forecast is set to the average
-    of the historical data.
+    of the historical data. See [1]
 
-    See Makridakis, Wheelwright and Hyndman (1998)
+    See Also
+    --------
+    forecast_tools.baseline.Naive1
+    forecast_tools.baseline.SNaive
+    forecast_tools.baseline.Drift
+    forecast_tools.baseline.EnsembleNaive
 
+    References:
+    -----------
+    [1.] Makridakis, Wheelwright and Hyndman. Forecasting (1998)
     '''
 
     def __init__(self):
@@ -616,19 +676,29 @@ class Average(Forecast):
 
 class Drift(Forecast):
     '''
-    Naive1 with drift
+    Naive1 forecast with drift
 
     Carry the last value foreward across a forecast horizon but
-     allow for upwards of downwards drift.
+    allow for upwards of downwards drift defined in [1]
 
     Drift = average change in the historical data.
-
-    https://otexts.com/fpp2/simple-methods.html
 
     Note.  The current implementation has a standard error of the forecast
     that is the same as for the naive1 se.  This could be adjusted for drift.
     The following link suggests this is minor and benchmark with R is v.similar
-    https://www.coursehero.com/file/p12k3ln/For-the-random-walk-with-drift-model-the-1-step-ahead-forecast-standard-error/
+    [2]
+
+    See Also
+    --------
+    forecast_tools.baseline.Naive1
+    forecast_tools.baseline.SNaive
+    forecast_tools.baseline.Average
+    forecast_tools.baseline.EnsembleNaive
+
+    References:
+    -----------
+    [1]. https://otexts.com/fpp2/simple-methods.html
+    [2]. https://www.coursehero.com/file/p12k3ln/For-the-random-walk-with-drift-model-the-1-step-ahead-forecast-standard-error/
 
     '''
 
