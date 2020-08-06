@@ -286,6 +286,7 @@ def scaled_cross_validation_score(model, cv, seasonal_period=None):
 
     return np.array(scores)
 
+
 def auto_naive(y_train, horizon=1, seasonal_period=1, min_train_size='auto',
                method='cv', step=1, window_size='auto', metric='mae'):
     '''Automatic selection of the 'best' naive benchmark on a 'single' series

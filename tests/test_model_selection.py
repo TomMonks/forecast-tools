@@ -272,4 +272,61 @@ def test_mase_cv_number_of_folds(train_size, min_train_size, horizon, step,
     assert expected == len(scores)
 
 
+@pytest.mark.parametrize("train, metric",
+                         [(np.arange(7), 'mae'),
+                          (np.arange(7), 'mase')])
+def test_auto_naive_return_length(train, metric):
+    result = ms.auto_naive(train, metric=metric)
+    assert len(result) == 2
 
+
+@pytest.mark.parametrize("train, cv, metric",
+                         [(np.arange(7), 'ro', 'mase'),
+                          (np.arange(7), 'sw', 'mase'),
+                          (np.arange(7), 'holdout', 'mase'),
+                          (np.arange(7), 'ro', 'mae'),
+                          (np.arange(7), 'sw', 'mae'),
+                          (np.arange(7), 'holdout', 'mae')])
+def test_auto_naive_return_length_vary_cv(train, cv, metric):
+    result = ms.auto_naive(train, metric=metric)
+    assert len(result) == 2
+
+
+@pytest.mark.parametrize("metric",
+                         [('ma'),
+                          (999),
+                          ('xxx')])
+def test_auto_naive_metric_value_error(metric):
+    train = np.arange(5)
+    with pytest.raises(ValueError):
+        ms.auto_naive(train, metric=metric)
+
+
+@pytest.mark.parametrize("method",
+                         [('ma'),
+                          (999),
+                          ('xxx')])
+def test_auto_naive_method_value_error(method):
+    train = np.arange(5)
+    with pytest.raises(ValueError):
+        ms.auto_naive(train, method=method)
+
+
+@pytest.mark.parametrize("window_size",
+                         [('ma'),
+                          (-999),
+                          ('xxx')])
+def test_auto_naive_window_size_value_error(window_size):
+    train = np.arange(5)
+    with pytest.raises(ValueError):
+        ms.auto_naive(train, window_size=window_size)
+
+
+@pytest.mark.parametrize("min_train_size",
+                         [('ma'),
+                          (-999),
+                          ('xxx')])
+def test_auto_naive_mintrain_size_value_error(min_train_size):
+    train = np.arange(5)
+    with pytest.raises(ValueError):
+        ms.auto_naive(train, min_train_size=min_train_size)
