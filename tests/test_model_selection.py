@@ -288,7 +288,7 @@ def test_auto_naive_return_length(train, metric):
                           (np.arange(7), 'sw', 'mae'),
                           (np.arange(7), 'holdout', 'mae')])
 def test_auto_naive_return_length_vary_cv(train, cv, metric):
-    result = ms.auto_naive(train, metric=metric)
+    result = ms.auto_naive(train, method=cv, metric=metric)
     assert len(result) == 2
 
 
@@ -330,3 +330,34 @@ def test_auto_naive_mintrain_size_value_error(min_train_size):
     train = np.arange(5)
     with pytest.raises(ValueError):
         ms.auto_naive(train, min_train_size=min_train_size)
+
+
+@pytest.mark.parametrize("train_size, min_train_size, horizon, step, expected",
+                         [(10, 3, 1, 1, 7),
+                          (10, 3, 2, 1, 6),
+                          (10, 3, 1, 2, 4),
+                          (10, 3, 2, 2, 3)])
+def test_cross_validation_folds_return_length(train_size, min_train_size,
+                                              horizon, step, expected):
+    y_train = np.arange(train_size)
+    cv = ms.rolling_forecast_origin(y_train, min_train_size, horizon, step)
+    result = ms.cross_validation_folds(b.Naive1(), cv)
+
+    assert len(result) == expected
+
+
+@pytest.mark.parametrize("train_size, min_train_size, horizon, step, expected",
+                         [(10, 3, 1, 1, 7),
+                          (10, 3, 2, 1, 6),
+                          (10, 3, 1, 2, 4),
+                          (10, 3, 2, 2, 3)])
+def test_cross_validation_score_return_length(train_size, min_train_size,
+                                              horizon, step, expected):
+    y_train = np.arange(train_size)
+    cv = ms.rolling_forecast_origin(y_train, min_train_size, horizon, step)
+    metric = metrics.mean_error
+    result = ms.cross_validation_score(b.Naive1(), cv, metric=metric, n_jobs=1)
+
+    assert len(result) == expected
+
+
