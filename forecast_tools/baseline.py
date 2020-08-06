@@ -1,5 +1,5 @@
 '''
-Contains classes for creating simple baseline/benchmark forecasts
+Tools for simple baseline/benchmark forecasts
 
 These methods might serve as the forecast themselves, but are more likely
 to be used as a baseline to evaluate if more complex models offer a sufficient
@@ -16,13 +16,15 @@ Average: np.sqrt(((h - 1) / self._period).astype(np.int)+1)
 
 Drift:
     Carry forward last time period, but allow for upwards/downwards drift.
+
+EnsembleNaive:
+    An unweighted average of all of the Naive forecasting methods.
 '''
 
 import numpy as np
 import pandas as pd
 from scipy.stats import norm, t
 from abc import ABC, abstractmethod
-
 
 # Boolean, unsigned integer, signed integer, float, complex.
 _NUMERIC_KINDS = set('buifc')
@@ -219,15 +221,89 @@ class Forecast(ABC):
 
 class Naive1(Forecast):
     '''
-    Naive1 or NF1: Carry the last value foreward across a
+    Naive forecast 1 or NF1: Carry the last value foreward across a
     forecast horizon
 
-    See Makridakis, Wheelwright and Hyndman (1998) and
-    Hyndman:
-    https://otexts.com/fpp2/simple-methods.html
+    For details and theory see [1]
+
+    Attributes
+    ----------
+    fittedvalues: pd.Series
+        In-sample predictions of training data
+    resid: pd.Series
+        In-sample residuals
+
+    Methods
+    -------
+    fit(train)
+        fit the model to training data
+    predict(horizon, return_predict_int=False, alpha=None)
+        Predict h-steps ahead
+    fit_predict(train, horizons, return_predict_int=False, alpha=None)
+        convenience method.  combine fit() and predict()
+
+    See Also
+    --------
+    forecast_tools.baseline.SNaive
+    forecast_tools.baseline.Drift
+    forecast_tools.baseline.Average
+    forecast_tools.baseline.EnsembleNaive
+
+    References:
+    ----------
+    [1]. https://otexts.com/fpp2/simple-methods.html
+
+    Examples:
+    --------
+
+    Basic fitting and prediction
+
+    >>> y_train = np.arange(10)
+    >>> model = Naive1()
+    >>> model.fit(y_train)
+    >>> model.predict(horizon=7)
+    array([9., 9., 9., 9., 9., 9., 9.]
+
+    fit_predict() convenience method
+
+    >>> y_train = np.arange(10)
+    >>> model = Naive1()
+    >>> model.fit_predict(y_train, horizon=7)
+    array([9., 9., 9., 9., 9., 9., 9.]
+
+    80 and 95% prediction intervals
+
+    >>> y_train = np.arange(10)
+    >>> model = Naive1()
+    >>> model.fit(y_train)
+    >>> y_pred, y_intervals = model.predict(horizon=2,
+                                            return_pred_interval=True,
+                                            alpha=[0.1, 0.05])
+    >>> y_pred
+    array([9., 9.]
+    >>> y_intervals[0]
+    array([[ 7.71844843, 10.28155157],
+           [ 7.1876124 , 10.8123876 ]])
+    >>> y_intervals[1]
+    array([[ 7.35514637, 10.64485363],
+           [ 6.67382569, 11.32617431]])
+
+
+    Fitted values (one step in-sample predictions)
+    .fittedvalue returns a pandas.Series called pred
+
+    >>> y_train = np.arange(5)
+    >>> model = Naive1()
+    >>> model.fit(y_train)
+    >>> model.fittedvalues
+    0    NaN
+    1    0.0
+    2    1.0
+    3    2.0
+    4    3.0
+    Name: pred, dtype: float64
 
     '''
-
     def __init__(self):
         '''
         Constructor method
@@ -238,6 +314,18 @@ class Naive1(Forecast):
             confidence levels for prediction intervals (e.g. [90, 95])
         '''
         self._fitted = None
+
+    def __repr__(self):
+        '''
+        String representation of object
+        '''
+        return f'Naive1()'
+
+    def __str__(self):
+        '''
+        Print/str representation of object
+        '''
+        return f'Naive1()'
 
     def fit(self, train):
         '''
@@ -305,7 +393,7 @@ class Naive1(Forecast):
             default behaviour is to return 80 and 90% intervals.
 
         Returns:
-        ------
+        -------
 
         if return_predict_int = False
 
@@ -352,9 +440,34 @@ class SNaive(Forecast):
     Each forecast to be equal to the last observed value from the
     same season of the year (e.g., the same month of the previous year).
 
-    SNF is useful for highly seasonal data.
+    SNF is useful for highly seasonal data. See [1]
 
-    See Hyndman: https://otexts.com/fpp2/simple-methods.html
+    Attributes
+    ----------
+    fittedvalues: pd.Series
+        In-sample predictions of training data
+    resid: pd.Series
+        In-sample residuals
+
+    Methods
+    -------
+    fit(train)
+        fit the model to training data
+    predict(horizon, return_predict_int=False, alpha=None)
+        Predict h-steps ahead
+    fit_predict(train, horizons, return_predict_int=False, alpha=None)
+        convenience method.  combine fit() and predict()
+
+    See Also
+    --------
+    forecast_tools.baseline.Naive1
+    forecast_tools.baseline.Drift
+    forecast_tools.baseline.Average
+    forecast_tools.baseline.EnsembleNaive
+
+    References:
+    -----------
+    [1]. https://otexts.com/fpp2/simple-methods.html
 
     '''
 
@@ -367,6 +480,18 @@ class SNaive(Forecast):
         '''
         self._period = period
         self._fitted = None
+
+    def __repr__(self):
+        '''
+        String representation of object
+        '''
+        return f'SNaive1(period={self._period})'
+
+    def __str__(self):
+        '''
+        Print/str representation of object
+        '''
+        return f'SNaive1(period={self._period})'
 
     def fit(self, train):
         '''
@@ -471,13 +596,51 @@ class Average(Forecast):
     Average forecast.  Forecast is set to the average
     of the historical data.
 
-    See Makridakis, Wheelwright and Hyndman (1998)
+    See for discussion of the average as a forecat measure [1]
 
+    Attributes
+    ----------
+    fittedvalues: pd.Series
+        In-sample predictions of training data
+    resid: pd.Series
+        In-sample residuals
+
+    Methods
+    -------
+    fit(train)
+        fit the model to training data
+    predict(horizon, return_predict_int=False, alpha=None)
+        Predict h-steps ahead
+    fit_predict(train, horizons, return_predict_int=False, alpha=None)
+        convenience method.  combine fit() and predict()
+
+    See Also
+    --------
+    forecast_tools.baseline.Naive1
+    forecast_tools.baseline.SNaive
+    forecast_tools.baseline.Drift
+    forecast_tools.baseline.EnsembleNaive
+
+    References:
+    -----------
+    [1.] Makridakis, Wheelwright and Hyndman. Forecasting (1998)
     '''
 
     def __init__(self):
         self._pred = None
         self._fitted = None
+
+    def __repr__(self):
+        '''
+        String representation of object
+        '''
+        return f'Average()'
+
+    def __str__(self):
+        '''
+        Print/str representation of object
+        '''
+        return f'Average()'
 
     def _get_fitted(self):
         return self._fitted['pred']
@@ -515,7 +678,6 @@ class Average(Forecast):
         self._pred = _train.mean()
         # ddof set to get sample mean
         self._resid_std = (_train - self._pred).std(ddof=1)
-        print(self._resid_std)
         self._fitted['pred'] = self._pred
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
 
@@ -582,22 +744,62 @@ class Average(Forecast):
 
 class Drift(Forecast):
     '''
-    Naive1 with drift: Carry the last value foreward across a
-    forecast horizon but allow for upwards of downwards drift.
+    Naive1 forecast with drift
+
+    Carry the last value foreward across a forecast horizon but
+    allow for upwards of downwards drift defined in [1]
 
     Drift = average change in the historical data.
-
-    https://otexts.com/fpp2/simple-methods.html
 
     Note.  The current implementation has a standard error of the forecast
     that is the same as for the naive1 se.  This could be adjusted for drift.
     The following link suggests this is minor and benchmark with R is v.similar
-    https://www.coursehero.com/file/p12k3ln/For-the-random-walk-with-drift-model-the-1-step-ahead-forecast-standard-error/
+    [2]
+
+    Attributes
+    ----------
+    fittedvalues: pd.Series
+        In-sample predictions of training data
+    resid: pd.Series
+        In-sample residuals
+
+    Methods
+    -------
+    fit(train)
+        fit the model to training data
+    predict(horizon, return_predict_int=False, alpha=None)
+        Predict h-steps ahead
+    fit_predict(train, horizons, return_predict_int=False, alpha=None)
+        convenience method.  combine fit() and predict()
+
+    See Also
+    --------
+    forecast_tools.baseline.Naive1
+    forecast_tools.baseline.SNaive
+    forecast_tools.baseline.Average
+    forecast_tools.baseline.EnsembleNaive
+
+    References:
+    -----------
+    [1]. https://otexts.com/fpp2/simple-methods.html
+    [2]. https://www.coursehero.com/file/p12k3ln/For-the-random-walk-with-drift-model-the-1-step-ahead-forecast-standard-error/
 
     '''
 
     def __init__(self):
         self._fitted = None
+
+    def __repr__(self):
+        '''
+        String representation of object
+        '''
+        return f'Drift()'
+
+    def __str__(self):
+        '''
+        Print/str representation of object
+        '''
+        return f'Drift()'
 
     def _get_fitted_gradient(self):
         return self._fitted['gradient_fit']
@@ -702,13 +904,54 @@ class Drift(Forecast):
     fitted_gradient = property(_get_fitted_gradient)
 
 
-class EnsembleNaive(object):
+class EnsembleNaive(Forecast):
+    '''
+    An ensemble of all naive forecast methods.
+
+    Attributes
+    ----------
+    fittedvalues: pd.Series
+        In-sample predictions of training data
+    resid: pd.Series
+        In-sample residuals
+
+    Methods
+    -------
+    fit(train)
+        fit the model to training data
+    predict(horizon, return_predict_int=False, alpha=None)
+        Predict h-steps ahead
+    fit_predict(train, horizons, return_predict_int=False, alpha=None)
+        convenience method.  combine fit() and predict()
+
+    See Also
+    --------
+    forecast_tools.baseline.Naive1
+    forecast_tools.baseline.SNaive
+    forecast_tools.baseline.Average
+    forecast_tools.baseline.Drift
+    '''
+
     def __init__(self, seasonal_period):
         self._estimators = {'NF1': Naive1(),
                             'SNaive': SNaive(period=seasonal_period),
                             'Average': Average(),
                             'Drift': Drift()
                             }
+
+    def __repr__(self):
+        '''
+        String representation of object
+        '''
+        p = self._estimators['SNaive']._period
+        return f'EnsembleNaive(seasonal_period={p})'
+
+    def __str__(self):
+        '''
+        Print/str representation of object
+        '''
+        p = self._estimators['SNaive']._period
+        return f'EnsembleNaive(seasonal_period={p})'
 
     def fit(self, train):
         '''
@@ -724,13 +967,20 @@ class EnsembleNaive(object):
         for _, estimator in self._estimators.items():
             estimator.fit(train)
 
-    def predict(self, horizon):
+    def predict(self, horizon, return_predict_int=False, alpha=None):
         preds = []
         for _, estimator in self._estimators.items():
             model_preds = estimator.predict(horizon)
             preds.append(model_preds)
 
         return np.array(preds).mean(axis=0)
+
+    def _std_h(self, horizon):
+        '''
+        Calculate the standard error of the residuals over
+        a forecast horizon.  This is method specific.
+        '''
+        pass
 
 
 def baseline_estimators(seasonal_period):

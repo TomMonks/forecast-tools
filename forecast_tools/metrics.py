@@ -7,12 +7,13 @@ MSE - mean squared error
 RMSE - root mean squared error
 MAPE - mean absolute percentage error
 sMAPE - symmetric MAPE.
+MASE - mean absolute scaled error
 
 coverage - prediction interval coverage
 '''
 import numpy as np
 
-from forecast_tools.baseline import Naive1, SNaive
+from forecast_tools.baseline import SNaive
 
 
 def as_arrays(y_true, y_pred):
@@ -179,6 +180,8 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred):
 
 def coverage(y_true, pred_intervals):
     '''
+    Prediction Interval Coverage
+
     Calculates the proportion of the true
     values are that are covered by the lower
     and upper bounds of the prediction intervals
@@ -231,18 +234,17 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
     float,
         scalar value representing the MASE
     '''
+    y_true, y_pred = as_arrays(y_true, y_pred)
 
     if period is None:
-        in_sample = Naive1()
-        in_sample.fit(y_train)
+        period = 1
 
-    else:
-        in_sample = SNaive(period=period)
-        in_sample.fit(y_train)
-        y_train = y_train[period:]
+    in_sample = SNaive(period=period)
+    in_sample.fit(y_train)
 
-    mae_insample = mean_absolute_error(
-        y_train, in_sample.fittedvalues.dropna())
+    mae_insample = mean_absolute_error(y_train[period:],
+                                       in_sample.fittedvalues.dropna())
+
     return mean_absolute_error(y_true, y_pred) / mae_insample
 
 
@@ -271,14 +273,14 @@ def forecast_errors(y_true, y_pred, metrics='all'):
 
     Example:
     ---------
-    y_true = [45, 60, 23, 45]
-    y_preds = [50, 50, 50, 50]
+    >>> y_true = [45, 60, 23, 45]
+    >>> y_preds = [50, 50, 50, 50]
 
-    metrics = forecast_errors(y_true, y_preds)
-    print(metrics)
+    >>> metrics = forecast_errors(y_true, y_preds)
+    >>> print(metrics)
 
-    metrics = forecast_errors(y_true, y_preds, metrics=['mape', 'smape'])
-    print(metrics)
+    >>> metrics = forecast_errors(y_true, y_preds, metrics=['mape', 'smape'])
+    >>> print(metrics)
 
     '''
     y_true, y_pred = as_arrays(y_true, y_pred)

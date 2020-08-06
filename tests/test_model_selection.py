@@ -248,3 +248,116 @@ def test_rfo_number_of_folds_pd(train_size, min_train_size, horizon, step,
         actual += 1
 
     assert expected == actual
+
+
+@pytest.mark.parametrize("train_size, min_train_size, horizon, step, expected",
+                         [(10, 3, 1, 1, 7),
+                          (10, 3, 2, 1, 6),
+                          (10, 3, 1, 2, 4),
+                          (10, 3, 2, 2, 3)])
+def test_mase_cv_number_of_folds(train_size, min_train_size, horizon, step,
+                                 expected):
+    '''
+    check that the number of folds returned from rolling origin
+    is as expected when data source is a pandas.DataFrame
+    '''
+    train = np.arange(train_size)
+    cv = ms.rolling_forecast_origin(train, min_train_size=min_train_size,
+                                    horizon=horizon, step=step)
+
+    scores = ms.scaled_cross_validation_score(b.Naive1(), cv)
+
+    print(expected, len(scores))
+    print(scores)
+    assert expected == len(scores)
+
+
+@pytest.mark.parametrize("train, metric",
+                         [(np.arange(7), 'mae'),
+                          (np.arange(7), 'mase')])
+def test_auto_naive_return_length(train, metric):
+    result = ms.auto_naive(train, metric=metric)
+    assert len(result) == 2
+
+
+@pytest.mark.parametrize("train, cv, metric",
+                         [(np.arange(7), 'ro', 'mase'),
+                          (np.arange(7), 'sw', 'mase'),
+                          (np.arange(7), 'holdout', 'mase'),
+                          (np.arange(7), 'ro', 'mae'),
+                          (np.arange(7), 'sw', 'mae'),
+                          (np.arange(7), 'holdout', 'mae')])
+def test_auto_naive_return_length_vary_cv(train, cv, metric):
+    result = ms.auto_naive(train, method=cv, metric=metric)
+    assert len(result) == 2
+
+
+@pytest.mark.parametrize("metric",
+                         [('ma'),
+                          (999),
+                          ('xxx')])
+def test_auto_naive_metric_value_error(metric):
+    train = np.arange(5)
+    with pytest.raises(ValueError):
+        ms.auto_naive(train, metric=metric)
+
+
+@pytest.mark.parametrize("method",
+                         [('ma'),
+                          (999),
+                          ('xxx')])
+def test_auto_naive_method_value_error(method):
+    train = np.arange(5)
+    with pytest.raises(ValueError):
+        ms.auto_naive(train, method=method)
+
+
+@pytest.mark.parametrize("window_size",
+                         [('ma'),
+                          (-999),
+                          ('xxx')])
+def test_auto_naive_window_size_value_error(window_size):
+    train = np.arange(5)
+    with pytest.raises(ValueError):
+        ms.auto_naive(train, window_size=window_size)
+
+
+@pytest.mark.parametrize("min_train_size",
+                         [('ma'),
+                          (-999),
+                          ('xxx')])
+def test_auto_naive_mintrain_size_value_error(min_train_size):
+    train = np.arange(5)
+    with pytest.raises(ValueError):
+        ms.auto_naive(train, min_train_size=min_train_size)
+
+
+@pytest.mark.parametrize("train_size, min_train_size, horizon, step, expected",
+                         [(10, 3, 1, 1, 7),
+                          (10, 3, 2, 1, 6),
+                          (10, 3, 1, 2, 4),
+                          (10, 3, 2, 2, 3)])
+def test_cross_validation_folds_return_length(train_size, min_train_size,
+                                              horizon, step, expected):
+    y_train = np.arange(train_size)
+    cv = ms.rolling_forecast_origin(y_train, min_train_size, horizon, step)
+    result = ms.cross_validation_folds(b.Naive1(), cv)
+
+    assert len(result) == expected
+
+
+@pytest.mark.parametrize("train_size, min_train_size, horizon, step, expected",
+                         [(10, 3, 1, 1, 7),
+                          (10, 3, 2, 1, 6),
+                          (10, 3, 1, 2, 4),
+                          (10, 3, 2, 2, 3)])
+def test_cross_validation_score_return_length(train_size, min_train_size,
+                                              horizon, step, expected):
+    y_train = np.arange(train_size)
+    cv = ms.rolling_forecast_origin(y_train, min_train_size, horizon, step)
+    metric = metrics.mean_error
+    result = ms.cross_validation_score(b.Naive1(), cv, metric=metric, n_jobs=1)
+
+    assert len(result) == expected
+
+
