@@ -1,4 +1,18 @@
 import setuptools
+from setuptools.command.egg_info import egg_info
+
+
+class egg_info_ex(egg_info):
+    """Includes license file into `.egg-info` folder."""
+
+    def run(self):
+        # don't duplicate license into `.egg-info` when building a distribution
+        if not self.distribution.have_run.get('install', True):
+            # `install` command is in progress, copy license
+            self.mkpath(self.egg_info)
+            self.copy_file('LICENSE', self.egg_info)
+
+        egg_info.run(self)
 
 # Read in the requirements.txt file
 with open("requirements.txt") as f:
@@ -12,10 +26,11 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="forecast-tools",
-    version="0.1.5",
+    version="0.1.6",
     author="Thomas Monks",
     author_email="forecast_tools@gmail.com",
     license="The MIT License (MIT)",
+    license_files=('LICENSE', ),
     description="Tools to support the forecasting process in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
