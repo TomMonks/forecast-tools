@@ -1,5 +1,8 @@
 # Change log
 
+## v0.1.6
+MIT LICENCE file added to PyPi package (previously missing).
+
 ## v0.1.5
 
 auto_naive
