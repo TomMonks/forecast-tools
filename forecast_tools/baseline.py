@@ -29,6 +29,10 @@ from abc import ABC, abstractmethod
 # Boolean, unsigned integer, signed integer, float, complex.
 _NUMERIC_KINDS = set('buifc')
 
+# constant
+TRAINING_TO_SHORT = "The training data is too short. If using SNaive " \
+    + "or EnsembleNaive, min_train_size must be greater than period/seasonal_period."
+
 
 def is_numeric(array):
     """Determine whether the argument has a numeric datatype, when
@@ -126,7 +130,7 @@ class Forecast(ABC):
             raise TypeError(
                 'Training data must be pd.Series, pd.DataFrame or np.ndarray')
         elif len(train) < min_length:
-            raise ValueError('Training data is empty')
+            raise ValueError(TRAINING_TO_SHORT)
         elif not is_numeric(train):
             raise TypeError('Training data must be numeric')
 
