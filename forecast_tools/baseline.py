@@ -996,9 +996,6 @@ def baseline_estimators(seasonal_period):
     seasonal_period - int,
         order of seasonal periods in the data (e.g daily = 7)
 
-    average_lookback - int,
-        number of lagged periods that average baseline includes
-
     Returns:
     --------
     dict,
