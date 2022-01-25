@@ -2,6 +2,7 @@
 
 ## v0.1.7
 A more informative error message when training data is too short for naive method.
+Minor fixes of outdated docstrings in forecast_tools.baseline
 
 ## v0.1.6
 MIT LICENCE file added to PyPi package (previously missing).

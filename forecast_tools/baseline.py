@@ -480,7 +480,7 @@ class SNaive(Forecast):
         Parameters:
         --------
         period - int, the seasonal period of the daya
-                 e.g. weekly = 7, monthly = 12, daily = 24
+                 e.g. day of week = 7, monthly = 12, quarterly = 4
         '''
         self._period = period
         self._fitted = None
@@ -489,13 +489,13 @@ class SNaive(Forecast):
         '''
         String representation of object
         '''
-        return f'SNaive1(period={self._period})'
+        return f'SNaive(period={self._period})'
 
     def __str__(self):
         '''
         Print/str representation of object
         '''
-        return f'SNaive1(period={self._period})'
+        return f'SNaive(period={self._period})'
 
     def fit(self, train):
         '''
@@ -937,6 +937,16 @@ class EnsembleNaive(Forecast):
     '''
 
     def __init__(self, seasonal_period):
+        '''
+
+        An ensemble of all naive forecast methods.
+
+        Params:
+        -------
+        period: int
+            the seasonal period of the data
+            e.g. day of week = 7, monthly = 12, quarterly = 4
+        '''
         self._estimators = {'NF1': Naive1(),
                             'SNaive': SNaive(period=seasonal_period),
                             'Average': Average(),
