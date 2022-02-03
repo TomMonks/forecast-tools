@@ -27,7 +27,7 @@ projects by including a function that returns all of the predictions within a
 split/fold. A seperate function then handles coverage.
 '''
 
-from logging import exception
+# from logging import exception
 import numpy as np
 from joblib import Parallel, delayed
 import warnings
@@ -162,7 +162,7 @@ def cross_validation_score(model, cv, metric, horizons=None,
     n_jobs: int, optional (default=-1)
         when -1 runs across all cores
         set = 1 to run each cross validation seperately.
-        using -1 speeds up cross validation of slow running models.
+        using -1 speeds up cross validation of slow running models
 
     Returns:
     -------
@@ -405,7 +405,6 @@ def auto_naive(y_train, horizon=1, seasonal_period=1, min_train_size='auto',
     if metric not in metrics:
         raise ValueError(f"Please select a metric from {list(metrics.keys())}")
 
-
     if min_train_size == 'auto':
         min_train_size = len(y_train) // 3
     elif not type(min_train_size) is int:
@@ -423,17 +422,18 @@ def auto_naive(y_train, horizon=1, seasonal_period=1, min_train_size='auto',
     if method == 'cv':
         # performing both ro and sw. check for conflicts in params
         if window_size != min_train_size:
-            msg = f"You are running both RO and SW where RO" \
+            msg = "You are running both RO and SW where RO" \
                 + f" {min_train_size=} is different from SO {window_size=}." \
                 + " Did you mean to do this?"
             warnings.warn(msg)
 
     # additinal auto_naive validation for min_train_size and window_size
     if len(y_train) < (min_train_size + horizon):
-        msg = f"The training data is shorter than {min_train_size=} + {horizon=}" \
-            + " No validation can be performed. "
+        msg = f"The training data is shorter than {min_train_size=} + " \
+            + "{horizon=} No validation can be performed. "
         raise ValueError(msg)
-    elif min_train_size < seasonal_period and (method == 'cv' or method == 'ro'):
+    elif min_train_size < seasonal_period and \
+            (method == 'cv' or method == 'ro'):
         msg = "Seasonal period is longer than the minimum training size for" \
             + " Rolling Origin CV. If this parameter is set to 'auto' try " \
             + " manually setting it."
@@ -443,8 +443,6 @@ def auto_naive(y_train, horizon=1, seasonal_period=1, min_train_size='auto',
             + "Window CV. If this parameter is set to 'auto' try " \
             + "manually setting it."
         raise ValueError(msg)
-
-
 
     baselines = baseline_estimators(seasonal_period)
 
