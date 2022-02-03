@@ -10,7 +10,7 @@
 
  # Vision for forecast-tools
 
- 1. Deliverhigh quality reliable code for forecasting education and practice with full documentation and unit testing.
+ 1. Deliver high quality reliable code for forecasting education and practice with full documentation and unit testing.
  2. Provide a simple to use pythonic interface that users of `statsmodels` and `sklearn` will recognise.
  3. To improve the quality of Machine Learning time series forecasting and encourage the use of best practice.
 
