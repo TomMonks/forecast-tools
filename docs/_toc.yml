@@ -1,0 +1,9 @@
+format: jb-book
+root: content/00_front_page
+parts:
+- caption: Quick start
+  chapters:
+  - file: content/01_benchmark_forecasts
+  - file: content/02_forecast_error
+  - file: content/03_cross_validation
+  - file: content/04_auto_naive
