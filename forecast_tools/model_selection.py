@@ -405,13 +405,6 @@ def auto_naive(y_train, horizon=1, seasonal_period=1, min_train_size='auto',
     if metric not in metrics:
         raise ValueError(f"Please select a metric from {list(metrics.keys())}")
 
-    if method == 'cv':
-        # performing both ro and sw. check for conflicts in params
-        if window_size != min_train_size:
-            msg = f"You are running both RO and SW where RO" \
-                + f" {min_train_size=} is different from SO {window_size=}." \
-                + " Did you mean to do this?"
-            warnings.warn(msg)
 
     if min_train_size == 'auto':
         min_train_size = len(y_train) // 3
@@ -426,6 +419,14 @@ def auto_naive(y_train, horizon=1, seasonal_period=1, min_train_size='auto',
         raise ValueError("valid window_size values are 'auto' or int > 0")
     elif window_size < 1:
         raise ValueError("valid window_size values are 'auto' or int > 0")
+
+    if method == 'cv':
+        # performing both ro and sw. check for conflicts in params
+        if window_size != min_train_size:
+            msg = f"You are running both RO and SW where RO" \
+                + f" {min_train_size=} is different from SO {window_size=}." \
+                + " Did you mean to do this?"
+            warnings.warn(msg)
 
     # additinal auto_naive validation for min_train_size and window_size
     if len(y_train) < (min_train_size + horizon):
