@@ -1,5 +1,6 @@
 import setuptools
 from setuptools.command.egg_info import egg_info
+from forecast_tools import __version__
 
 
 class egg_info_ex(egg_info):
@@ -26,7 +27,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="forecast-tools",
-    version="0.1.6",
+    version=__version__,
     author="Thomas Monks",
     author_email="forecast_tools@gmail.com",
     license="The MIT License (MIT)",

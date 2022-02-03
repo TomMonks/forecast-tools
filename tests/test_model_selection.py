@@ -286,10 +286,37 @@ def test_auto_naive_return_length(train, metric):
                           (np.arange(7), 'holdout', 'mase'),
                           (np.arange(7), 'ro', 'mae'),
                           (np.arange(7), 'sw', 'mae'),
-                          (np.arange(7), 'holdout', 'mae')])
+                          (np.arange(7), 'holdout', 'mae'),
+                          (np.arange(364), 'cv', 'mae')])
 def test_auto_naive_return_length_vary_cv(train, cv, metric):
     result = ms.auto_naive(train, method=cv, metric=metric)
     assert len(result) == 2
+
+
+@pytest.mark.parametrize("train, seasonal_period, min_train_size, window_size",
+                         [(np.arange(500), 365, 365, 'auto'),
+                          (np.arange(500), 365, 365, 364)])
+def test_auto_naive_ro_sw_param_mismatch(train, seasonal_period,
+                                         min_train_size, window_size):
+    """
+    Test created to fail and replicate an error in auto_naive.
+    This happened when there is a conflict between the seasonal period
+    and the two CV parameters: min_train_size and window_size for
+    rolling origin and sliding window CV respectively.
+
+    E.g.
+    len(train) = 500
+    seasonal_period = 365
+    min_train_size = 365
+    window_size = 'auto'
+
+    in this circumstance window_size was originally set to
+    len(train) // 3 < seasonal_period
+    """
+    with pytest.raises(ValueError):
+        ms.auto_naive(train, seasonal_period=seasonal_period,
+                      min_train_size=min_train_size,
+                      window_size=window_size)
 
 
 @pytest.mark.parametrize("metric",
