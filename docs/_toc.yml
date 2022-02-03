@@ -1,6 +1,10 @@
 format: jb-book
 root: content/00_front_page
 parts:
+- caption: Introduction
+  chapters:
+  - file: content/00a_citation
+  - file: content/00b_contribute
 - caption: Quick start
   chapters:
   - file: content/01_benchmark_forecasts
