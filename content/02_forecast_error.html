@@ -247,6 +247,16 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#forecast-tools-imports">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     forecast_tools
+    </span>
+   </code>
+   imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#load-data-for-this-lecture">
    Load data for this lecture
   </a>
@@ -293,6 +303,16 @@
                         </div>
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#forecast-tools-imports">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     forecast_tools
+    </span>
+   </code>
+   imports
+  </a>
+ </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#load-data-for-this-lecture">
    Load data for this lecture
@@ -354,10 +374,22 @@
 </div>
 </div>
 </div>
+<div class="section" id="forecast-tools-imports">
+<h2><code class="docutils literal notranslate"><span class="pre">forecast_tools</span></code> imports<a class="headerlink" href="#forecast-tools-imports" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running in Google Colab install forecast-tools</span>
+<span class="k">if</span> <span class="s1">&#39;google.colab&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+    <span class="o">!</span>pip install forecast-tools
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">forecast_tools.datasets</span> <span class="kn">import</span> <span class="n">load_emergency_dept</span>
 </pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -438,7 +470,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x11edfb550&gt;
 </pre></div>
 </div>
-<img alt="../_images/02_forecast_error_12_1.png" src="../_images/02_forecast_error_12_1.png" />
+<img alt="../_images/02_forecast_error_14_1.png" src="../_images/02_forecast_error_14_1.png" />
 </div>
 </div>
 </div>

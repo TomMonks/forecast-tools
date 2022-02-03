@@ -357,6 +357,15 @@
 </div>
 </div>
 </div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running in Google Colab install forecast-tools</span>
+<span class="k">if</span> <span class="s1">&#39;google.colab&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+    <span class="o">!</span>pip install forecast-tools
+</pre></div>
+</div>
+</div>
+</div>
 <p>Up till now we have used a single validation period to select our best model.  The weakness of that approach is that it gives you a sample size of 1 (that’s better than nothing, but generally poor statistics!).  Time series cross validation is an approach to provide more data points when comparing models. In the classicial time series literature time series cross validation is called a <strong>Rolling Forecast Origin</strong>.  There may also be benefit of taking a <strong>sliding window</strong> approach to cross validaiton.  This second approach maintains a fixed sized training set.  I.e. it drops older values from the time series during validation.</p>
 <div class="section" id="rolling-forecast-origin">
 <h2>Rolling Forecast Origin<a class="headerlink" href="#rolling-forecast-origin" title="Permalink to this headline">¶</a></h2>

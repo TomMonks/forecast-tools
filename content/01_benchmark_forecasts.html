@@ -254,6 +254,21 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#forecast-tools-imports">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     forecast-tools
+    </span>
+   </code>
+   imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#helper-functions">
+   Helper functions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#the-ed-arrivals-dataset">
    The ED arrivals dataset.
   </a>
@@ -313,6 +328,21 @@
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#the-importance-of-a-baseline-model">
    The importance of a baseline model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#forecast-tools-imports">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     forecast-tools
+    </span>
+   </code>
+   imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#helper-functions">
+   Helper functions
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -389,6 +419,18 @@
 </div>
 </div>
 </div>
+</div>
+<div class="section" id="forecast-tools-imports">
+<h2><code class="docutils literal notranslate"><span class="pre">forecast-tools</span></code> imports<a class="headerlink" href="#forecast-tools-imports" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running in Google Colab install forecast-tools</span>
+<span class="k">if</span> <span class="s1">&#39;google.colab&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+    <span class="o">!</span>pip install forecast-tools
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">forecast_tools.datasets</span> <span class="kn">import</span> <span class="n">load_emergency_dept</span>
@@ -396,6 +438,9 @@
 </div>
 </div>
 </div>
+</div>
+<div class="section" id="helper-functions">
+<h2>Helper functions<a class="headerlink" href="#helper-functions" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">preds_as_series</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">preds</span><span class="p">):</span>
@@ -464,7 +509,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:xlabel=&#39;date&#39;&gt;
 </pre></div>
 </div>
-<img alt="../_images/01_benchmark_forecasts_9_1.png" src="../_images/01_benchmark_forecasts_9_1.png" />
+<img alt="../_images/01_benchmark_forecasts_12_1.png" src="../_images/01_benchmark_forecasts_12_1.png" />
 </div>
 </div>
 </div>
@@ -553,7 +598,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f7a00867a30&gt;
 </pre></div>
 </div>
-<img alt="../_images/01_benchmark_forecasts_17_1.png" src="../_images/01_benchmark_forecasts_17_1.png" />
+<img alt="../_images/01_benchmark_forecasts_20_1.png" src="../_images/01_benchmark_forecasts_20_1.png" />
 </div>
 </div>
 <p>## Naive Forecast 1</p>
@@ -608,7 +653,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f7a0103eaf0&gt;
 </pre></div>
 </div>
-<img alt="../_images/01_benchmark_forecasts_22_1.png" src="../_images/01_benchmark_forecasts_22_1.png" />
+<img alt="../_images/01_benchmark_forecasts_25_1.png" src="../_images/01_benchmark_forecasts_25_1.png" />
 </div>
 </div>
 </div>
@@ -658,7 +703,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f7a00b17430&gt;
 </pre></div>
 </div>
-<img alt="../_images/01_benchmark_forecasts_27_1.png" src="../_images/01_benchmark_forecasts_27_1.png" />
+<img alt="../_images/01_benchmark_forecasts_30_1.png" src="../_images/01_benchmark_forecasts_30_1.png" />
 </div>
 </div>
 </div>
@@ -716,7 +761,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f7a00c7aaf0&gt;
 </pre></div>
 </div>
-<img alt="../_images/01_benchmark_forecasts_32_1.png" src="../_images/01_benchmark_forecasts_32_1.png" />
+<img alt="../_images/01_benchmark_forecasts_35_1.png" src="../_images/01_benchmark_forecasts_35_1.png" />
 </div>
 </div>
 </div>
@@ -801,7 +846,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/01_benchmark_forecasts_36_0.png" src="../_images/01_benchmark_forecasts_36_0.png" />
+<img alt="../_images/01_benchmark_forecasts_39_0.png" src="../_images/01_benchmark_forecasts_39_0.png" />
 </div>
 </div>
 </div>
@@ -828,7 +873,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/01_benchmark_forecasts_40_0.png" src="../_images/01_benchmark_forecasts_40_0.png" />
+<img alt="../_images/01_benchmark_forecasts_43_0.png" src="../_images/01_benchmark_forecasts_43_0.png" />
 </div>
 </div>
 </div>
