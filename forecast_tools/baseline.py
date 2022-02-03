@@ -29,6 +29,11 @@ from abc import ABC, abstractmethod
 # Boolean, unsigned integer, signed integer, float, complex.
 _NUMERIC_KINDS = set('buifc')
 
+# constant
+TRAINING_TO_SHORT = "The training data is too short. If using SNaive " \
+    + "or EnsembleNaive, min_train_size must be greater than period/" \
+    + "seasonal_period."
+
 
 def is_numeric(array):
     """Determine whether the argument has a numeric datatype, when
@@ -126,7 +131,7 @@ class Forecast(ABC):
             raise TypeError(
                 'Training data must be pd.Series, pd.DataFrame or np.ndarray')
         elif len(train) < min_length:
-            raise ValueError('Training data is empty')
+            raise ValueError(TRAINING_TO_SHORT)
         elif not is_numeric(train):
             raise TypeError('Training data must be numeric')
 
@@ -304,6 +309,7 @@ class Naive1(Forecast):
     Name: pred, dtype: float64
 
     '''
+
     def __init__(self):
         '''
         Constructor method
@@ -319,13 +325,13 @@ class Naive1(Forecast):
         '''
         String representation of object
         '''
-        return f'Naive1()'
+        return 'Naive1()'
 
     def __str__(self):
         '''
         Print/str representation of object
         '''
-        return f'Naive1()'
+        return 'Naive1()'
 
     def fit(self, train):
         '''
@@ -476,7 +482,7 @@ class SNaive(Forecast):
         Parameters:
         --------
         period - int, the seasonal period of the daya
-                 e.g. weekly = 7, monthly = 12, daily = 24
+                 e.g. day of week = 7, monthly = 12, quarterly = 4
         '''
         self._period = period
         self._fitted = None
@@ -485,13 +491,13 @@ class SNaive(Forecast):
         '''
         String representation of object
         '''
-        return f'SNaive1(period={self._period})'
+        return f'SNaive(period={self._period})'
 
     def __str__(self):
         '''
         Print/str representation of object
         '''
-        return f'SNaive1(period={self._period})'
+        return f'SNaive(period={self._period})'
 
     def fit(self, train):
         '''
@@ -634,13 +640,13 @@ class Average(Forecast):
         '''
         String representation of object
         '''
-        return f'Average()'
+        return 'Average()'
 
     def __str__(self):
         '''
         Print/str representation of object
         '''
-        return f'Average()'
+        return 'Average()'
 
     def _get_fitted(self):
         return self._fitted['pred']
@@ -793,13 +799,13 @@ class Drift(Forecast):
         '''
         String representation of object
         '''
-        return f'Drift()'
+        return 'Drift()'
 
     def __str__(self):
         '''
         Print/str representation of object
         '''
-        return f'Drift()'
+        return 'Drift()'
 
     def _get_fitted_gradient(self):
         return self._fitted['gradient_fit']
@@ -933,6 +939,16 @@ class EnsembleNaive(Forecast):
     '''
 
     def __init__(self, seasonal_period):
+        '''
+
+        An ensemble of all naive forecast methods.
+
+        Params:
+        -------
+        period: int
+            the seasonal period of the data
+            e.g. day of week = 7, monthly = 12, quarterly = 4
+        '''
         self._estimators = {'NF1': Naive1(),
                             'SNaive': SNaive(period=seasonal_period),
                             'Average': Average(),
@@ -991,9 +1007,6 @@ def baseline_estimators(seasonal_period):
     --------
     seasonal_period - int,
         order of seasonal periods in the data (e.g daily = 7)
-
-    average_lookback - int,
-        number of lagged periods that average baseline includes
 
     Returns:
     --------
