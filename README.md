@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomMonks/forecast-tools/master)
 [![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360+/)
+[![Read the Docs](https://readthedocs.org/projects/pip/badge/?version=latest)](https://tommonks.github.io/forecast-tools/)
 
  forecast-tools has been developed to support forecasting education and applied forecasting research.  It is MIT licensed and freely available to practitioners, students and researchers via PyPi.  There is a long term plan to make forecast-tools available via conda-forge.
 
