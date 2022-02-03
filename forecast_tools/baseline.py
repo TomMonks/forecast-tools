@@ -31,7 +31,8 @@ _NUMERIC_KINDS = set('buifc')
 
 # constant
 TRAINING_TO_SHORT = "The training data is too short. If using SNaive " \
-    + "or EnsembleNaive, min_train_size must be greater than period/seasonal_period."
+    + "or EnsembleNaive, min_train_size must be greater than period/" \
+    + "seasonal_period."
 
 
 def is_numeric(array):
@@ -308,6 +309,7 @@ class Naive1(Forecast):
     Name: pred, dtype: float64
 
     '''
+
     def __init__(self):
         '''
         Constructor method
@@ -323,13 +325,13 @@ class Naive1(Forecast):
         '''
         String representation of object
         '''
-        return f'Naive1()'
+        return 'Naive1()'
 
     def __str__(self):
         '''
         Print/str representation of object
         '''
-        return f'Naive1()'
+        return 'Naive1()'
 
     def fit(self, train):
         '''
@@ -638,13 +640,13 @@ class Average(Forecast):
         '''
         String representation of object
         '''
-        return f'Average()'
+        return 'Average()'
 
     def __str__(self):
         '''
         Print/str representation of object
         '''
-        return f'Average()'
+        return 'Average()'
 
     def _get_fitted(self):
         return self._fitted['pred']
@@ -797,13 +799,13 @@ class Drift(Forecast):
         '''
         String representation of object
         '''
-        return f'Drift()'
+        return 'Drift()'
 
     def __str__(self):
         '''
         Print/str representation of object
         '''
-        return f'Drift()'
+        return 'Drift()'
 
     def _get_fitted_gradient(self):
         return self._fitted['gradient_fit']
