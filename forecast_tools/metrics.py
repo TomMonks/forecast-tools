@@ -12,6 +12,7 @@ MASE - mean absolute scaled error
 coverage - prediction interval coverage
 '''
 import numpy as np
+import pandas as pd
 
 from forecast_tools.baseline import SNaive
 
@@ -178,34 +179,6 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(100 * (numerator / denominator))
 
 
-def coverage(y_true, pred_intervals):
-    '''
-    Prediction Interval Coverage
-
-    Calculates the proportion of the true
-    values are that are covered by the lower
-    and upper bounds of the prediction intervals
-
-    Parameters:
-    -------
-    y_true -- array-like,
-        actual observations
-
-    pred_intervals -- np.array, matrix (hx2)
-        prediction intervals
-
-    Returns:
-    -------
-    float
-    '''
-    y_true = np.asarray(y_true)
-    lower = np.asarray(pred_intervals.T[0])
-    upper = np.asarray(pred_intervals.T[1])
-
-    cover = len(np.where((y_true > lower) & (y_true < upper))[0])
-    return cover / len(y_true)
-
-
 def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
     '''
     Mean absolute scaled error (MASE)
@@ -313,6 +286,124 @@ def _forecast_error_functions():
     funcs['mape'] = mean_absolute_percentage_error
     funcs['smape'] = symmetric_mean_absolute_percentage_error
     return funcs
+
+
+def coverage(y_true, pred_intervals):
+    '''
+    Prediction Interval Coverage
+
+    Calculates the proportion of the true
+    values are that are covered by the lower
+    and upper bounds of the prediction intervals
+
+    Parameters:
+    -------
+    y_true -- array-like,
+        actual observations
+
+    pred_intervals -- np.array, matrix (hx2)
+        prediction intervals
+
+    Returns:
+    -------
+    float
+    '''
+    y_true = np.asarray(y_true)
+    lower = np.asarray(pred_intervals.T[0])
+    upper = np.asarray(pred_intervals.T[1])
+
+    cover = len(np.where((y_true > lower) & (y_true < upper))[0])
+    return cover / len(y_true)
+
+
+def winkler_score(intervals, observations, alpha):
+    '''
+    Returns the mean winkler score of a set of observations and prediction
+    intervals
+
+    A Winkler score is the width of the interval plus a penality proportional
+    to the deviation (above or below the interval) and 2/$\alpha$
+
+    Smaller winkler scores are better.
+
+    Parameters:
+    -----------
+    intervals: array-like
+        array of prediction intervals
+
+    observations: float or array-like
+        individual observation or array of ground truth observations
+
+    alpha: float
+        The prediction interval alpha.  For an 80% pred intervals alpha=0.2
+
+    Returns:
+    -------
+    float, numpy.ndarray
+
+    Example usage:
+    --------------
+
+    Individual winkler score:
+    ```python
+    >>> alpha = 0.2
+    >>> interval = [744.54, 773.22]
+    >>> y_t = 741.84
+    >>> ws = winkler_score(interval, y_t, alpha)
+    >>> print(round(ws, 2))
+
+    56.68
+    ```
+
+    Multiple interval scores
+
+    ```python
+    >>> TARGET = 0.80
+    >>> HOLDOUT = 14
+    >>> PERIOD = 7
+    >>>
+    >>> attends = load_emergency_dept()
+    >>> # train-test split
+    >>> train, test = attends[:-HOLDOUT], attends[-HOLDOUT:]
+    >>> model = SNaive(PERIOD)
+    >>> # returns 80 and 90% prediction intervals by default.
+    >>> preds, intervals_ed = model.fit_predict(train, HOLDOUT,
+        ... return_predict_int=True)
+    >>> ws = mean_winkler_score_np(intervals_ed[0], test_ed, alpha=1-TARGET)
+    >>> print(f'Mean winkler score: {ws:.2f}')
+
+    Mean winkler score: 79.72
+    ```
+
+    '''
+    # distinguish between handling individual obs and multiple obs
+    if isinstance(observations, (np.ndarray, pd.DataFrame)):
+        observations = np.array(observations).T[0]
+    else:
+        observations = np.array([observations])
+
+    # handle intervals for an individual observation
+    if len(intervals) == 2:
+        intervals = np.array(intervals).reshape(1, -1)
+
+    # interval widths
+    scores = intervals[:, 1] - intervals[:, 0]
+
+    # observation falls below lower interval
+    below_lower = observations < intervals[:, 0]
+
+    # observation exceeds upper interval
+    above_upper = observations > intervals[:, 1]
+
+    # lower penality
+    scores[below_lower] += \
+        ((2/alpha) * (intervals[:, 0][below_lower] - observations[below_lower]))
+
+    # upper penality
+    scores[above_upper] += \
+        ((2/alpha) * (observations[above_upper] - intervals[:, 1][above_upper]))
+
+    return scores.mean()
 
 
 if __name__ == '__main__':
