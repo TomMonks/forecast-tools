@@ -198,7 +198,7 @@ def test_mase_naive(y_train, y_true, y_pred, expected):
 def test_mase_snaive(y_train, y_true, y_pred, expected):
     '''
     test mean absolute scaled error calculation using SNaive as scaler
-
+git
     test calcs produced using libre office calc.
     '''
     error = m.mean_absolute_scaled_error(y_true, y_pred, y_train, period=7)
@@ -207,12 +207,15 @@ def test_mase_snaive(y_train, y_true, y_pred, expected):
 
 @pytest.mark.parametrize("y_intervals, y_test, alpha, expected",
                          [([744.54, 773.22], 741.84, 0.2, 55.68),
+                          ([744.54, 773.22], [741.84], 0.2, 55.68),
                           ([744.54, 773.22], 745.0, 0.2, 28.68),
                           (np.array([744.54, 773.22]), 745.0, 0.2, 28.68),
                           (pd.DataFrame([744.54, 773.22]), 745.0, 0.2, 28.68)])
 def test_winkler_score(y_intervals, y_test, alpha, expected):
     '''
-    test the correct error functions are returned
+    Test that the winkler score returns the correct value
+
+    Tests one step forecasts only.
     '''
     ws = m.winkler_score(y_intervals, y_test, alpha)
     assert pytest.approx(expected) == ws

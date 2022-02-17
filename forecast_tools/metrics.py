@@ -377,8 +377,11 @@ def winkler_score(intervals, observations, alpha):
 
     '''
     # distinguish between handling individual obs and multiple obs
-    if isinstance(observations, (np.ndarray, pd.DataFrame)):
-        observations = np.array(observations).T[0]
+    if isinstance(observations, (np.ndarray, pd.DataFrame, list)):
+        if len(observations) > 1:
+            observations = np.array(observations).T[0]
+        else:
+            observations = np.array(observations)
     else:
         observations = np.array([observations])
 
@@ -397,11 +400,13 @@ def winkler_score(intervals, observations, alpha):
 
     # lower penality
     scores[below_lower] += \
-        ((2/alpha) * (intervals[:, 0][below_lower] - observations[below_lower]))
+        ((2/alpha) * (intervals[:, 0]
+         [below_lower] - observations[below_lower]))
 
     # upper penality
     scores[above_upper] += \
-        ((2/alpha) * (observations[above_upper] - intervals[:, 1][above_upper]))
+        ((2/alpha) * (observations[above_upper] -
+         intervals[:, 1][above_upper]))
 
     return scores.mean()
 
