@@ -5,8 +5,11 @@ in the metrics module
 
 import pytest
 import numpy as np
+import pandas as pd
 
 from forecast_tools import metrics as m
+from forecast_tools import datasets
+from forecast_tools import baseline
 
 
 @pytest.mark.parametrize("y_true, y_pred, metrics, expected",
@@ -200,3 +203,40 @@ def test_mase_snaive(y_train, y_true, y_pred, expected):
     '''
     error = m.mean_absolute_scaled_error(y_true, y_pred, y_train, period=7)
     assert pytest.approx(expected) == error
+
+
+@pytest.mark.parametrize("y_intervals, y_test, alpha, expected",
+                         [([744.54, 773.22], 741.84, 0.2, 55.68),
+                          ([744.54, 773.22], 745.0, 0.2, 28.68),
+                          (np.array([744.54, 773.22]), 745.0, 0.2, 28.68),
+                          (pd.DataFrame([744.54, 773.22]), 745.0, 0.2, 28.68)])
+def test_winkler_score(y_intervals, y_test, alpha, expected):
+    '''
+    test the correct error functions are returned
+    '''
+    ws = m.winkler_score(y_intervals, y_test, alpha)
+    assert pytest.approx(expected) == ws
+
+
+def test_winkler_score_m_step():
+    '''
+    test the correct error functions are returned
+    '''
+    HOLDOUT = 7
+    PERIOD = 7
+    expected = 130.75
+
+    attends = datasets.load_emergency_dept()
+
+    # train-test split
+    train, test = attends[: -HOLDOUT], attends[-HOLDOUT:]
+
+    model = baseline.SNaive(PERIOD)
+
+    # returns 80 and 90% prediction intervals by default.
+    preds, intervals = model.fit_predict(train, HOLDOUT,
+                                         return_predict_int=True)
+
+    ws = m.winkler_score(intervals[0], test, alpha=0.2)
+
+    assert pytest.approx(expected, abs=0.01) == ws

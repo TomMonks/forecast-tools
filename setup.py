@@ -15,6 +15,7 @@ class egg_info_ex(egg_info):
 
         egg_info.run(self)
 
+
 # Read in the requirements.txt file
 with open("requirements.txt") as f:
     requirements = []
