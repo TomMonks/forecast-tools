@@ -11,8 +11,10 @@ MASE - mean absolute scaled error
 
 coverage - prediction interval coverage
 '''
+from argparse import ArgumentError
 import numpy as np
 import pandas as pd
+import numbers
 
 from forecast_tools.baseline import SNaive
 
@@ -329,10 +331,10 @@ def winkler_score(intervals, observations, alpha):
     Parameters:
     -----------
     intervals: array-like
-        array of prediction intervals
+        array of prediction intervals 
 
-    observations: float or array-like
-        individual observation or array of ground truth observations
+    observations: float, integer or array-like
+        individual observation or array of ground truth observations.
 
     alpha: float
         The prediction interval alpha.  For an 80% pred intervals alpha=0.2
@@ -376,14 +378,20 @@ def winkler_score(intervals, observations, alpha):
     ```
 
     '''
+
+    type_err_msg = "The observations param should be array-like of " \
+        + "integers or floats"
+
     # distinguish between handling individual obs and multiple obs
     if isinstance(observations, (np.ndarray, pd.DataFrame, list)):
         if len(observations) > 1:
             observations = np.array(observations).T[0]
         else:
             observations = np.array(observations)
-    else:
+    elif isinstance(observations, numbers.Number):
         observations = np.array([observations])
+    else:
+        raise TypeError(type_err_msg)
 
     # handle intervals for an individual observation
     if len(intervals) == 2:

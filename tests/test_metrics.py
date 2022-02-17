@@ -243,3 +243,10 @@ def test_winkler_score_m_step():
     ws = m.winkler_score(intervals[0], test, alpha=0.2)
 
     assert pytest.approx(expected, abs=0.01) == ws
+
+
+@pytest.mark.parametrize("y_intervals, y_test, alpha",
+                         [([744.54, 773.22], "741.84", 0.2)])
+def test_winkler_score_invalid_type(y_intervals, y_test, alpha):
+    with pytest.raises(TypeError):
+        m.winkler_score(y_intervals, y_test, alpha)
