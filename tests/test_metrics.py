@@ -250,3 +250,17 @@ def test_winkler_score_m_step():
 def test_winkler_score_invalid_type(y_intervals, y_test, alpha):
     with pytest.raises(TypeError):
         m.winkler_score(y_intervals, y_test, alpha)
+
+
+def test_acd():
+    intervals = np.array([[37520, 58225],
+                          [29059, 49764],
+                          [47325, 68030],
+                          [36432, 57137],
+                          [35865, 56570],
+                          [33419, 54124]])
+
+    y_true = np.array([37463, 40828, 56148, 45342, 43741, 45907])
+
+    acd = m.absolute_coverage_difference(y_true, intervals, target=0.95)
+    assert pytest.approx(acd, abs=0.01) == 0.12

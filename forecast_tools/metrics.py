@@ -419,6 +419,62 @@ def winkler_score(intervals, observations, alpha):
     return scores.mean()
 
 
+def absolute_coverage_difference(y_true, pred_intervals, target=0.95):
+    '''
+    The absolute coverage difference (ACD)
+
+    ACD is the absolute difference between the average coverage 
+    of a method and the desired empirical coverage (default = 0.95). 
+
+    If the future values are outside the prediction intervals
+    by a method an average of 2% of the time (coverage of 98%), 
+    ACD = |0.98 - 0.95| = 0.03
+
+    Params:
+    ------
+    y_true: array-like 
+        The ground truth future values
+
+    pred_intervals: array-like
+        The generated prediction intervals. Where 
+        len(pred_intervals) == len(y_true)
+
+    target: float, optional (default = 0.95)
+        The desired empirical coverage
+
+    Returns:
+    --------
+    float
+
+    Sources:
+    --------
+    M4 competition paper: 
+    https://www.sciencedirect.com/science/article/pii/S0169207019301128
+
+    Examples:
+    ---------
+    ```python
+    >>> intervals = np.array([[37520, 58225],
+    ...                       [29059, 49764],
+    ...                       [47325, 68030],
+    ...                       [36432, 57137],
+    ...                       [35865, 56570],
+    ...                       [33419, 54124]])
+
+    >>> y_true = np.array([37463, 40828, 56148, 
+    ...                    45342, 43741, 45907])
+
+    >>> acd = absolute_coverage_difference(y_true, intervals, 
+    ...                                    target=0.95)
+    >>> print(round(acd, 2))
+
+    0.12
+    ```
+    '''
+    mean_coverage = coverage(y_true, pred_intervals)
+    return abs(mean_coverage - target)
+
+
 if __name__ == '__main__':
     y_true = [45, 60, 23, 45]
     y_preds = [50, 50, 50, 50]
