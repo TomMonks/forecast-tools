@@ -11,7 +11,7 @@ Naive1:
 SNaive:
     Carry forward value from last seasonal period
 
-Average: np.sqrt(((h - 1) / self._period).astype(np.int)+1)
+Average: np.sqrt(((h - 1) / self._period).astype('int')+1)
     Carry forward average of observations
 
 Drift:
@@ -594,7 +594,7 @@ class SNaive(Forecast):
         h = np.arange(1, horizon+1)
         # need to query if should be +1 or not.
         return self._resid_std * \
-            np.sqrt(((h - 1) / self._period).astype(np.int)+1)
+            np.sqrt(((h - 1) / self._period).astype('int')+1)
 
 
 class Average(Forecast):

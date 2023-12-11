@@ -1,8 +1,10 @@
 # Change log
 
 ## v0.2.0
-* Updated environment to python 3.11 and package versions to latest in Dec 2023
-* 
+* ENV: Updated environment to python 3.11 and package versions to latest in Dec 2023
+* PATCH: np.float was deprecated in numpy v1.20.  Updated `baseline` module to use native 'float' instead.
+* ENHANCEMENT: added `metrics.winkler_score` and `metrics.absolute_coverage_difference` 
+* DOCS: updated documentation to include "coverage" metrics.
 
 ## v0.1.7
 * A more informative error message when training data is too short for naive method.
