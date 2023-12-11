@@ -433,7 +433,7 @@ class Naive1(Forecast):
 
         std = np.full(shape=horizon,
                       fill_value=self._resid_std,
-                      dtype=np.float)
+                      dtype='float')
 
         std_h = std * indexes
         return std_h
@@ -745,7 +745,7 @@ class Average(Forecast):
 
     def _std_h(self, horizon):
         std = self._resid_std * np.sqrt(1 + (1/self._t))
-        return np.full(shape=horizon, fill_value=std, dtype=np.float)
+        return np.full(shape=horizon, fill_value=std, dtype='float')
 
 
 class Drift(Forecast):
