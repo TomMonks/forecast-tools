@@ -386,5 +386,3 @@ def test_cross_validation_score_return_length(train_size, min_train_size,
     result = ms.cross_validation_score(b.Naive1(), cv, metric=metric, n_jobs=1)
 
     assert len(result) == expected
-
-
