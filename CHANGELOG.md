@@ -1,5 +1,9 @@
 # Change log
 
+## v0.2.0
+* Updated environment to python 3.11 and package versions to latest in Dec 2023
+* 
+
 ## v0.1.7
 * A more informative error message when training data is too short for naive method.
 * Minor fixes of outdated docstrings in forecast_tools.baseline
