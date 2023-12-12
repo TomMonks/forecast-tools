@@ -15,5 +15,4 @@ If you use forecast-tools for research, a practical report, education or any rea
   url          = {https://zenodo.org/doi/10.5281/zenodo.3759863}
 }
 
-}
 ```
