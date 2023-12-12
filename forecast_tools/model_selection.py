@@ -240,10 +240,16 @@ def cross_validation_folds(model, cv, n_jobs=-1):
 
     Returns:
     -------
-    np.ndarray of tuples
+    List of tuples
     each tuple is (cv_train, cv_test, cv_y_pred)
-    '''
 
+
+    Notes:
+    ------
+    PATCH: This function was originally designed to return an array
+    However, from numpy 1.20 this was not allowed and raised a 
+    ValueError.  It was updated to return a list.
+    '''
     cv_folds = \
         Parallel(n_jobs=n_jobs)(delayed(forecast)(model,
                                                   cv_train,
@@ -251,7 +257,7 @@ def cross_validation_folds(model, cv, n_jobs=-1):
                                                   len(cv_test))
                                 for cv_train, cv_test in cv)
 
-    return np.array(cv_folds)
+    return cv_folds
 
 
 def scaled_cross_validation_score(model, cv, seasonal_period=None):
