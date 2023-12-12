@@ -1,5 +1,9 @@
 # Change log
 
+## v0.2.1
+* PATCH: fixed typo in setup.py
+* DOCS: added missing CITATION.cff
+
 ## v0.2.0
 * ENV: Updated environment to python 3.11 and package versions to latest in Dec 2023
 * PATCH: np.float and np.int were deprecated in numpy v1.20.  Updated `baseline` module to use native 'float' and 'int' instead.
