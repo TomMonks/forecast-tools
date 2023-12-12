@@ -1,0 +1,764 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Evaluating a prediction interval &#8212; forecast-tools</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/02a_coverage_metrics';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Time Series Cross Validation" href="03_cross_validation.html" />
+    <link rel="prev" title="Measuring Point Forecast Error" href="02_forecast_error.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="00_front_page.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">forecast-tools</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="00_front_page.html">
+                    Welcome
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="00a_citation.html">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="00b_contribute.html">Contributing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Quick start</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_benchmark_forecasts.html">Simple forecasting techniques</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_forecast_error.html">Measuring Point Forecast Error</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Evaluating a prediction interval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_cross_validation.html">Time Series Cross Validation</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="04_auto_naive.html">Automatically selecting a naive model to use as a benchmark</a></li>
+
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/TomMonks/forecast-tools/master?urlpath=lab/tree/content/02a_coverage_metrics.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/TomMonks/forecast-tools/blob/master/content/02a_coverage_metrics.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/TomMonks/forecast-tools" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/TomMonks/forecast-tools/issues/new?title=Issue%20on%20page%20%2Fcontent/02a_coverage_metrics.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/02a_coverage_metrics.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Evaluating a prediction interval</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empirical-coverage">Empirical Coverage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#absolute-coverage-difference-acd">Absolute Coverage Difference (ACD)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#winkler-score-also-called-interval-score">Winkler score (also called interval score)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation">Interpretation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#winkler-score-for-an-individual-obs">Winkler score for an individual obs</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#winkler-score-for-multiple-step-prediction">Winkler score for multiple step prediction</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="evaluating-a-prediction-interval">
+<h1>Evaluating a prediction interval<a class="headerlink" href="#evaluating-a-prediction-interval" title="Permalink to this heading">#</a></h1>
+<p>In practice, producing a prediction interval that offers the correct level of coverage is tricky. If the model is a poor fit then it will produce PIs that are too wide. While more complex methods tend to be overconfident and produce intervals that are too narrow.</p>
+<section id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">forecast_tools.baseline</span> <span class="kn">import</span> <span class="n">SNaive</span><span class="p">,</span> <span class="n">Naive1</span>
+<span class="kn">from</span> <span class="nn">forecast_tools.metrics</span> <span class="kn">import</span> <span class="p">(</span><span class="n">winkler_score</span><span class="p">,</span> 
+                                    <span class="n">absolute_coverage_difference</span><span class="p">,</span>
+                                    <span class="n">coverage</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">forecast_tools.datasets</span> <span class="kn">import</span> <span class="n">load_emergency_dept</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="empirical-coverage">
+<h2>Empirical Coverage<a class="headerlink" href="#empirical-coverage" title="Permalink to this heading">#</a></h2>
+<p>A simple way evaluate a prediction interval is to quantify its empirical coverage of a test set.</p>
+<p>The intervals in the example below have 83% coverage of the true values.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">37520</span><span class="p">,</span> <span class="mi">58225</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">29059</span><span class="p">,</span> <span class="mi">49764</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">47325</span><span class="p">,</span> <span class="mi">68030</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">36432</span><span class="p">,</span> <span class="mi">57137</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">35865</span><span class="p">,</span> <span class="mi">56570</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">33419</span><span class="p">,</span> <span class="mi">54124</span><span class="p">]])</span>
+
+<span class="n">y_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">37463</span><span class="p">,</span> <span class="mi">40828</span><span class="p">,</span> <span class="mi">56148</span><span class="p">,</span> <span class="mi">45342</span><span class="p">,</span> <span class="mi">43741</span><span class="p">,</span> <span class="mi">45907</span><span class="p">])</span>
+<span class="n">mean_cov</span> <span class="o">=</span> <span class="n">coverage</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">intervals</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">mean_cov</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.83
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="absolute-coverage-difference-acd">
+<h2>Absolute Coverage Difference (ACD)<a class="headerlink" href="#absolute-coverage-difference-acd" title="Permalink to this heading">#</a></h2>
+<p>You can enhance the basic coverage metric by considering a desired (or target) coverage that the method promised.  The absolute coverage difference is the absolute difference between average coverage and the target coverage level.</p>
+<p>For example if the average coverage is 83% and the target is a 95% coverage then the absolute coverage difference is</p>
+<p><span class="math notranslate nohighlight">\(|0.83 - 0.95| = 0.12\)</span></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">37520</span><span class="p">,</span> <span class="mi">58225</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">29059</span><span class="p">,</span> <span class="mi">49764</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">47325</span><span class="p">,</span> <span class="mi">68030</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">36432</span><span class="p">,</span> <span class="mi">57137</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">35865</span><span class="p">,</span> <span class="mi">56570</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">33419</span><span class="p">,</span> <span class="mi">54124</span><span class="p">]])</span>
+
+<span class="n">y_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">37463</span><span class="p">,</span> <span class="mi">40828</span><span class="p">,</span> <span class="mi">56148</span><span class="p">,</span> <span class="mi">45342</span><span class="p">,</span> <span class="mi">43741</span><span class="p">,</span> <span class="mi">45907</span><span class="p">])</span>
+<span class="n">acd</span> <span class="o">=</span> <span class="n">absolute_coverage_difference</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">intervals</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">acd</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.12
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="winkler-score-also-called-interval-score">
+<h2>Winkler score (also called interval score)<a class="headerlink" href="#winkler-score-also-called-interval-score" title="Permalink to this heading">#</a></h2>
+<p>An alternative way to assess prediction interval coverage for a specific time series is using the Winkler score.</p>
+<p>The winkler score is defined as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}W_{\alpha,t} = \begin{cases}
+  (u_{\alpha,t} - \ell_{\alpha,t}) + \frac{2}{\alpha} (\ell_{\alpha,t} - y_t) &amp; \text{if } y_t &lt; \ell_{\alpha,t} \\
+  (u_{\alpha,t} - \ell_{\alpha,t})   &amp; \text{if }  \ell_{\alpha,t} \le y_t \le u_{\alpha,t} \\
+  (u_{\alpha,t} - \ell_{\alpha,t}) + \frac{2}{\alpha} (y_t - u_{\alpha,t}) &amp; \text{if } y_t &gt; u_{\alpha,t}.
+  \end{cases}\end{split}\]</div>
+<p>Where</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(u_{\alpha, t}\)</span> is the upper prediction interval value for <span class="math notranslate nohighlight">\(\alpha\)</span> and horizon <span class="math notranslate nohighlight">\(t\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(l_{\alpha, t}\)</span> is the lower prediction interval value for <span class="math notranslate nohighlight">\(\alpha\)</span> and horizon <span class="math notranslate nohighlight">\(t\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(y_t\)</span> is the ground truth observation at horizon <span class="math notranslate nohighlight">\(t\)</span></p></li>
+</ul>
+<p><strong>sources</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://otexts.com/fpp3/distaccuracy.html">https://otexts.com/fpp3/distaccuracy.html</a></p></li>
+<li><p><a class="reference external" href="https://www.tandfonline.com/doi/abs/10.1198/016214506000001437">https://www.tandfonline.com/doi/abs/10.1198/016214506000001437</a></p></li>
+<li><p><a class="reference external" href="https://www.tandfonline.com/doi/pdf/10.1080/01621459.1972.10481224?needAccess=true">https://www.tandfonline.com/doi/pdf/10.1080/01621459.1972.10481224?needAccess=true</a></p></li>
+</ul>
+<section id="interpretation">
+<h3>Interpretation<a class="headerlink" href="#interpretation" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>A Winkler score is the width of the interval plus a penality proportional to the deviation (above or below the interval) and 2/<span class="math notranslate nohighlight">\(\alpha\)</span></p></li>
+<li><p>Smaller winkler scores are better!</p></li>
+</ul>
+</section>
+<section id="winkler-score-for-an-individual-obs">
+<h3>Winkler score for an individual obs<a class="headerlink" href="#winkler-score-for-an-individual-obs" title="Permalink to this heading">#</a></h3>
+<p>Assume our model has generated a prediction interval of [744.54, 773.22].  We know that the true observation lies outside of the lower interval 741.84.  The winkler score is therefore:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">interval</span> <span class="o">=</span> <span class="p">[</span><span class="mf">744.54</span><span class="p">,</span> <span class="mf">773.22</span><span class="p">]</span>
+<span class="n">y_t</span> <span class="o">=</span> <span class="mf">741.84</span>
+<span class="n">ws</span> <span class="o">=</span> <span class="n">winkler_score</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span> <span class="n">y_t</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>55.68
+</pre></div>
+</div>
+</div>
+</div>
+<p>if instead our y_t fell within the interval.  The winkler score would be equal to the width of the interval.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">interval</span> <span class="o">=</span> <span class="p">[</span><span class="mf">744.54</span><span class="p">,</span> <span class="mf">773.22</span><span class="p">]</span>
+<span class="n">y_t</span> <span class="o">=</span> <span class="mf">745.0</span>
+<span class="n">ws</span> <span class="o">=</span> <span class="n">winkler_score</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span> <span class="n">y_t</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Winkler score: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s1">; Interval width: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Winkler score: 28.68; Interval width: 28.68
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="winkler-score-for-multiple-step-prediction">
+<h2>Winkler score for multiple step prediction<a class="headerlink" href="#winkler-score-for-multiple-step-prediction" title="Permalink to this heading">#</a></h2>
+<p>More commonly a model will generate a prediction over a multi-step horizon.  Here for example Seasonal naive is used to predict a 7 day holdout sample in the ED dataset.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">HOLDOUT</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">PERIOD</span> <span class="o">=</span> <span class="mi">7</span>
+
+<span class="n">attends</span> <span class="o">=</span> <span class="n">load_emergency_dept</span><span class="p">()</span>
+
+<span class="c1"># train-test split</span>
+<span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="n">attends</span><span class="p">[:</span><span class="o">-</span><span class="n">HOLDOUT</span><span class="p">],</span> <span class="n">attends</span><span class="p">[</span><span class="o">-</span><span class="n">HOLDOUT</span><span class="p">:]</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">SNaive</span><span class="p">(</span><span class="n">PERIOD</span><span class="p">)</span>
+
+<span class="c1"># returns 80 and 90% prediction intervals by default.</span>
+<span class="n">preds</span><span class="p">,</span> <span class="n">intervals</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">HOLDOUT</span><span class="p">,</span> <span class="n">return_predict_int</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">ws</span> <span class="o">=</span> <span class="n">winkler_score</span><span class="p">(</span><span class="n">intervals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">test</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Winkler score: </span><span class="si">{</span><span class="n">ws</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Winkler score: 130.75
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "TomMonks/forecast-tools",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="02_forecast_error.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Measuring Point Forecast Error</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="03_cross_validation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Time Series Cross Validation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empirical-coverage">Empirical Coverage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#absolute-coverage-difference-acd">Absolute Coverage Difference (ACD)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#winkler-score-also-called-interval-score">Winkler score (also called interval score)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation">Interpretation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#winkler-score-for-an-individual-obs">Winkler score for an individual obs</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#winkler-score-for-multiple-step-prediction">Winkler score for multiple step prediction</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Thomas Monks
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
