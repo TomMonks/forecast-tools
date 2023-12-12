@@ -1,0 +1,23 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: forecast-tools
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Thomas
+    family-names: Monks
+    affiliation: University of Exeter
+    orcid: 'https://orcid.org/0000-0003-2631-4481'
+repository-code: 'https://github.com/TomMonks/forecast-tools'
+url: >-
+  https://tommonks.github.io/forecast-tools/content/00_front_page.html
+repository: 'https://pypi.org/project/forecast-tools/'
+keywords:
+  - python
+  - forecasting
+  - operational research
+license: MIT
