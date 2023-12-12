@@ -1,10 +1,11 @@
-# forecast-tools: fundamental tools to support the forecasting process in python.
+# `forecast-tools`: fundamental tools to support the forecasting process in python.
 
 [![DOI](https://zenodo.org/badge/250494795.svg)](https://zenodo.org/badge/latestdoi/250494795)
+[![ORCID: Monks](https://img.shields.io/badge/ORCID-0000--0003--2631--4481-brightgreen)](https://orcid.org/0000-0003-2631-4481)
 [![PyPI version fury.io](https://badge.fury.io/py/forecast-tools.svg)](https://pypi.python.org/pypi/forecast-tools/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomMonks/forecast-tools/master)
-[![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360+/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380+/)
 [![Read the Docs](https://readthedocs.org/projects/pip/badge/?version=latest)](https://tommonks.github.io/forecast-tools/)
 
  forecast-tools has been developed to support forecasting education and applied forecasting research.  It is MIT licensed and freely available to practitioners, students and researchers via PyPi.  There is a long term plan to make forecast-tools available via conda-forge.
@@ -19,13 +20,15 @@
 
 1. Implementation of classic naive forecast benchmarks such as Naive Forecast 1 along with prediction intervals
 2. Implementation of scale-dependent, relative and scaled forecast errors.
-3. Rolling forecast origin and sliding window for time series cross validation
-4. Built in daily level datasets
+3. Implementation of scale-dependent and relative metrics to evaluate forecast prediction intervals
+4. Rolling forecast origin and sliding window for time series cross validation
+5. Built in daily level datasets
 
 ## Two simple ways to explore forecast-tools
 
 1. `pip install forecast-tools`
 2. Click on the launch-binder at the top of this readme. This will open example Jupyter notebooks in the cloud via Binder.
+3. Read our [documentation on GitHub pages](https://tommonks.github.io/forecast-tools/)
 
 ## Citation
 
@@ -50,12 +53,18 @@ Please fork Dev, make your modifications, run the unit tests and submit a pull r
 
 Development environment:
 
-* `conda env create -f binder/environment.yml`
+```
+conda env create -f binder/environment.yml
+```
 
-* `conda activate forecast_dev`
+```
+conda activate forecast_dev
+```
 
 Unit tests are provided and can be run from the command `pytest` and its coverage extension.  Run the following in the terminal.
 
-* `pytest --cov=forecast_tools tests/`
+```
+pytest --cov=forecast_tools tests/
+```
 
 **All contributions are welcome and must include unit tests!**
