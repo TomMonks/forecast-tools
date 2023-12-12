@@ -41,8 +41,8 @@ setuptools.setup(
     include_package_data=True,
     package_data={"": ["forecast_tools/data/*.csv"]},
     classifiers=[
-        "Programming Language :: Python :: 3.8"
-        "Programming Language :: Python :: 3.9"
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "License :: OSI Approved :: MIT License",
