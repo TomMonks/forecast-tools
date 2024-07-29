@@ -1,5 +1,11 @@
 # Change log
 
+## v0.3.0 UNRELEASED
+
+### Fixed
+
+* TESTING: `np.NAN` -> `np.nan` and `np.Inf` -> `np.inf`. The original constants have been deprecated in `numpy`
+
 ## v0.1.7
 * A more informative error message when training data is too short for naive method.
 * Minor fixes of outdated docstrings in forecast_tools.baseline
