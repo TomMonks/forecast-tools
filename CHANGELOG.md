@@ -14,10 +14,10 @@
 
 * BUILD: `setup.py`, `requirements.txt`, `MANIFEST.in` no longer needed with hatch build backend.
 
-
 ### Fixed
 
 * TESTING: `np.NAN` -> `np.nan` and `np.Inf` -> `np.inf`. The original constants have been deprecated in `numpy`
+* MODEL: auto_naive error message patch.
 
 ## v0.2.1
 * PATCH: fixed typo in setup.py
