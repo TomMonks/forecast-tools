@@ -5,9 +5,10 @@ build-backend = "hatchling.build"
 [project]
 name = "forecast-tools"
 dynamic = ["version"]
-description = "Tools to support the forecasting process in Python"
+description = "Tools to support forecasting education in Python"
 readme = "README.md"
 license = "MIT"
+keywords = ["forecasting", "time-series", "naive", "snaive", "error-metrics", "education"]
 requires-python = ">=3.8"
 authors = [
     { name = "Thomas Monks", email = "forecast_tools@gmail.com" },
@@ -33,6 +34,7 @@ dependencies = [
 Homepage = "https://github.com/TomMonks/forecast-tools"
 "Bug Tracker" = "https://github.com/TomMonks/forecast-tools/issues"
 Documentation = "https://tommonks.github.io/forecast-tools"
+Changelog = "https://github.com/TomMonks/forecast-tools/blob/master/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "forecast_tools/__init__.py"
