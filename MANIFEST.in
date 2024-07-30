@@ -1,3 +1,0 @@
-include *.txt
-recursive-include forecast_tools/data *.csv
-recursive-include examples *.ipynb

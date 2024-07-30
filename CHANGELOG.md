@@ -1,5 +1,24 @@
 # Change log
 
+## v0.3.0 UNRELEASED
+
+### Changed
+
+* ENV: Development environment upgraded to Python 3.11 and libraries as of July 2024.
+
+### Added
+
+* BUILD: `pyproject.toml` added in migration from setuptools to hatch for package build and test management.
+
+### Removed
+
+* BUILD: `setup.py`, `requirements.txt`, `MANIFEST.in` no longer needed with hatch build backend.
+
+
+### Fixed
+
+* TESTING: `np.NAN` -> `np.nan` and `np.Inf` -> `np.inf`. The original constants have been deprecated in `numpy`
+
 ## v0.2.1
 * PATCH: fixed typo in setup.py
 * DOCS: added missing CITATION.cff

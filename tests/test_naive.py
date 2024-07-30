@@ -6,7 +6,7 @@ Tests currently cover:
 1. Forecast horizons
 2. Allowable input types: np.ndarray, pd.DataFrame, pd.Series
 3. Failure paths for abnormal input such as np.nan, non numeric,
-   empty arrays and np.Inf
+   empty arrays and np.inf
 4. Predictions
     - naive1 - carries forward last value
     - snaive - carries forward previous h values
@@ -388,8 +388,8 @@ def test_ensemble_forecast_input_numpy(data, horizon, expected):
                           (1.0, TypeError),
                           (np.array(['foo', 'bar', 'spam', 'eggs']),
                           TypeError),
-                          (np.array([1, 2, 3, 4, 5, 6, np.NAN]), TypeError),
-                          (np.array([1, 2, 3, 4, np.Inf, 5, 6]), TypeError)])
+                          (np.array([1, 2, 3, 4, 5, 6, np.nan]), TypeError),
+                          (np.array([1, 2, 3, 4, np.inf, 5, 6]), TypeError)])
 def test_ensemble_abnormal_input(data, exception):
     '''
     test naive1 raises correct exceptions on abnormal input
@@ -474,8 +474,8 @@ def test_average_forecast_output_longer_horizon(data, period, expected):
                           (1.0, TypeError),
                           (np.array(['foo', 'bar', 'spam', 'eggs']),
                           TypeError),
-                          (np.array([1, 2, 3, 4, 5, 6, np.NAN]), TypeError),
-                          (np.array([1, 2, 3, 4, np.Inf, 5, 6]), TypeError)])
+                          (np.array([1, 2, 3, 4, 5, 6, np.nan]), TypeError),
+                          (np.array([1, 2, 3, 4, np.inf, 5, 6]), TypeError)])
 def test_naive1_abnormal_input(data, exception):
     '''
     test naive1 raises correct exceptions on abnormal input
@@ -491,7 +491,7 @@ def test_naive1_abnormal_input(data, exception):
                           (np.array(['foo', 'bar', 'spam', 'eggs']),
                           TypeError),
                           (np.array([1, 2, 3, 4, 5, 6, np.nan]), TypeError),
-                          (np.array([1, 2, 3, 4, np.Inf, 5, 6]), TypeError)
+                          (np.array([1, 2, 3, 4, np.inf, 5, 6]), TypeError)
                           ])
 def test_snaive_abnormal_input(data, exception):
     '''
@@ -508,7 +508,7 @@ def test_snaive_abnormal_input(data, exception):
                           (np.array(['foo', 'bar', 'spam', 'eggs']),
                           TypeError),
                           (np.array([1, 2, 3, 4, 5, 6, np.nan]), TypeError),
-                          (np.array([1, 2, 3, 4, np.Inf, 5, 6]), TypeError)])
+                          (np.array([1, 2, 3, 4, np.inf, 5, 6]), TypeError)])
 def test_average_abnormal_input(data, exception):
     '''
     test average raises correct exceptions on abnormal input
@@ -524,7 +524,7 @@ def test_average_abnormal_input(data, exception):
                           (np.array(['foo', 'bar', 'spam', 'eggs']),
                           TypeError),
                           (np.array([1, 2, 3, 4, 5, 6, np.nan]), TypeError),
-                          (np.array([1, 2, 3, 4, np.Inf, 5, 6]), TypeError)])
+                          (np.array([1, 2, 3, 4, np.inf, 5, 6]), TypeError)])
 def test_drift_abnormal_input(data, exception):
     '''
     test drift raises correct exceptions on abnormal input
