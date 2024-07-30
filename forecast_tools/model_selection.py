@@ -436,7 +436,7 @@ def auto_naive(y_train, horizon=1, seasonal_period=1, min_train_size='auto',
     # additinal auto_naive validation for min_train_size and window_size
     if len(y_train) < (min_train_size + horizon):
         msg = f"The training data is shorter than {min_train_size=} + " \
-            + "{horizon=} No validation can be performed. "
+            + f"{horizon=} No validation can be performed. "
         raise ValueError(msg)
     elif min_train_size < seasonal_period and \
             (method == 'cv' or method == 'ro'):
