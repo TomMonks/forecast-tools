@@ -2,6 +2,7 @@ name: forecast_dev
 channels:
   - conda-forge
 dependencies:
+  - hatch
   - joblib=1.4.2
   - jupyterlab=4.2.4
   - matplotlib=3.9.1
