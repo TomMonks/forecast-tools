@@ -15,6 +15,7 @@ class egg_info_ex(egg_info):
 
         egg_info.run(self)
 
+
 # Read in the requirements.txt file
 with open("requirements.txt") as f:
     requirements = []
@@ -40,12 +41,13 @@ setuptools.setup(
     include_package_data=True,
     package_data={"": ["forecast_tools/data/*.csv"]},
     classifiers=[
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6.9',
+    python_requires='>=3.8',
     install_requires=requirements,
 )
