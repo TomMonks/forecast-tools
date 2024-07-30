@@ -67,7 +67,7 @@ Unit tests are provided and can be run via `hatch` and its coverage extension.  
 To run tests in multiple Python environments (3.8-3.12)
 
 ```
-hatch test -all
+hatch test --all
 ```
 
 To obtain a coverage report run
