@@ -5,7 +5,7 @@
 [![PyPI version fury.io](https://badge.fury.io/py/forecast-tools.svg)](https://pypi.python.org/pypi/forecast-tools/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomMonks/forecast-tools/master)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380+/)
+[![Python](https://img.shields.io/pypi/pyversions/forecast-tools)](https://pypi.org/project/forecasta-tools/)
 [![Read the Docs](https://readthedocs.org/projects/pip/badge/?version=latest)](https://tommonks.github.io/forecast-tools/)
 
  forecast-tools has been developed to support forecasting education and applied forecasting research.  It is MIT licensed and freely available to practitioners, students and researchers via PyPi.  There is a long term plan to make forecast-tools available via conda-forge.
@@ -24,7 +24,7 @@
 4. Rolling forecast origin and sliding window for time series cross validation
 5. Built in daily level datasets
 
-## Two simple ways to explore forecast-tools
+## Ways to explore forecast-tools
 
 1. `pip install forecast-tools`
 2. Click on the launch-binder at the top of this readme. This will open example Jupyter notebooks in the cloud via Binder.
@@ -53,20 +53,27 @@ If you use forecast-tools for research, a practical report, education or any rea
 
 Please fork Dev, make your modifications, run the unit tests and submit a pull request for review.
 
+> We provide a conda environment for development of forecast-tools. We recommend use of mamba as opposed to conda (although conda will work) as it is FOSS and faster.  Install from [mini-forge](https://github.com/conda-forge/miniforge)
+
 Development environment:
 
 ```
-conda env create -f binder/environment.yml
+mamba env create -f binder/environment.yml
+mamba activate forecast_dev
 ```
 
-```
-conda activate forecast_dev
-```
+Unit tests are provided and can be run via `hatch` and its coverage extension.  Run the following in the terminal.
 
-Unit tests are provided and can be run from the command `pytest` and its coverage extension.  Run the following in the terminal.
+To run tests in multiple Python environments (3.8-3.12)
 
 ```
-pytest --cov=forecast_tools tests/
+hatch test -all
+```
+
+To obtain a coverage report run
+
+```
+hatch test --cover
 ```
 
 **All contributions are welcome and must include unit tests!**
