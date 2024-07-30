@@ -2,9 +2,14 @@
 
 ## v0.3.0 UNRELEASED
 
+### Changed
+
+* ENV: Development environment upgraded to Python 3.11 and libraries as of July 2024.
+
 ### Fixed
 
 * TESTING: `np.NAN` -> `np.nan` and `np.Inf` -> `np.inf`. The original constants have been deprecated in `numpy`
+
 ## v0.2.1
 * PATCH: fixed typo in setup.py
 * DOCS: added missing CITATION.cff
