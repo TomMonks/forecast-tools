@@ -252,6 +252,14 @@ def test_winkler_score_invalid_type(y_intervals, y_test, alpha):
         m.winkler_score(y_intervals, y_test, alpha)
 
 
+@pytest.mark.parametrize("alpha", [-0.1, 0, 1, 1.1])
+def test_winkler_score_invalid_alpha(alpha):
+    """Test error thrown if invalid alpha passed to winkler score"""
+    with pytest.raises(ValueError):
+        m.winkler_score([744.54, 773.22], 741.84, alpha)
+
+
+
 def test_acd():
     intervals = np.array([[37520, 58225],
                           [29059, 49764],

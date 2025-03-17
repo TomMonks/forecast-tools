@@ -317,7 +317,7 @@ def coverage(y_true, pred_intervals):
     cover = len(np.where((y_true > lower) & (y_true < upper))[0])
     return cover / len(y_true)
 
-def winkler_score(intervals, observations, alpha):
+def winkler_score(intervals, observations, alpha, return_details=False):
     '''
     Returns the mean winkler score of a set of observations and prediction
     intervals
@@ -381,6 +381,10 @@ def winkler_score(intervals, observations, alpha):
     type_err_msg = "The observations param should be array-like of " \
         + "integers or floats"
 
+    # Validate alpha
+    if not 0 < alpha < 1:
+        raise ValueError("Alpha must be between 0 and 1")
+
     # distinguish between handling individual obs and multiple obs
     if isinstance(observations, (np.ndarray, pd.DataFrame, list)):
         if len(observations) > 1:
@@ -411,6 +415,15 @@ def winkler_score(intervals, observations, alpha):
     
     scores = widths + penalty_below + penalty_above
 
+    if return_details:
+        return {
+            'mean_score': scores.mean(),
+            'individual_scores': scores,
+            'coverage': np.mean(~(below_mask | above_mask)),
+            'below_count': np.sum(below_mask),
+            'above_count': np.sum(above_mask)
+        }
+    
     return scores.mean()
 
 
