@@ -16,6 +16,8 @@ import numpy as np
 import pandas as pd
 import numbers
 
+import numpy.typing as npt
+
 from forecast_tools.baseline import SNaive
 
 
@@ -317,7 +319,12 @@ def coverage(y_true, pred_intervals):
     cover = len(np.where((y_true > lower) & (y_true < upper))[0])
     return cover / len(y_true)
 
-def winkler_score(intervals, observations, alpha, return_details=False):
+def winkler_score(
+        intervals: npt.ArrayLike, 
+        observations: npt.ArrayLike,
+        alpha: float, 
+        return_details: bool = False
+):
     '''
     Returns the mean winkler score of a set of observations and prediction
     intervals
@@ -385,20 +392,25 @@ def winkler_score(intervals, observations, alpha, return_details=False):
     if not 0 < alpha < 1:
         raise ValueError("Alpha must be between 0 and 1")
 
-    # distinguish between handling individual obs and multiple obs
-    if isinstance(observations, (np.ndarray, pd.DataFrame, list)):
-        if len(observations) > 1:
-            observations = np.array(observations).T[0]
-        else:
-            observations = np.array(observations)
+    # Convert observations to numpy array
+    if isinstance(observations, (pd.Series, pd.DataFrame)):
+        observations = observations.to_numpy().flatten()
+    elif isinstance(observations, list):
+        observations = np.array(observations)
     elif isinstance(observations, numbers.Number):
+        # individual number
         observations = np.array([observations])
     else:
-        raise TypeError(type_err_msg)
+        observations = np.asarray(observations).flatten()
 
-     # handle intervals for an individual observation
+    # handle intervals for an individual observation
+    intervals = np.asarray(intervals)
     if len(intervals) == 2:
         intervals = np.array(intervals).reshape(1, -1)
+
+    if len(intervals) == 0:
+         raise ValueError("Intervals array is empty!")
+
 
     # Validate intervals...
 
@@ -413,15 +425,20 @@ def winkler_score(intervals, observations, alpha, return_details=False):
     # Vectorized calculation
     # interval widths
     widths = intervals[:, 1] - intervals[:, 0]
-    # observation falls below lower interval
     below_mask = observations < intervals[:, 0]
-
-    # observation exceeds upper interval
     above_mask = observations > intervals[:, 1]
+
+
+    # Calculate penalties
+    penalty_factor = 2.0 / alpha
+    penalty_below = np.zeros_like(widths)
+    penalty_above = np.zeros_like(widths)
     
-    # penalities
-    penalty_below = ((2/alpha) * (intervals[:, 0] - observations)) * below_mask
-    penalty_above = ((2/alpha) * (observations - intervals[:, 1])) * above_mask
+    if np.any(below_mask):
+        penalty_below[below_mask] = penalty_factor * (intervals[below_mask, 0] - observations[below_mask])
+    
+    if np.any(above_mask):
+        penalty_above[above_mask] = penalty_factor * (observations[above_mask] - intervals[above_mask, 1])
     
     scores = widths + penalty_below + penalty_above
 

@@ -265,6 +265,9 @@ def test_winkler_score_invalid_interval():
         m.winkler_score([773.22, 744.54], 741.84, 0.2)
 
 
+def test_winkler_score_empty_input():
+    with pytest.raises(ValueError):
+        m.winkler_score([], [], 0.2) == 0.0
 
 
 def test_acd():
