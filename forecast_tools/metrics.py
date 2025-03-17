@@ -1,4 +1,4 @@
-'''
+"""
 Metrics to measure forecast error
 
 ME - mean error
@@ -10,8 +10,10 @@ sMAPE - symmetric MAPE.
 MASE - mean absolute scaled error
 
 coverage - prediction interval coverage
-'''
-from argparse import ArgumentError
+winkler_score - winkler score for prediction interval
+absolute_coverage_difference - difference of coverage from target
+"""
+
 import numpy as np
 import pandas as pd
 import numbers
@@ -22,7 +24,7 @@ from forecast_tools.baseline import SNaive
 
 
 def as_arrays(y_true, y_pred):
-    '''
+    """
     Returns ground truth and predict
     values as numpy arrays.
 
@@ -36,12 +38,12 @@ def as_arrays(y_true, y_pred):
     Returns:
     -------
     Tuple(np.array np.array)
-    '''
+    """
     return np.asarray(y_true), np.asarray(y_pred)
 
 
 def mean_error(y_true, y_pred):
-    '''
+    """
     Computes Mean Error (ME).
 
     Parameters:
@@ -55,13 +57,13 @@ def mean_error(y_true, y_pred):
     -------
     float
         scalar value representing the ME
-    '''
+    """
     y_true, y_pred = as_arrays(y_true, y_pred)
     return np.mean(y_true - y_pred)
 
 
 def mean_absolute_percentage_error(y_true, y_pred):
-    '''
+    """
     Mean Absolute Percentage Error (MAPE).
 
     MAPE is a relative error measure of forecast accuracy.
@@ -84,13 +86,13 @@ def mean_absolute_percentage_error(y_true, y_pred):
     -------
     float,
         scalar value representing the MAPE (0-100)
-    '''
+    """
     y_true, y_pred = as_arrays(y_true, y_pred)
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 
 def mean_absolute_error(y_true, y_pred):
-    '''
+    """
     Mean Absolute Error (MAE)
 
     Parameters:
@@ -104,13 +106,13 @@ def mean_absolute_error(y_true, y_pred):
     -------
     float,
         scalar value representing the MAE
-    '''
+    """
     y_true, y_pred = as_arrays(y_true, y_pred)
     return np.mean(np.abs((y_true - y_pred)))
 
 
 def mean_squared_error(y_true, y_pred):
-    '''
+    """
     Mean Squared Error (MSE)
 
     Parameters:
@@ -124,13 +126,13 @@ def mean_squared_error(y_true, y_pred):
     -------
     float,
         scalar value representing the MSE
-    '''
+    """
     y_true, y_pred = as_arrays(y_true, y_pred)
     return np.mean(np.square((y_true - y_pred)))
 
 
 def root_mean_squared_error(y_true, y_pred):
-    '''
+    """
     Root Mean Squared Error (RMSE).
 
     Square root of the mean squared error.
@@ -146,13 +148,13 @@ def root_mean_squared_error(y_true, y_pred):
     -------
     float,
         scalar value representing the RMSE
-    '''
+    """
     y_true, y_pred = as_arrays(y_true, y_pred)
     return np.sqrt(mean_squared_error(y_true, y_pred))
 
 
 def symmetric_mean_absolute_percentage_error(y_true, y_pred):
-    '''
+    """
     Symmetric Mean Absolute Percentage Error (sMAPE)
 
     A proposed improvement./replacement for MAPE.  (But still not symmetric).
@@ -176,7 +178,7 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred):
     -------
     float,
         scalar value representing the RMSE
-    '''
+    """
     y_true, y_pred = as_arrays(y_true, y_pred)
     numerator = 2 * np.abs(y_true - y_pred)
     denominator = np.abs(y_pred) + np.abs(y_true)
@@ -184,7 +186,7 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred):
 
 
 def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
-    '''
+    """
     Mean absolute scaled error (MASE)
 
     MASE = MAE / MAE_{insample, naive}
@@ -210,7 +212,7 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
     -------
     float,
         scalar value representing the MASE
-    '''
+    """
     y_true, y_pred = as_arrays(y_true, y_pred)
 
     if period is None:
@@ -219,14 +221,15 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
     in_sample = SNaive(period=period)
     in_sample.fit(y_train)
 
-    mae_insample = mean_absolute_error(y_train[period:],
-                                       in_sample.fittedvalues.dropna())
+    mae_insample = mean_absolute_error(
+        y_train[period:], in_sample.fittedvalues.dropna()
+    )
 
     return mean_absolute_error(y_true, y_pred) / mae_insample
 
 
-def forecast_errors(y_true, y_pred, metrics='all'):
-    '''
+def forecast_errors(y_true, y_pred, metrics="all"):
+    """
     Convenience function for return a multiple
     forecast errors
 
@@ -259,11 +262,11 @@ def forecast_errors(y_true, y_pred, metrics='all'):
     >>> metrics = forecast_errors(y_true, y_preds, metrics=['mape', 'smape'])
     >>> print(metrics)
 
-    '''
+    """
     y_true, y_pred = as_arrays(y_true, y_pred)
 
-    if metrics == 'all':
-        metrics = ['me', 'mae', 'mse', 'rmse', 'mape', 'smape']
+    if metrics == "all":
+        metrics = ["me", "mae", "mse", "rmse", "mape", "smape"]
 
     funcs = _forecast_error_functions()
     errors = {}
@@ -274,26 +277,26 @@ def forecast_errors(y_true, y_pred, metrics='all'):
 
 
 def _forecast_error_functions():
-    '''
+    """
     Return all forecast functions in
     a dict
 
     Returns:
     --------
         dict
-    '''
+    """
     funcs = {}
-    funcs['me'] = mean_error
-    funcs['mae'] = mean_absolute_error
-    funcs['mse'] = mean_squared_error
-    funcs['rmse'] = root_mean_squared_error
-    funcs['mape'] = mean_absolute_percentage_error
-    funcs['smape'] = symmetric_mean_absolute_percentage_error
+    funcs["me"] = mean_error
+    funcs["mae"] = mean_absolute_error
+    funcs["mse"] = mean_squared_error
+    funcs["rmse"] = root_mean_squared_error
+    funcs["mape"] = mean_absolute_percentage_error
+    funcs["smape"] = symmetric_mean_absolute_percentage_error
     return funcs
 
 
 def coverage(y_true, pred_intervals):
-    '''
+    """
     Prediction Interval Coverage
 
     Calculates the proportion of the true
@@ -311,7 +314,7 @@ def coverage(y_true, pred_intervals):
     Returns:
     -------
     float
-    '''
+    """
     y_true = np.asarray(y_true)
     lower = np.asarray(pred_intervals.T[0])
     upper = np.asarray(pred_intervals.T[1])
@@ -319,13 +322,14 @@ def coverage(y_true, pred_intervals):
     cover = len(np.where((y_true > lower) & (y_true < upper))[0])
     return cover / len(y_true)
 
+
 def winkler_score(
-        intervals: npt.ArrayLike, 
-        observations: npt.ArrayLike,
-        alpha: float, 
-        return_details: bool = False
-):
-    '''
+    intervals: npt.ArrayLike,
+    observations: npt.ArrayLike,
+    alpha: float,
+    return_scores: bool = False,
+) -> float | dict:
+    """
     Returns the mean winkler score of a set of observations and prediction
     intervals
 
@@ -337,7 +341,7 @@ def winkler_score(
     Parameters:
     -----------
     intervals: array-like
-        array of prediction intervals 
+        array of prediction intervals
 
     observations: float, integer or array-like
         individual observation or array of ground truth observations.
@@ -345,9 +349,14 @@ def winkler_score(
     alpha: float
         The prediction interval alpha.  For an 80% pred intervals alpha=0.2
 
+    return_scores: bool. optipnal (Default = False)
+        Returns a dictionary containined both the mean winkler score and the
+        individual scores
+
     Returns:
     -------
-    float, numpy.ndarray
+    float | dict
+        mean winkler score or dict containing mean and individual scores
 
     Example usage:
     --------------
@@ -383,10 +392,7 @@ def winkler_score(
     Mean winkler score: 79.72
     ```
 
-    '''
-
-    type_err_msg = "The observations param should be array-like of " \
-        + "integers or floats"
+    """
 
     # Validate alpha
     if not 0 < alpha < 1:
@@ -409,18 +415,19 @@ def winkler_score(
         intervals = np.array(intervals).reshape(1, -1)
 
     if len(intervals) == 0:
-         raise ValueError("Intervals array is empty!")
-
+        raise ValueError("Intervals array is empty!")
 
     # Validate intervals...
-
     if intervals.shape[1] != 2:
         raise ValueError("Each interval must have a lower and upper bound")
-
 
     # validate mistakes in intervals passed in.
     if np.any(intervals[:, 0] > intervals[:, 1]):
         raise ValueError("Lower bounds must be less than or equal to upper bounds")
+
+    # Ensure matching dimensions
+    if len(intervals) != len(observations):
+        raise ValueError("Number of intervals must match number of observations")
 
     # Vectorized calculation
     # interval widths
@@ -428,50 +435,52 @@ def winkler_score(
     below_mask = observations < intervals[:, 0]
     above_mask = observations > intervals[:, 1]
 
-
     # Calculate penalties
     penalty_factor = 2.0 / alpha
     penalty_below = np.zeros_like(widths)
     penalty_above = np.zeros_like(widths)
-    
+
     if np.any(below_mask):
-        penalty_below[below_mask] = penalty_factor * (intervals[below_mask, 0] - observations[below_mask])
-    
+        penalty_below[below_mask] = penalty_factor * (
+            intervals[below_mask, 0] - observations[below_mask]
+        )
+
     if np.any(above_mask):
-        penalty_above[above_mask] = penalty_factor * (observations[above_mask] - intervals[above_mask, 1])
-    
+        penalty_above[above_mask] = penalty_factor * (
+            observations[above_mask] - intervals[above_mask, 1]
+        )
+
     scores = widths + penalty_below + penalty_above
 
-    if return_details:
+    if return_scores:
         return {
-            'mean_score': scores.mean(),
-            'individual_scores': scores,
-            'coverage': np.mean(~(below_mask | above_mask)),
-            'below_count': np.sum(below_mask),
-            'above_count': np.sum(above_mask)
+            "mean_score": scores.mean(),
+            "individual_scores": scores,
+            "below_count": np.sum(below_mask),
+            "above_count": np.sum(above_mask),
         }
-    
+
     return scores.mean()
 
 
 def absolute_coverage_difference(y_true, pred_intervals, target=0.95):
-    '''
+    """
     The absolute coverage difference (ACD)
 
-    ACD is the absolute difference between the average coverage 
-    of a method and the desired empirical coverage (default = 0.95). 
+    ACD is the absolute difference between the average coverage
+    of a method and the desired empirical coverage (default = 0.95).
 
     If the future values are outside the prediction intervals
-    by a method an average of 2% of the time (coverage of 98%), 
+    by a method an average of 2% of the time (coverage of 98%),
     ACD = |0.98 - 0.95| = 0.03
 
     Params:
     ------
-    y_true: array-like 
+    y_true: array-like
         The ground truth future values
 
     pred_intervals: array-like
-        The generated prediction intervals. Where 
+        The generated prediction intervals. Where
         len(pred_intervals) == len(y_true)
 
     target: float, optional (default = 0.95)
@@ -483,7 +492,7 @@ def absolute_coverage_difference(y_true, pred_intervals, target=0.95):
 
     Sources:
     --------
-    M4 competition paper: 
+    M4 competition paper:
     https://www.sciencedirect.com/science/article/pii/S0169207019301128
 
     Examples:
@@ -496,26 +505,26 @@ def absolute_coverage_difference(y_true, pred_intervals, target=0.95):
     ...                       [35865, 56570],
     ...                       [33419, 54124]])
 
-    >>> y_true = np.array([37463, 40828, 56148, 
+    >>> y_true = np.array([37463, 40828, 56148,
     ...                    45342, 43741, 45907])
 
-    >>> acd = absolute_coverage_difference(y_true, intervals, 
+    >>> acd = absolute_coverage_difference(y_true, intervals,
     ...                                    target=0.95)
     >>> print(round(acd, 2))
 
     0.12
     ```
-    '''
+    """
     mean_coverage = coverage(y_true, pred_intervals)
     return abs(mean_coverage - target)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     y_true = [45, 60, 23, 45]
     y_preds = [50, 50, 50, 50]
 
     metrics = forecast_errors(y_true, y_preds)
     print(metrics)
 
-    metrics = forecast_errors(y_true, y_preds, metrics=['mape', 'smape'])
+    metrics = forecast_errors(y_true, y_preds, metrics=["mape", "smape"])
     print(metrics)

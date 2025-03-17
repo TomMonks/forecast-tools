@@ -269,6 +269,10 @@ def test_winkler_score_empty_input():
     with pytest.raises(ValueError):
         m.winkler_score([], [], 0.2) == 0.0
 
+def test_winkler_score_mismatched_lengths():
+    with pytest.raises(ValueError):
+        m.winkler_score([[744.54, 773.22], [750, 780]], [741.84, 760, 770], 0.2)
+
 
 def test_acd():
     intervals = np.array([[37520, 58225],
