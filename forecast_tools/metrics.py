@@ -317,7 +317,6 @@ def coverage(y_true, pred_intervals):
     cover = len(np.where((y_true > lower) & (y_true < upper))[0])
     return cover / len(y_true)
 
-
 def winkler_score(intervals, observations, alpha):
     '''
     Returns the mean winkler score of a set of observations and prediction
@@ -397,24 +396,20 @@ def winkler_score(intervals, observations, alpha):
     if len(intervals) == 2:
         intervals = np.array(intervals).reshape(1, -1)
 
+    # Vectorized calculation
     # interval widths
-    scores = intervals[:, 1] - intervals[:, 0]
-
+    widths = intervals[:, 1] - intervals[:, 0]
     # observation falls below lower interval
-    below_lower = observations < intervals[:, 0]
+    below_mask = observations < intervals[:, 0]
 
     # observation exceeds upper interval
-    above_upper = observations > intervals[:, 1]
-
-    # lower penality
-    scores[below_lower] += \
-        ((2/alpha) * (intervals[:, 0]
-         [below_lower] - observations[below_lower]))
-
-    # upper penality
-    scores[above_upper] += \
-        ((2/alpha) * (observations[above_upper] -
-         intervals[:, 1][above_upper]))
+    above_mask = observations > intervals[:, 1]
+    
+    # penalities
+    penalty_below = ((2/alpha) * (intervals[:, 0] - observations)) * below_mask
+    penalty_above = ((2/alpha) * (observations - intervals[:, 1])) * above_mask
+    
+    scores = widths + penalty_below + penalty_above
 
     return scores.mean()
 
