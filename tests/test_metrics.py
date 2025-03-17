@@ -259,6 +259,13 @@ def test_winkler_score_invalid_alpha(alpha):
         m.winkler_score([744.54, 773.22], 741.84, alpha)
 
 
+def test_winkler_score_invalid_interval():
+    """Test that winkler catch incorrect lower > upper bound"""
+    with pytest.raises(ValueError):
+        m.winkler_score([773.22, 744.54], 741.84, 0.2)
+
+
+
 
 def test_acd():
     intervals = np.array([[37520, 58225],

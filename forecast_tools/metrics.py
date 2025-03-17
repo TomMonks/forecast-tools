@@ -396,9 +396,19 @@ def winkler_score(intervals, observations, alpha, return_details=False):
     else:
         raise TypeError(type_err_msg)
 
-    # handle intervals for an individual observation
+     # handle intervals for an individual observation
     if len(intervals) == 2:
         intervals = np.array(intervals).reshape(1, -1)
+
+    # Validate intervals...
+
+    if intervals.shape[1] != 2:
+        raise ValueError("Each interval must have a lower and upper bound")
+
+
+    # validate mistakes in intervals passed in.
+    if np.any(intervals[:, 0] > intervals[:, 1]):
+        raise ValueError("Lower bounds must be less than or equal to upper bounds")
 
     # Vectorized calculation
     # interval widths
