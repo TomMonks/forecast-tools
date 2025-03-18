@@ -26,4 +26,4 @@ def load_emergency_dept():
     df = pd.read_csv(path, index_col='date', parse_dates=True,
                      dayfirst=True, date_format="%d/%m/%y")
     df.index.freq = 'D'
-    return df2017-01-22
+    return df
