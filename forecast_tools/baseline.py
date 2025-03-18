@@ -1076,9 +1076,9 @@ def boot_prediction_intervals(preds, resid, horizon, levels=None, boots=1000):
         q_upper = level + alpha
         q_lower = (1 - level) - alpha
 
-        upper = np.percentile(data, q_upper*100, interpolation='higher',
+        upper = np.percentile(data, q_upper*100, method='higher',
                               axis=0)
-        lower = np.percentile(data, q_lower*100, interpolation='higher',
+        lower = np.percentile(data, q_lower*100, method='higher',
                               axis=0)
 
         pis.append(np.array([lower, upper]).T)
