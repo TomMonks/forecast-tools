@@ -217,7 +217,7 @@ def test_winkler_score(y_intervals, y_test, alpha, expected):
 
     Tests one step forecasts only.
     '''
-    ws = m.winkler_score(y_intervals, y_test, alpha)
+    ws = m.winkler_score(y_test, y_intervals, alpha)
     assert pytest.approx(expected) == ws
 
 
@@ -240,7 +240,7 @@ def test_winkler_score_m_step():
     preds, intervals = model.fit_predict(train, HOLDOUT,
                                          return_predict_int=True)
 
-    ws = m.winkler_score(intervals[0], test, alpha=0.2)
+    ws = m.winkler_score(test, intervals[0], alpha=0.2)
 
     assert pytest.approx(expected, abs=0.01) == ws
 
@@ -249,20 +249,20 @@ def test_winkler_score_m_step():
                          [([744.54, 773.22], "741.84", 0.2)])
 def test_winkler_score_invalid_type(y_intervals, y_test, alpha):
     with pytest.raises(TypeError):
-        m.winkler_score(y_intervals, y_test, alpha)
+        m.winkler_score(y_test, y_intervals, alpha)
 
 
 @pytest.mark.parametrize("alpha", [-0.1, 0, 1, 1.1])
 def test_winkler_score_invalid_alpha(alpha):
     """Test error thrown if invalid alpha passed to winkler score"""
     with pytest.raises(ValueError):
-        m.winkler_score([744.54, 773.22], 741.84, alpha)
+        m.winkler_score(741.84, [744.54, 773.22], alpha)
 
 
 def test_winkler_score_invalid_interval():
     """Test that winkler catch incorrect lower > upper bound"""
     with pytest.raises(ValueError):
-        m.winkler_score([773.22, 744.54], 741.84, 0.2)
+        m.winkler_score(741.84, [773.22, 744.54], 0.2)
 
 
 def test_winkler_score_empty_input():
@@ -271,7 +271,7 @@ def test_winkler_score_empty_input():
 
 def test_winkler_score_mismatched_lengths():
     with pytest.raises(ValueError):
-        m.winkler_score([[744.54, 773.22], [750, 780]], [741.84, 760, 770], 0.2)
+        m.winkler_score([741.84, 760, 770], [[744.54, 773.22], [750, 780]], 0.2)
 
 
 def test_acd():

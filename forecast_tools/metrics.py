@@ -324,8 +324,8 @@ def coverage(y_true, pred_intervals):
 
 
 def winkler_score(
+    y_true: npt.ArrayLike,
     intervals: npt.ArrayLike,
-    observations: npt.ArrayLike,
     alpha: float,
     return_scores: bool = False,
 ) -> float | dict:
@@ -340,11 +340,11 @@ def winkler_score(
 
     Parameters:
     -----------
+    y_true: float, integer or array-like
+        individual observation or array of ground truth observations.
+    
     intervals: array-like
         array of prediction intervals
-
-    observations: float, integer or array-like
-        individual observation or array of ground truth observations.
 
     alpha: float
         The prediction interval alpha.  For an 80% pred intervals alpha=0.2
@@ -399,15 +399,15 @@ def winkler_score(
         raise ValueError("Alpha must be between 0 and 1")
 
     # Convert observations to numpy array
-    if isinstance(observations, (pd.Series, pd.DataFrame)):
-        observations = observations.to_numpy().flatten()
-    elif isinstance(observations, list):
-        observations = np.array(observations)
-    elif isinstance(observations, numbers.Number):
+    if isinstance(y_true, (pd.Series, pd.DataFrame)):
+        y_true = y_true.to_numpy().flatten()
+    elif isinstance(y_true, list):
+        y_true = np.array(y_true)
+    elif isinstance(y_true, numbers.Number):
         # individual number
-        observations = np.array([observations])
+        y_true = np.array([y_true])
     else:
-        observations = np.asarray(observations).flatten()
+        y_true = np.asarray(y_true).flatten()
 
     # handle intervals for an individual observation
     intervals = np.asarray(intervals)
@@ -426,14 +426,14 @@ def winkler_score(
         raise ValueError("Lower bounds must be less than or equal to upper bounds")
 
     # Ensure matching dimensions
-    if len(intervals) != len(observations):
+    if len(intervals) != len(y_true):
         raise ValueError("Number of intervals must match number of observations")
 
     # Vectorized calculation
     # interval widths
     widths = intervals[:, 1] - intervals[:, 0]
-    below_mask = observations < intervals[:, 0]
-    above_mask = observations > intervals[:, 1]
+    below_mask = y_true < intervals[:, 0]
+    above_mask = y_true > intervals[:, 1]
 
     # Calculate penalties
     penalty_factor = 2.0 / alpha
@@ -442,12 +442,12 @@ def winkler_score(
 
     if np.any(below_mask):
         penalty_below[below_mask] = penalty_factor * (
-            intervals[below_mask, 0] - observations[below_mask]
+            intervals[below_mask, 0] - y_true[below_mask]
         )
 
     if np.any(above_mask):
         penalty_above[above_mask] = penalty_factor * (
-            observations[above_mask] - intervals[above_mask, 1]
+            y_true[above_mask] - intervals[above_mask, 1]
         )
 
     scores = widths + penalty_below + penalty_above
