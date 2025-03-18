@@ -402,12 +402,20 @@ def coverage(
     Examples:
     ---------
     ```
-    >>> intervals = np.array([[37520][58225],
-    ...[29059][49764],
-    ...[47325][68030]])
-    >>> y_true = np.array([37520][40828][70000])
-    >>> coverage(y_true, intervals)
-    0.6666666666666666
+    intervals = np.array(
+        [
+            [37520, 58225],
+            [29059, 49764],
+            [47325, 68030],
+            [36432, 57137],
+            [35865, 56570],
+            [33419, 54124],
+        ]
+    )
+
+    y_true = np.array([37463, 40828, 56148, 45342, 43741, 45907])
+    mean_cov = coverage(y_true, intervals)
+    print(round(mean_cov, 2))
     ```
     """
     # Validate inputs without requiring alpha
