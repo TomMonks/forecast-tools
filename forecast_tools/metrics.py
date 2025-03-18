@@ -609,7 +609,7 @@ def interval_scores(
         intervals: npt.ArrayLike, 
         alpha: float, 
         metrics: str | list[str] = "all"
-) -> dict[str : float]:
+) -> dict[str, float]:
     """
     Convenience function for return a multiple
     interval evaluation scores.
@@ -639,15 +639,23 @@ def interval_scores(
 
     Example:
     ---------
-    >>> y_true = [45, 60, 23, 45]
-    >>> y_preds = [50, 50, 50, 50]
+    >>> HOLDOUT = 7
+    >>> PERIOD = 7
 
-    >>> metrics = forecast_errors(y_true, y_preds)
-    >>> print(metrics)
+    >>> attends = load_emergency_dept()
 
-    >>> metrics = forecast_errors(y_true, y_preds, metrics=['acd', 'winkler'])
-    >>> print(metrics)
+    >>> # train-test split
+    >>> train, test = attends[:-HOLDOUT], attends[-HOLDOUT:]
 
+    >>> model = SNaive(PERIOD)
+
+    # returns 80 and 90% prediction intervals by default.
+    >>> preds, intervals = model.fit_predict(train, HOLDOUT, return_predict_int=True)
+
+    >>> intervals_80 = intervals[0]
+
+    >>> scores = interval_scores(test, intervals_80, alpha=0.2)
+    >>> print(scores)
     """
     y_true, intervals = _validate_interval_inputs(y_true, intervals, alpha)
 
