@@ -1,6 +1,22 @@
 # Change log
 
-## v0.3.0 UNRELEASED
+## UNRELEASED
+
+### Changed
+
+* BREAKING: Unified interface to `winkler_score`, `absolute_coverage_difference` and `coverage`
+* DOCS: upgrade documentation for prediction interval evaluation.
+
+### Added
+
+* Common validation input parameter function for `winkler_score` and `absolute_coverage_difference`
+* Additional test suite for `winkler_score` focussing on input parameters.
+
+### Fixed
+
+* PATCH: `boot_prediction_intervals` percentile estimation using `numpy` modified to remove deprecated parameter `interpolation`. Replaced with `method` parameter.
+
+## v0.3.0 
 
 ### Changed
 
