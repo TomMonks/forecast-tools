@@ -295,38 +295,10 @@ def _forecast_error_functions():
     return funcs
 
 
-def coverage(y_true, pred_intervals):
-    """
-    Prediction Interval Coverage
-
-    Calculates the proportion of the true
-    values are that are covered by the lower
-    and upper bounds of the prediction intervals
-
-    Parameters:
-    -------
-    y_true -- array-like,
-        actual observations
-
-    pred_intervals -- np.array, matrix (hx2)
-        prediction intervals
-
-    Returns:
-    -------
-    float
-    """
-    y_true = np.asarray(y_true)
-    lower = np.asarray(pred_intervals.T[0])
-    upper = np.asarray(pred_intervals.T[1])
-
-    cover = len(np.where((y_true > lower) & (y_true < upper))[0])
-    return cover / len(y_true)
-
-
 def _validate_interval_inputs(
     y_true: npt.ArrayLike,
     intervals: npt.ArrayLike,
-    alpha: float,
+    alpha: float = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Validates inputs for prediction interval evaluation functions.
@@ -339,9 +311,10 @@ def _validate_interval_inputs(
     intervals: array-like
         Array of prediction intervals.
         
-    alpha: float
+    alpha: float, optional (default=None)
         The prediction interval alpha. For an 80% prediction interval, alpha=0.2.
-        
+        If set to None then alpha is not checked.
+
     Returns:
     --------
     tuple[np.ndarray, np.ndarray]
@@ -351,10 +324,22 @@ def _validate_interval_inputs(
     -------
     ValueError
         If inputs don't meet validation requirements.
+    TypeError
+        If inputs are not of compatible types.
     """
     # Validate alpha
-    if not 0 < alpha < 1:
-        raise ValueError("Alpha must be between 0 and 1")
+    if alpha is not None:
+        if not 0 < alpha < 1:
+            raise ValueError("Alpha must be between 0 and 1")
+        
+    # Check if y_true is of a compatible type before conversion
+    if not (isinstance(y_true, (list, tuple, np.ndarray, pd.Series, pd.DataFrame)) or 
+            isinstance(y_true, (int, float, complex, bool, np.number))):
+        raise TypeError(f"y_true must be array-like or a number, got {type(y_true).__name__}")
+    
+    # Check if intervals is of a compatible type before conversion
+    if not isinstance(intervals, (list, tuple, np.ndarray, pd.Series, pd.DataFrame)):
+        raise TypeError(f"intervals must be array-like, got {type(intervals).__name__}")
     
     # Convert observations to numpy array
     if isinstance(y_true, (pd.Series, pd.DataFrame)):
@@ -389,6 +374,53 @@ def _validate_interval_inputs(
     
     return y_true, intervals
 
+
+def coverage(
+    y_true: npt.ArrayLike, 
+    pred_intervals: npt.ArrayLike
+) -> float:
+    """
+    Prediction Interval Coverage
+
+    Calculates the proportion of the true values that are covered by the 
+    prediction intervals (lower and upper bounds), including values exactly 
+    on the boundaries.
+
+    Parameters:
+    -----------
+    y_true: array-like
+        Actual observations.
+
+    pred_intervals: array-like
+        Prediction intervals, where each interval is [lower, upper].
+
+    Returns:
+    --------
+    float
+        The proportion of observations that fall within the prediction intervals.
+        
+    Examples:
+    ---------
+    ```
+    >>> intervals = np.array([[37520][58225],
+    ...[29059][49764],
+    ...[47325][68030]])
+    >>> y_true = np.array([37520][40828][70000])
+    >>> coverage(y_true, intervals)
+    0.6666666666666666
+    ```
+    """
+    # Validate inputs without requiring alpha
+    y_true, pred_intervals = _validate_interval_inputs(y_true, pred_intervals)
+    
+    # Extract lower and upper bounds
+    lower = pred_intervals[:, 0]
+    upper = pred_intervals[:, 1]
+    
+    # Calculate coverage, including boundary values
+    covered = np.sum((y_true >= lower) & (y_true <= upper))
+    
+    return covered / len(y_true)
 
 
 def winkler_score(

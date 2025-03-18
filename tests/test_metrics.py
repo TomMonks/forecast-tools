@@ -287,3 +287,52 @@ def test_acd():
 
     acd = m.absolute_coverage_difference(y_true, intervals, alpha=0.05)
     assert pytest.approx(acd, abs=0.01) == 0.12
+
+
+
+@pytest.mark.parametrize("pred_intervals, y_true, expected", [
+    # Floating point precision tests
+    ([[10.0, 15.0], [15.0, 20.0], [25.0, 30.0]], [10.0000001, 20.0, 29.9999999], 1.0),
+    
+    # Extreme values
+    (
+        [
+            [np.finfo(float).max - 1, np.finfo(float).max],
+            [np.finfo(float).min, np.finfo(float).min + 1]
+        ],
+        [np.finfo(float).max, np.finfo(float).min],
+        1.0
+    ),
+])
+def test_coverage_edge_cases(pred_intervals, y_true, expected):
+    """Test coverage with floating point precision issues and extreme values."""
+    result = m.coverage(y_true, pred_intervals)
+    assert pytest.approx(expected) == result
+
+@pytest.mark.parametrize("pred_intervals, y_true", [
+    # Invalid types
+    ("not an array", [10, 20, 30]),
+    ([[5, 15], [15, 25], [25, 35]], "not an array"),
+])
+def test_coverage_type_errors(pred_intervals, y_true):
+    """Test that coverage raises TypeError for invalid input types."""
+    with pytest.raises(TypeError):
+        m.coverage(y_true, pred_intervals)
+
+@pytest.mark.parametrize("pred_intervals, y_true", [
+    # Empty arrays
+    ([], []),
+    
+    # Mismatched lengths
+    ([[5, 15], [15, 25]], [10, 20, 30]),
+    
+    # Invalid intervals (lower > upper)
+    ([[15, 5], [25, 15], [35, 25]], [10, 20, 30]),
+    
+    # Wrong interval shape
+    ([[5, 15, 20], [15, 25, 30], [25, 35, 40]], [10, 20, 30]),
+])
+def test_coverage_value_errors(pred_intervals, y_true):
+    """Test that coverage raises ValueError for invalid inputs."""
+    with pytest.raises(ValueError):
+        m.coverage(y_true, pred_intervals)
