@@ -323,6 +323,74 @@ def coverage(y_true, pred_intervals):
     return cover / len(y_true)
 
 
+def _validate_interval_inputs(
+    y_true: npt.ArrayLike,
+    intervals: npt.ArrayLike,
+    alpha: float,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Validates inputs for prediction interval evaluation functions.
+    
+    Parameters:
+    -----------
+    y_true: float, integer or array-like
+        Individual observation or array of ground truth observations.
+    
+    intervals: array-like
+        Array of prediction intervals.
+        
+    alpha: float
+        The prediction interval alpha. For an 80% prediction interval, alpha=0.2.
+        
+    Returns:
+    --------
+    tuple[np.ndarray, np.ndarray]
+        Validated and properly formatted y_true and intervals arrays.
+        
+    Raises:
+    -------
+    ValueError
+        If inputs don't meet validation requirements.
+    """
+    # Validate alpha
+    if not 0 < alpha < 1:
+        raise ValueError("Alpha must be between 0 and 1")
+    
+    # Convert observations to numpy array
+    if isinstance(y_true, (pd.Series, pd.DataFrame)):
+        y_true = y_true.to_numpy().flatten()
+    elif isinstance(y_true, list):
+        y_true = np.array(y_true)
+    elif isinstance(y_true, numbers.Number):
+        # individual number
+        y_true = np.array([y_true])
+    else:
+        y_true = np.asarray(y_true).flatten()
+    
+    # Handle intervals for an individual observation
+    intervals = np.asarray(intervals)
+    if len(intervals) == 2 and intervals.ndim == 1:
+        intervals = np.array(intervals).reshape(1, -1)
+    
+    if len(intervals) == 0:
+        raise ValueError("Intervals array is empty!")
+    
+    # Validate intervals shape
+    if intervals.shape[1] != 2:
+        raise ValueError(f"Each interval must have a lower and upper bound {intervals.shape}")
+    
+    # Validate interval bounds
+    if np.any(intervals[:, 0] > intervals[:, 1]):
+        raise ValueError("Lower bounds must be less than or equal to upper bounds")
+    
+    # Ensure matching dimensions
+    if len(intervals) != len(y_true):
+        raise ValueError("Number of intervals must match number of observations")
+    
+    return y_true, intervals
+
+
+
 def winkler_score(
     y_true: npt.ArrayLike,
     intervals: npt.ArrayLike,
@@ -393,41 +461,9 @@ def winkler_score(
     ```
 
     """
-
-    # Validate alpha
-    if not 0 < alpha < 1:
-        raise ValueError("Alpha must be between 0 and 1")
-
-    # Convert observations to numpy array
-    if isinstance(y_true, (pd.Series, pd.DataFrame)):
-        y_true = y_true.to_numpy().flatten()
-    elif isinstance(y_true, list):
-        y_true = np.array(y_true)
-    elif isinstance(y_true, numbers.Number):
-        # individual number
-        y_true = np.array([y_true])
-    else:
-        y_true = np.asarray(y_true).flatten()
-
-    # handle intervals for an individual observation
-    intervals = np.asarray(intervals)
-    if len(intervals) == 2:
-        intervals = np.array(intervals).reshape(1, -1)
-
-    if len(intervals) == 0:
-        raise ValueError("Intervals array is empty!")
-
-    # Validate intervals...
-    if intervals.shape[1] != 2:
-        raise ValueError("Each interval must have a lower and upper bound")
-
-    # validate mistakes in intervals passed in.
-    if np.any(intervals[:, 0] > intervals[:, 1]):
-        raise ValueError("Lower bounds must be less than or equal to upper bounds")
-
-    # Ensure matching dimensions
-    if len(intervals) != len(y_true):
-        raise ValueError("Number of intervals must match number of observations")
+    
+    # validate inputs
+    y_true, intervals = _validate_interval_inputs(y_true, intervals, alpha)
 
     # Vectorized calculation
     # interval widths
@@ -465,7 +501,7 @@ def winkler_score(
 
 def absolute_coverage_difference(
         y_true: npt.ArrayLike, 
-        pred_intervals: npt.ArrayLike, 
+        intervals: npt.ArrayLike, 
         alpha=0.05
 ) -> float:
     """
@@ -478,12 +514,12 @@ def absolute_coverage_difference(
     by a method an average of 2% of the time (coverage of 98%),
     ACD = |0.98 - 0.95| = 0.03
 
-    Params:
+    Parameters:
     ------
     y_true: array-like
         The ground truth future values
 
-    pred_intervals: array-like
+    intervals: array-like
         The generated prediction intervals. Where
         len(pred_intervals) == len(y_true)
 
@@ -520,7 +556,11 @@ def absolute_coverage_difference(
     0.12
     ```
     """
-    mean_coverage = coverage(y_true, pred_intervals)
+
+    # validate inputs
+    y_true, intervals = _validate_interval_inputs(y_true, intervals, alpha)
+
+    mean_coverage = coverage(y_true, intervals)
     return abs(mean_coverage - (1-alpha))
 
 

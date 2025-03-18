@@ -210,7 +210,8 @@ git
                           ([744.54, 773.22], [741.84], 0.2, 55.68),
                           ([744.54, 773.22], 745.0, 0.2, 28.68),
                           (np.array([744.54, 773.22]), 745.0, 0.2, 28.68),
-                          (pd.DataFrame([744.54, 773.22]), 745.0, 0.2, 28.68)])
+                          (pd.Series([744.54, 773.22]), 745.0, 0.2, 28.68),
+                          (pd.DataFrame([744.54, 773.22]).T, 745.0, 0.2, 28.68)])
 def test_winkler_score(y_intervals, y_test, alpha, expected):
     '''
     Test that the winkler score returns the correct value
