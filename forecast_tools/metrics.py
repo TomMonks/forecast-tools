@@ -366,7 +366,7 @@ def winkler_score(
     >>> alpha = 0.2
     >>> interval = [744.54, 773.22]
     >>> y_t = 741.84
-    >>> ws = winkler_score(interval, y_t, alpha)
+    >>> ws = winkler_score(y_t, interval, alpha)
     >>> print(round(ws, 2))
 
     56.68
@@ -386,7 +386,7 @@ def winkler_score(
     >>> # returns 80 and 90% prediction intervals by default.
     >>> preds, intervals_ed = model.fit_predict(train, HOLDOUT,
         ... return_predict_int=True)
-    >>> ws = mean_winkler_score_np(intervals_ed[0], test_ed, alpha=1-TARGET)
+    >>> ws = winkler_score_np(test_ed, intervals_ed[0],, alpha=1-TARGET)
     >>> print(f'Mean winkler score: {ws:.2f}')
 
     Mean winkler score: 79.72
