@@ -284,5 +284,5 @@ def test_acd():
 
     y_true = np.array([37463, 40828, 56148, 45342, 43741, 45907])
 
-    acd = m.absolute_coverage_difference(y_true, intervals, target=0.95)
+    acd = m.absolute_coverage_difference(y_true, intervals, alpha=0.05)
     assert pytest.approx(acd, abs=0.01) == 0.12
