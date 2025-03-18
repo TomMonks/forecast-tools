@@ -604,6 +604,84 @@ def absolute_coverage_difference(
     return abs(mean_coverage - (1-alpha))
 
 
+def interval_scores(
+        y_true: npt.ArrayLike, 
+        intervals: npt.ArrayLike, 
+        alpha: float, 
+        metrics: str | list[str] = "all"
+) -> dict[str : float]:
+    """
+    Convenience function for return a multiple
+    interval evaluation scores.
+
+    Parameters:
+    --------
+    y_true: array-like
+        The ground truth future values
+
+    intervals: array-like
+        The generated prediction intervals. Where
+        len(pred_intervals) == len(y_true)
+
+    alpha: float
+        The alpha used to generate the prediction intervals.
+        E.g. 0.05 expects a 95% coverage.
+
+    metrics -- str or List
+        interval score metrics to compute.
+        'all' returns all interval scores available
+        List options: ["coverage", "acd", "winkler"]
+
+    Returns:
+    -------
+    dict,
+        interval score metrics within a dictionary
+
+    Example:
+    ---------
+    >>> y_true = [45, 60, 23, 45]
+    >>> y_preds = [50, 50, 50, 50]
+
+    >>> metrics = forecast_errors(y_true, y_preds)
+    >>> print(metrics)
+
+    >>> metrics = forecast_errors(y_true, y_preds, metrics=['acd', 'winkler'])
+    >>> print(metrics)
+
+    """
+    y_true, intervals = _validate_interval_inputs(y_true, intervals, alpha)
+
+    if metrics == "all":
+        metrics = ["coverage", "acd", "winkler"]
+
+    funcs = _interval_evaluation_functions()
+    scores = {}
+    for metric in metrics:
+        if metric == "coverage":
+            scores[metric] = funcs[metric](y_true, intervals)
+        else:
+            scores[metric] = funcs[metric](y_true, intervals, alpha)
+
+    return scores
+
+
+def _interval_evaluation_functions() -> dict:
+    """
+    Return all interval score functions in a dict
+
+    Returns:
+    --------
+        dict
+    """
+    funcs = {}
+    funcs["coverage"] = coverage
+    funcs["acd"] = absolute_coverage_difference
+    funcs["winkler"] = winkler_score
+    return funcs
+
+
+
+
 if __name__ == "__main__":
     y_true = [45, 60, 23, 45]
     y_preds = [50, 50, 50, 50]
