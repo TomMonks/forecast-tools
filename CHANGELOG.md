@@ -12,10 +12,12 @@
 
 * Common validation input parameter function for `winkler_score`, `coverage`, and `absolute_coverage_difference`
 * Additional test suite for `winkler_score` and `coverage` functions focussing on input parameters.
+* `metrics.interval_score` kitchen sink function will return all interval scores (winkler, acd, coverage) by default or can be limited to selection.
 
 ### Fixed
 
 * PATCH: `boot_prediction_intervals` percentile estimation using `numpy` modified to remove deprecated parameter `interpolation`. Replaced with `method` parameter.
+* PATCH: fixed `data.load_emergency_dept` date parsing user warning. Added date format parameter to pandas read in.
 
 ## v0.3.0 
 
