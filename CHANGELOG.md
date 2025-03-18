@@ -6,11 +6,12 @@
 
 * BREAKING: Unified interface to `winkler_score`, `absolute_coverage_difference` and `coverage`
 * DOCS: upgrade documentation for prediction interval evaluation.
+* ENV: pip installs `forecast-tools` from local python package in edit mode.
 
 ### Added
 
-* Common validation input parameter function for `winkler_score` and `absolute_coverage_difference`
-* Additional test suite for `winkler_score` focussing on input parameters.
+* Common validation input parameter function for `winkler_score`, `coverage`, and `absolute_coverage_difference`
+* Additional test suite for `winkler_score` and `coverage` functions focussing on input parameters.
 
 ### Fixed
 
