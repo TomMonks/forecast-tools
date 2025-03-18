@@ -9,6 +9,6 @@ parts:
   chapters:
   - file: content/01_benchmark_forecasts
   - file: content/02_forecast_error
-  - file: content/02a_coverage_metrics
-  - file: content/03_cross_validation
-  - file: content/04_auto_naive
+  - file: content/03_interval_scores
+  - file: content/04_cross_validation
+  - file: content/05_auto_naive
