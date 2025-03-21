@@ -5,17 +5,25 @@ Please fork Dev, make your modifications, run the unit tests and submit a pull r
 Development environment:
 
 ```
-conda env create -f binder/environment.yml
+mamba env create -f binder/environment.yml
 ```
 
 ```
-conda activate forecast_dev
+mamba activate forecast_tools
 ```
 
-Unit tests are provided and can be run from the command `pytest` and its coverage extension.  Run the following in the terminal.
+Unit tests are provided and can be run via `hatch` and its coverage extension.  Run the following in the terminal.
+
+To run tests in multiple Python environments (3.9-3.12)
 
 ```
-pytest --cov=forecast_tools tests/
+hatch test --all
+```
+
+To obtain a coverage report run
+
+```
+hatch test --cover
 ```
 
 **All contributions are welcome and must include unit tests!**
