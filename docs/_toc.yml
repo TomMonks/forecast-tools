@@ -12,3 +12,4 @@ parts:
   - file: content/03_interval_scores
   - file: content/04_cross_validation
   - file: content/05_auto_naive
+  - file: content/06_plotting
