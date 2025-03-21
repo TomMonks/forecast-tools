@@ -19,6 +19,7 @@ import pandas as pd
 import numbers
 
 import numpy.typing as npt
+from typing import Optional, Dict, Tuple, List, Union
 
 from forecast_tools.baseline import SNaive
 
@@ -298,8 +299,8 @@ def _forecast_error_functions():
 def _validate_interval_inputs(
     y_true: npt.ArrayLike,
     intervals: npt.ArrayLike,
-    alpha: float = None,
-) -> tuple[np.ndarray, np.ndarray]:
+    alpha: Optional[float] = None,
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Validates inputs for prediction interval evaluation functions.
     
@@ -435,8 +436,8 @@ def winkler_score(
     y_true: npt.ArrayLike,
     intervals: npt.ArrayLike,
     alpha: float,
-    return_scores: bool = False,
-) -> float | dict:
+    return_scores: Optional[bool] = False,
+) -> Union[float, Dict]:
     """
     Returns the mean winkler score of a set of observations and prediction
     intervals
@@ -542,7 +543,7 @@ def winkler_score(
 def absolute_coverage_difference(
         y_true: npt.ArrayLike, 
         intervals: npt.ArrayLike, 
-        alpha=0.05
+        alpha: Optional[float] = 0.05
 ) -> float:
     """
     The absolute coverage difference (ACD)
@@ -608,8 +609,8 @@ def interval_scores(
         y_true: npt.ArrayLike, 
         intervals: npt.ArrayLike, 
         alpha: float, 
-        metrics: str | list[str] = "all"
-) -> dict[str, float]:
+        metrics: Union[str, List[str]] = "all"
+) -> Dict[str, float]:
     """
     Convenience function for return a multiple
     interval evaluation scores.
@@ -673,7 +674,7 @@ def interval_scores(
     return scores
 
 
-def _interval_evaluation_functions() -> dict:
+def _interval_evaluation_functions() -> Dict:
     """
     Return all interval score functions in a dict
 
