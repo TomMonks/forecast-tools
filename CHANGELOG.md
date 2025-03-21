@@ -4,6 +4,7 @@
 
 ### Changed
 
+* BREAKING: dropped Python 3.8 support
 * BREAKING: Unified interface to `winkler_score`, `absolute_coverage_difference` and `coverage`
 * DOCS: upgrade documentation for prediction interval evaluation.
 * ENV: pip installs `forecast-tools` from local python package in edit mode.
