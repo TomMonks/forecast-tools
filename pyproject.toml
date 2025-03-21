@@ -20,6 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
     "joblib>=0.14.1",
@@ -28,6 +29,7 @@ dependencies = [
     "pandas>=1.0.1",
     "scipy>=1.4.1",
     "seaborn>=0.10.0",
+    "plotly>6.0.0"
 ]
 
 [project.urls]
