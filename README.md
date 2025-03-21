@@ -23,6 +23,7 @@
 3. Implementation of scale-dependent and relative metrics to evaluate forecast prediction intervals
 4. Rolling forecast origin and sliding window for time series cross validation
 5. Built in daily level datasets
+6. An interactive plotting tool to visualise train test splits and forecasts.
 
 ## Ways to explore forecast-tools
 
@@ -59,12 +60,12 @@ Development environment:
 
 ```
 mamba env create -f binder/environment.yml
-mamba activate forecast_dev
+mamba activate forecast_tools
 ```
 
 Unit tests are provided and can be run via `hatch` and its coverage extension.  Run the following in the terminal.
 
-To run tests in multiple Python environments (3.8-3.12)
+To run tests in multiple Python environments (3.9-3.12)
 
 ```
 hatch test --all
