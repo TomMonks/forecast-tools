@@ -13,6 +13,8 @@
 * Common validation input parameter function for `winkler_score`, `coverage`, and `absolute_coverage_difference`
 * Additional test suite for `winkler_score` and `coverage` functions focussing on input parameters.
 * `metrics.interval_score` kitchen sink function will return all interval scores (winkler, acd, coverage) by default or can be limited to selection.
+* `plotting` module: contains the interactive plotly function `plot_time_series`. Documentation also created.
+* ENV: added plotly to package requirements.
 
 ### Fixed
 
