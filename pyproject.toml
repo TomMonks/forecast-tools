@@ -9,14 +9,13 @@ description = "Tools to support forecasting education in Python"
 readme = "README.md"
 license = "MIT"
 keywords = ["forecasting", "time-series", "naive", "snaive", "error-metrics", "education"]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [
     { name = "Thomas Monks", email = "forecast_tools@gmail.com" },
 ]
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -47,5 +46,5 @@ include = [
 ]
 
 [[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+python = ["3.9", "3.10", "3.11", "3.12"]
 
