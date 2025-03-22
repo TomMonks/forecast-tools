@@ -181,16 +181,28 @@ def mean_squared_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
     --------
     y_true -- array-like
         actual observations from time series
-    y_pred -- arraylike
+    y_pred -- array-like
         the predictions to evaluate
 
     Returns:
     -------
     float,
         scalar value representing the MSE
+
+    Raises:
+    ------
+    ValueError
+        If inputs cannot be converted to numeric arrays or have different lengths
+    TypeError
+        If inputs are not array-like
     """
-    y_true, y_pred = as_arrays(y_true, y_pred)
-    return np.mean(np.square((y_true - y_pred)))
+    y_true_arr, y_pred_arr = as_arrays(y_true, y_pred)
+    
+    # Check if arrays contain numeric data
+    if not np.issubdtype(y_true_arr.dtype, np.number) or not np.issubdtype(y_pred_arr.dtype, np.number):
+        raise ValueError("Input arrays must contain numeric values")
+    
+    return np.mean(np.square((y_true_arr - y_pred_arr)))
 
 
 def root_mean_squared_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
@@ -211,7 +223,6 @@ def root_mean_squared_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> flo
     float,
         scalar value representing the RMSE
     """
-    y_true, y_pred = as_arrays(y_true, y_pred)
     return np.sqrt(mean_squared_error(y_true, y_pred))
 
 

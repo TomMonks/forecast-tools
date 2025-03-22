@@ -178,40 +178,99 @@ def test_mean_absolute_percentage_error_warnings():
         m.mean_absolute_percentage_error([1e-11, 1, 2], [0, 1, 2])
 
 
-@pytest.mark.parametrize("y_pred, y_true, expected",
-                         [([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
-                          ([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12],
-                           36.0),
-                          ([103, 130, 132, 124, 124, 108],
-                           [129, 111, 122, 129, 110, 141],
-                           407.833333333333),
-                          ([103, 130, 132, 124, 124, 108, 160, 160],
-                           [129, 111, 122, 129, 110, 141, 142, 143],
-                           382.50)])
+@pytest.mark.parametrize("y_true, y_pred, expected", [
+    # Original test cases
+    ([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
+    ([7, 8, 9, 10, 11, 12], [1, 2, 3, 4, 5, 6], 36.0),
+    ([129, 111, 122, 129, 110, 141], [103, 130, 132, 124, 124, 108], 407.833333333333),
+    ([129, 111, 122, 129, 110, 141, 142, 143], [103, 130, 132, 124, 124, 108, 160, 160], 382.50),
+    
+    # Additional test cases with different data types
+    (np.array([1, 2, 3, 4, 5, 6]), np.array([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.Series([1, 2, 3, 4, 5, 6]), pd.Series([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.DataFrame([1, 2, 3, 4, 5, 6]), pd.Series([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.DataFrame([1, 2, 3, 4, 5, 6]), np.array([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.Series([1, 2, 3, 4, 5, 6]), [1, 2, 3, 4, 5, 6], 0.0),
+    
+    # Test with float values
+    ([1.5, 2.5, 3.5], [1.0, 2.0, 3.0], 0.25),
+    
+    # Test with negative values
+    ([-1, -2, -3], [-4, -5, -6], 9.0),
+    
+    # Test with mixed positive and negative values
+    ([1, -2, 3], [4, -5, 6], 9.0),
+    
+    # Test with 2D arrays (should be flattened)
+    (np.array([[1, 2], [3, 4]]), np.array([[5, 6], [7, 8]]), 16.0),
+])
 def test_mean_squared_error(y_true, y_pred, expected):
     '''
-    test mean squared error calculation
+    Test mean squared error calculation with various input types
     '''
     error = m.mean_squared_error(y_true, y_pred)
-    assert pytest.approx(expected) == error
+    assert pytest.approx(expected, rel=1e-9) == error
 
 
-@pytest.mark.parametrize("y_pred, y_true, expected",
-                         [([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
-                          ([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12],
-                           6.0),
-                          ([103, 130, 132, 124, 124, 108],
-                           [129, 111, 122, 129, 110, 141],
-                           20.1948838405506),
-                          ([103, 130, 132, 124, 124, 108, 160, 160],
-                           [129, 111, 122, 129, 110, 141, 142, 143],
-                           19.5576072156079)])
+@pytest.mark.parametrize("y_true, y_pred, expected", [
+    # Original test cases
+    ([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
+    ([7, 8, 9, 10, 11, 12], [1, 2, 3, 4, 5, 6], 6.0),
+    ([129, 111, 122, 129, 110, 141], [103, 130, 132, 124, 124, 108], 20.1948838405506),
+    ([129, 111, 122, 129, 110, 141, 142, 143], [103, 130, 132, 124, 124, 108, 160, 160], 19.5576072156079),
+    
+    # Additional test cases with different data types
+    (np.array([1, 2, 3, 4, 5, 6]), np.array([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.Series([1, 2, 3, 4, 5, 6]), pd.Series([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.Series([1, 2, 3, 4, 5, 6]), [1, 2, 3, 4, 5, 6], 0.0),
+    
+    # Test with float values
+    ([1.5, 2.5, 3.5], [1.0, 2.0, 3.0], 0.5),
+    
+    # Test with negative values
+    ([-1, -2, -3], [-4, -5, -6], 3.0),
+    
+    # Test with mixed positive and negative values
+    ([1, -2, 3], [4, -5, 6], 3.0),
+    
+    # Test with 2D arrays (should be flattened)
+    (np.array([[1, 2], [3, 4]]), np.array([[5, 6], [7, 8]]), 4.0),
+])
 def test_root_mean_squared_error(y_true, y_pred, expected):
     '''
-    test root mean squared error calculation
+    Test root mean squared error calculation with various input types
     '''
     error = m.root_mean_squared_error(y_true, y_pred)
-    assert pytest.approx(expected) == error
+    assert pytest.approx(expected, rel=1e-9) == error
+
+
+# Tests for error handling
+@pytest.mark.parametrize("y_true, y_pred, exception", [
+    # Different lengths
+    ([1, 2, 3], [1, 2], ValueError),
+    
+    # Empty arrays
+    ([], [], ValueError),
+    
+    # Non-numeric values
+    (["a", "b", "c"], [1, 2, 3], ValueError),
+    ([1, 2, 3], ["a", "b", "c"], ValueError),
+    
+    # Non-array-like objects
+    (123, [1, 2, 3], TypeError),
+    ([1, 2, 3], None, TypeError),
+])
+def test_error_metrics_exceptions(y_true, y_pred, exception):
+    '''
+    Test that appropriate exceptions are raised for invalid inputs
+    for both MSE and RMSE functions
+    '''
+    with pytest.raises(exception):
+        m.mean_squared_error(y_true, y_pred)
+    
+    with pytest.raises(exception):
+        m.root_mean_squared_error(y_true, y_pred)
+
 
 
 @pytest.mark.parametrize("y_pred, y_true, expected",
