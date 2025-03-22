@@ -24,9 +24,9 @@ from typing import Optional, Dict, Tuple, List, Union
 from forecast_tools.baseline import SNaive
 
 
-def as_arrays(y_true, y_pred):
+def as_arrays(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Returns ground truth and predict
+    Returns ground truth and predictions
     values as numpy arrays.
 
     Parameters:
@@ -39,19 +39,25 @@ def as_arrays(y_true, y_pred):
     Returns:
     -------
     Tuple(np.array np.array)
+
+    Notes:
+    -----
+    Patched in v0.4.1 to flatten arrays. This handles edge case
+    where y_true and y_pred are different data structures e.g.
+    an array and a dataframe.
     """
-    return np.asarray(y_true), np.asarray(y_pred)
+    return np.asarray(y_true).flatten(), np.asarray(y_pred).flatten()
 
 
-def mean_error(y_true, y_pred):
+def mean_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
     """
     Computes Mean Error (ME).
 
     Parameters:
     --------
-    y_true -- array-like
+    y_true: array-like
         actual observations from time series
-    y_pred -- arraylike
+    y_pred: arraylike
         the predictions to evaluate
 
     Returns:
@@ -63,7 +69,7 @@ def mean_error(y_true, y_pred):
     return np.mean(y_true - y_pred)
 
 
-def mean_absolute_percentage_error(y_true, y_pred):
+def mean_absolute_percentage_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
     """
     Mean Absolute Percentage Error (MAPE).
 
@@ -78,9 +84,9 @@ def mean_absolute_percentage_error(y_true, y_pred):
 
     Parameters:
     --------
-    y_true -- array-like
+    y_true: array-like
         actual observations from time series
-    y_pred -- arraylike
+    y_pred: arraylike
         the predictions to evaluate
 
     Returns:
@@ -92,7 +98,7 @@ def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 
-def mean_absolute_error(y_true, y_pred):
+def mean_absolute_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
     """
     Mean Absolute Error (MAE)
 
@@ -112,7 +118,7 @@ def mean_absolute_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred)))
 
 
-def mean_squared_error(y_true, y_pred):
+def mean_squared_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
     """
     Mean Squared Error (MSE)
 
@@ -132,7 +138,7 @@ def mean_squared_error(y_true, y_pred):
     return np.mean(np.square((y_true - y_pred)))
 
 
-def root_mean_squared_error(y_true, y_pred):
+def root_mean_squared_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
     """
     Root Mean Squared Error (RMSE).
 
@@ -154,7 +160,7 @@ def root_mean_squared_error(y_true, y_pred):
     return np.sqrt(mean_squared_error(y_true, y_pred))
 
 
-def symmetric_mean_absolute_percentage_error(y_true, y_pred):
+def symmetric_mean_absolute_percentage_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) ->float:
     """
     Symmetric Mean Absolute Percentage Error (sMAPE)
 
@@ -186,7 +192,12 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(100 * (numerator / denominator))
 
 
-def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
+def mean_absolute_scaled_error(
+        y_true: npt.ArrayLike, 
+        y_pred: npt.ArrayLike, 
+        y_train:npt.ArrayLike, 
+        period: Optional[int] = None
+) -> float:
     """
     Mean absolute scaled error (MASE)
 
@@ -229,7 +240,11 @@ def mean_absolute_scaled_error(y_true, y_pred, y_train, period=None):
     return mean_absolute_error(y_true, y_pred) / mae_insample
 
 
-def forecast_errors(y_true, y_pred, metrics="all"):
+def forecast_errors(
+        y_true: npt.ArrayLike, 
+        y_pred:npt.ArrayLike, 
+        metrics: Union[str, List[str]] = "all"
+) -> dict:
     """
     Convenience function for return a multiple
     forecast errors
@@ -277,7 +292,7 @@ def forecast_errors(y_true, y_pred, metrics="all"):
     return errors
 
 
-def _forecast_error_functions():
+def _forecast_error_functions() -> dict:
     """
     Return all forecast functions in
     a dict
