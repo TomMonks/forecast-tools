@@ -273,22 +273,60 @@ def test_error_metrics_exceptions(y_true, y_pred, exception):
 
 
 
-@pytest.mark.parametrize("y_pred, y_true, expected",
-                         [([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
-                          ([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12],
-                           99.5634920634921),
-                          ([103, 130, 132, 124, 124, 108],
-                           [129, 111, 122, 129, 110, 141],
-                           14.7466414897349),
-                          ([103, 130, 132, 124, 124, 108, 160, 160],
-                           [129, 111, 122, 129, 110, 141, 142, 143],
-                           13.9526876064932)])
-def test_symmetric_mape(y_true, y_pred, expected):
+@pytest.mark.parametrize("y_true, y_pred, expected", [
+    # Original test cases (with corrected parameter order)
+    ([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
+    ([7, 8, 9, 10, 11, 12], [1, 2, 3, 4, 5, 6], 99.5634920634921),
+    ([129, 111, 122, 129, 110, 141], [103, 130, 132, 124, 124, 108], 14.7466414897349),
+    ([129, 111, 122, 129, 110, 141, 142, 143], [103, 130, 132, 124, 124, 108, 160, 160], 13.9526876064932),
+    
+    # Additional test cases with different data types
+    (np.array([1, 2, 3, 4, 5, 6]), np.array([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.Series([7, 8, 9, 10, 11, 12]), pd.Series([1, 2, 3, 4, 5, 6]), 99.5634920634921),
+    (pd.Series([129, 111, 122, 129, 110, 141]), [103, 130, 132, 124, 124, 108], 14.7466414897349),
+])
+def test_symmetric_mean_absolute_percentage_error(y_true, y_pred, expected):
     '''
-    test symmetric mean absolute percentage error calculation
+    Test symmetric mean absolute percentage error calculation with various input types
     '''
     error = m.symmetric_mean_absolute_percentage_error(y_true, y_pred)
-    assert pytest.approx(expected) == error
+    assert pytest.approx(expected, rel=1e-9) == error
+
+# Tests for error handling
+@pytest.mark.parametrize("y_true, y_pred, exception", [
+    # Different lengths
+    ([1, 2, 3], [1, 2], ValueError),
+    
+    # Empty arrays
+    ([], [], ValueError),
+    
+    # Non-numeric values
+    (["a", "b", "c"], [1, 2, 3], ValueError),
+    ([1, 2, 3], ["a", "b", "c"], ValueError),
+    
+    # Non-array-like objects
+    (123, [1, 2, 3], TypeError),
+    ([1, 2, 3], None, TypeError),
+    
+    # Division by zero cases (when both values are zero)
+    ([0], [0], ValueError),
+    ([1, 0, 3], [1, 0, 3], ValueError),
+])
+def test_symmetric_mean_absolute_percentage_error_exceptions(y_true, y_pred, exception):
+    '''
+    Test symmetric mean absolute percentage error raises appropriate exceptions for invalid inputs
+    '''
+    with pytest.raises(exception):
+        m.symmetric_mean_absolute_percentage_error(y_true, y_pred)
+
+# Test for warning with very small values
+def test_symmetric_mean_absolute_percentage_error_warnings():
+    '''
+    Test warnings for very small values that might cause numerical instability
+    '''
+    with pytest.warns(UserWarning):
+        m.symmetric_mean_absolute_percentage_error([1e-11], [1e-11])
+
 
 
 @pytest.mark.parametrize("y_true, y_intervals, expected",

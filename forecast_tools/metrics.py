@@ -226,36 +226,62 @@ def root_mean_squared_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> flo
     return np.sqrt(mean_squared_error(y_true, y_pred))
 
 
-def symmetric_mean_absolute_percentage_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) ->float:
+def symmetric_mean_absolute_percentage_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
     """
     Symmetric Mean Absolute Percentage Error (sMAPE)
 
-    A proposed improvement./replacement for MAPE.  (But still not symmetric).
+    A proposed improvement/replacement for MAPE. Despite its name, it is not perfectly symmetric.
 
-    Computation based on Hyndsight blog:
-    https://robjhyndman.com/hyndsight/smape/
+    Computation based on formula: 
+    sMAPE = (1/n) * Σ(2|y_true - y_pred| / (|y_true| + |y_pred|)) * 100
 
     Limitations of sMAPE:
-
-    1. When the ground true value is close to zero MAPE is inflated.
-    2. Like MAPE it is not symmetric.
+    1. When values are close to zero, sMAPE can be inflated.
+    2. When either y_true or y_pred is zero, the formula can produce undefined results.
+    3. It is bounded between 0% and 200%.
+    4. It treats over-forecasting and under-forecasting differently.
 
     Parameters:
     --------
     y_true -- array-like
         actual observations from time series
-    y_pred -- arraylike
+    y_pred -- array-like
         the predictions to evaluate
 
     Returns:
     -------
     float,
-        scalar value representing the RMSE
+        scalar value representing the sMAPE (0-200)
+        
+    Raises:
+    ------
+    ValueError
+        If inputs contain zeros, cannot be converted to numeric arrays, or have different lengths
+    TypeError
+        If inputs are not array-like
     """
-    y_true, y_pred = as_arrays(y_true, y_pred)
-    numerator = 2 * np.abs(y_true - y_pred)
-    denominator = np.abs(y_pred) + np.abs(y_true)
+    y_true_arr, y_pred_arr = as_arrays(y_true, y_pred)
+    
+    # Check if arrays contain numeric data
+    if not np.issubdtype(y_true_arr.dtype, np.number) or not np.issubdtype(y_pred_arr.dtype, np.number):
+        raise ValueError("Input arrays must contain numeric values")
+    
+    # Check for division by zero
+    denominator = np.abs(y_pred_arr) + np.abs(y_true_arr)
+    if np.any(denominator == 0):
+        raise ValueError("sMAPE cannot be calculated when both y_true and y_pred contain zeros at the same index")
+    
+    # Check for very small denominators that might cause numerical instability
+    small_values = denominator < 1e-10
+    if np.any(small_values):
+        warnings.warn(
+            "Some values in y_true and y_pred sum to a very small number (<1e-10), which may lead to inflated sMAPE values",
+            UserWarning
+        )
+    
+    numerator = 2 * np.abs(y_true_arr - y_pred_arr)
     return np.mean(100 * (numerator / denominator))
+
 
 
 def mean_absolute_scaled_error(
