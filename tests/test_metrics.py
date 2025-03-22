@@ -42,19 +42,64 @@ def test_forecast_error_return_funcs(y_true, y_pred, metrics, expected):
     assert list(funcs_dict.keys()) == expected
 
 
-@pytest.mark.parametrize("y_pred, y_true, expected",
-                         [([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
-                          ([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], 6.0),
-                          ([103, 130, 132, 124, 124, 108],
-                           [129, 111, 122, 129, 110, 141], 17.833333),
-                          ([103, 130, 132, 124, 124, 108, 160, 160],
-                           [129, 111, 122, 129, 110, 141, 142, 143], 17.75)])
+@pytest.mark.parametrize(
+    "y_true, y_pred, expected",
+    [
+        # Basic test cases with lists
+        ([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
+        ([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], 6.0),
+        ([103, 130, 132, 124, 124, 108], [129, 111, 122, 129, 110, 141], 17.833333),
+        
+        # Different array-like data types
+        (np.array([1, 2, 3]), np.array([4, 5, 6]), 3.0),
+        (pd.Series([1, 2, 3]), [4, 5, 6], 3.0),
+        ([1, 2, 3], pd.Series([4, 5, 6]), 3.0),
+        (pd.DataFrame([1, 2, 3]), pd.DataFrame([4, 5, 6]), 3.0),
+        (pd.DataFrame([1, 2, 3]), pd.Series([4, 5, 6]), 3.0),
+        (pd.DataFrame([1, 2, 3]), np.array([4, 5, 6]), 3.0),
+        
+        # Float values
+        ([1.5, 2.5, 3.5], [1.0, 2.0, 3.0], 0.5),
+        
+        # Mixed types
+        ([1, 2, 3], [1.5, 2.5, 3.5], 0.5),
+        
+        # 2D arrays (should be flattened)
+        (np.array([[1, 2], [3, 4]]), np.array([[5, 6], [7, 8]]), 4.0),
+    ]
+)
 def test_mean_absolute_error(y_true, y_pred, expected):
     '''
-    test mean absolute error calculation
+    Test mean absolute error calculation with various input types
     '''
     error = m.mean_absolute_error(y_true, y_pred)
     assert pytest.approx(expected) == error
+
+
+@pytest.mark.parametrize(
+    "y_true, y_pred, exception",
+    [
+        # Different lengths
+        ([1, 2, 3], [1, 2], ValueError),
+        
+        # Empty arrays
+        ([], [], ValueError),
+        
+        # Non-numeric values
+        (["a", "b", "c"], [1, 2, 3], ValueError),
+        ([1, 2, 3], ["a", "b", "c"], ValueError),
+        
+        # Non-array-like objects
+        (123, [1, 2, 3], TypeError),
+        ([1, 2, 3], None, TypeError),
+    ]
+)
+def test_mean_absolute_error_exceptions(y_true, y_pred, exception):
+    '''
+    Test mean absolute error raises appropriate exceptions for invalid inputs
+    '''
+    with pytest.raises(exception):
+        m.mean_absolute_error(y_true, y_pred)
 
 
 @pytest.mark.parametrize("y_pred, y_true, expected",
@@ -79,8 +124,14 @@ def test_mean_error(y_true, y_pred, expected):
                           ([103, 130, 132, 124, 124, 108],
                            [129, 111, 122, 129, 110, 141],
                            14.2460623711587),
-                          ([103, 130, 132, 124, 124, 108, 160, 160],
+                          (np.array([103, 130, 132, 124, 124, 108, 160, 160]),
+                           pd.DataFrame([129, 111, 122, 129, 110, 141, 142, 143]),
+                           13.7550678066365),
+                           (pd.Series([103, 130, 132, 124, 124, 108, 160, 160]),
                            [129, 111, 122, 129, 110, 141, 142, 143],
+                           13.7550678066365),
+                           (pd.Series([103, 130, 132, 124, 124, 108, 160, 160]),
+                           np.array([129, 111, 122, 129, 110, 141, 142, 143]),
                            13.7550678066365)])
 def test_mean_absolute_percentage_error(y_true, y_pred, expected):
     '''
@@ -90,58 +141,192 @@ def test_mean_absolute_percentage_error(y_true, y_pred, expected):
     assert pytest.approx(expected) == error
 
 
-@pytest.mark.parametrize("y_pred, y_true, expected",
-                         [([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
-                          ([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12],
-                           36.0),
-                          ([103, 130, 132, 124, 124, 108],
-                           [129, 111, 122, 129, 110, 141],
-                           407.833333333333),
-                          ([103, 130, 132, 124, 124, 108, 160, 160],
-                           [129, 111, 122, 129, 110, 141, 142, 143],
-                           382.50)])
+# Additional tests for error cases
+@pytest.mark.parametrize("y_true, y_pred, exception", [
+    # Different lengths
+    ([100, 200, 300], [100, 200], ValueError),
+    
+    # Empty arrays
+    ([], [], ValueError),
+    
+    # Non-numeric values
+    (["a", "b", "c"], [1, 2, 3], ValueError),
+    ([1, 2, 3], ["a", "b", "c"], ValueError),
+    
+    # Non-array-like objects
+    (123, [1, 2, 3], TypeError),
+    ([1, 2, 3], None, TypeError),
+    
+    # Zeros in y_true (division by zero)
+    ([0, 1, 2], [0, 1, 2], ValueError),
+    ([1, 0, 2], [1, 0, 2], ValueError),
+])
+def test_mean_absolute_percentage_error_exceptions(y_true, y_pred, exception):
+    '''
+    Test mean absolute percentage error raises appropriate exceptions for invalid inputs
+    '''
+    with pytest.raises(exception):
+        m.mean_absolute_percentage_error(y_true, y_pred)
+
+
+# Test for warning with very small values
+def test_mean_absolute_percentage_error_warnings():
+    '''
+    Test warnings for very small values in y_true
+    '''
+    with pytest.warns(UserWarning):
+        m.mean_absolute_percentage_error([1e-11, 1, 2], [0, 1, 2])
+
+
+@pytest.mark.parametrize("y_true, y_pred, expected", [
+    # Original test cases
+    ([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
+    ([7, 8, 9, 10, 11, 12], [1, 2, 3, 4, 5, 6], 36.0),
+    ([129, 111, 122, 129, 110, 141], [103, 130, 132, 124, 124, 108], 407.833333333333),
+    ([129, 111, 122, 129, 110, 141, 142, 143], [103, 130, 132, 124, 124, 108, 160, 160], 382.50),
+    
+    # Additional test cases with different data types
+    (np.array([1, 2, 3, 4, 5, 6]), np.array([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.Series([1, 2, 3, 4, 5, 6]), pd.Series([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.DataFrame([1, 2, 3, 4, 5, 6]), pd.Series([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.DataFrame([1, 2, 3, 4, 5, 6]), np.array([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.Series([1, 2, 3, 4, 5, 6]), [1, 2, 3, 4, 5, 6], 0.0),
+    
+    # Test with float values
+    ([1.5, 2.5, 3.5], [1.0, 2.0, 3.0], 0.25),
+    
+    # Test with negative values
+    ([-1, -2, -3], [-4, -5, -6], 9.0),
+    
+    # Test with mixed positive and negative values
+    ([1, -2, 3], [4, -5, 6], 9.0),
+    
+    # Test with 2D arrays (should be flattened)
+    (np.array([[1, 2], [3, 4]]), np.array([[5, 6], [7, 8]]), 16.0),
+])
 def test_mean_squared_error(y_true, y_pred, expected):
     '''
-    test mean squared error calculation
+    Test mean squared error calculation with various input types
     '''
     error = m.mean_squared_error(y_true, y_pred)
-    assert pytest.approx(expected) == error
+    assert pytest.approx(expected, rel=1e-9) == error
 
 
-@pytest.mark.parametrize("y_pred, y_true, expected",
-                         [([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
-                          ([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12],
-                           6.0),
-                          ([103, 130, 132, 124, 124, 108],
-                           [129, 111, 122, 129, 110, 141],
-                           20.1948838405506),
-                          ([103, 130, 132, 124, 124, 108, 160, 160],
-                           [129, 111, 122, 129, 110, 141, 142, 143],
-                           19.5576072156079)])
+@pytest.mark.parametrize("y_true, y_pred, expected", [
+    # Original test cases
+    ([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
+    ([7, 8, 9, 10, 11, 12], [1, 2, 3, 4, 5, 6], 6.0),
+    ([129, 111, 122, 129, 110, 141], [103, 130, 132, 124, 124, 108], 20.1948838405506),
+    ([129, 111, 122, 129, 110, 141, 142, 143], [103, 130, 132, 124, 124, 108, 160, 160], 19.5576072156079),
+    
+    # Additional test cases with different data types
+    (np.array([1, 2, 3, 4, 5, 6]), np.array([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.Series([1, 2, 3, 4, 5, 6]), pd.Series([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.Series([1, 2, 3, 4, 5, 6]), [1, 2, 3, 4, 5, 6], 0.0),
+    
+    # Test with float values
+    ([1.5, 2.5, 3.5], [1.0, 2.0, 3.0], 0.5),
+    
+    # Test with negative values
+    ([-1, -2, -3], [-4, -5, -6], 3.0),
+    
+    # Test with mixed positive and negative values
+    ([1, -2, 3], [4, -5, 6], 3.0),
+    
+    # Test with 2D arrays (should be flattened)
+    (np.array([[1, 2], [3, 4]]), np.array([[5, 6], [7, 8]]), 4.0),
+])
 def test_root_mean_squared_error(y_true, y_pred, expected):
     '''
-    test root mean squared error calculation
+    Test root mean squared error calculation with various input types
     '''
     error = m.root_mean_squared_error(y_true, y_pred)
-    assert pytest.approx(expected) == error
+    assert pytest.approx(expected, rel=1e-9) == error
 
 
-@pytest.mark.parametrize("y_pred, y_true, expected",
-                         [([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
-                          ([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12],
-                           99.5634920634921),
-                          ([103, 130, 132, 124, 124, 108],
-                           [129, 111, 122, 129, 110, 141],
-                           14.7466414897349),
-                          ([103, 130, 132, 124, 124, 108, 160, 160],
-                           [129, 111, 122, 129, 110, 141, 142, 143],
-                           13.9526876064932)])
-def test_symmetric_mape(y_true, y_pred, expected):
+# Tests for error handling
+@pytest.mark.parametrize("y_true, y_pred, exception", [
+    # Different lengths
+    ([1, 2, 3], [1, 2], ValueError),
+    
+    # Empty arrays
+    ([], [], ValueError),
+    
+    # Non-numeric values
+    (["a", "b", "c"], [1, 2, 3], ValueError),
+    ([1, 2, 3], ["a", "b", "c"], ValueError),
+    
+    # Non-array-like objects
+    (123, [1, 2, 3], TypeError),
+    ([1, 2, 3], None, TypeError),
+])
+def test_error_metrics_exceptions(y_true, y_pred, exception):
     '''
-    test symmetric mean absolute percentage error calculation
+    Test that appropriate exceptions are raised for invalid inputs
+    for both MSE and RMSE functions
+    '''
+    with pytest.raises(exception):
+        m.mean_squared_error(y_true, y_pred)
+    
+    with pytest.raises(exception):
+        m.root_mean_squared_error(y_true, y_pred)
+
+
+
+@pytest.mark.parametrize("y_true, y_pred, expected", [
+    # Original test cases (with corrected parameter order)
+    ([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
+    ([7, 8, 9, 10, 11, 12], [1, 2, 3, 4, 5, 6], 99.5634920634921),
+    ([129, 111, 122, 129, 110, 141], [103, 130, 132, 124, 124, 108], 14.7466414897349),
+    ([129, 111, 122, 129, 110, 141, 142, 143], [103, 130, 132, 124, 124, 108, 160, 160], 13.9526876064932),
+    
+    # Additional test cases with different data types
+    (np.array([1, 2, 3, 4, 5, 6]), np.array([1, 2, 3, 4, 5, 6]), 0.0),
+    (pd.Series([7, 8, 9, 10, 11, 12]), pd.Series([1, 2, 3, 4, 5, 6]), 99.5634920634921),
+    (pd.Series([129, 111, 122, 129, 110, 141]), [103, 130, 132, 124, 124, 108], 14.7466414897349),
+])
+def test_symmetric_mean_absolute_percentage_error(y_true, y_pred, expected):
+    '''
+    Test symmetric mean absolute percentage error calculation with various input types
     '''
     error = m.symmetric_mean_absolute_percentage_error(y_true, y_pred)
-    assert pytest.approx(expected) == error
+    assert pytest.approx(expected, rel=1e-9) == error
+
+# Tests for error handling
+@pytest.mark.parametrize("y_true, y_pred, exception", [
+    # Different lengths
+    ([1, 2, 3], [1, 2], ValueError),
+    
+    # Empty arrays
+    ([], [], ValueError),
+    
+    # Non-numeric values
+    (["a", "b", "c"], [1, 2, 3], ValueError),
+    ([1, 2, 3], ["a", "b", "c"], ValueError),
+    
+    # Non-array-like objects
+    (123, [1, 2, 3], TypeError),
+    ([1, 2, 3], None, TypeError),
+    
+    # Division by zero cases (when both values are zero)
+    ([0], [0], ValueError),
+    ([1, 0, 3], [1, 0, 3], ValueError),
+])
+def test_symmetric_mean_absolute_percentage_error_exceptions(y_true, y_pred, exception):
+    '''
+    Test symmetric mean absolute percentage error raises appropriate exceptions for invalid inputs
+    '''
+    with pytest.raises(exception):
+        m.symmetric_mean_absolute_percentage_error(y_true, y_pred)
+
+# Test for warning with very small values
+def test_symmetric_mean_absolute_percentage_error_warnings():
+    '''
+    Test warnings for very small values that might cause numerical instability
+    '''
+    with pytest.warns(UserWarning):
+        m.symmetric_mean_absolute_percentage_error([1e-11], [1e-11])
+
 
 
 @pytest.mark.parametrize("y_true, y_intervals, expected",

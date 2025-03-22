@@ -1,6 +1,17 @@
 # Change log
 
-## UNRELEASED
+## 0.4.1
+
+## Changed
+
+* All point forecast metrics now validate inputs and raise `ValueError` or `TypeError` when `y_true` and `y_pred` do not meet specifications
+* `mean_absolute_percentage_error` and `symmetric_mean_absolute_percentage_error` now raise user warnings when values are close to zero. i.e. inflation of metrics can occur.
+
+## Fixed
+
+* PATCH: point forecast metrics can now handle edge case where `y_true` and `y_pred` inputs are different data types (e.g. `pd.Series` and `np.array`). Prior to v0.4.1 this generated an incorrect metric.  
+
+## [v0.4.0 2025-03-22](https://github.com/TomMonks/forecast-tools/releases/tag/v0.4.0)
 
 ### Changed
 
