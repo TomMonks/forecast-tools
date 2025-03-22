@@ -1,6 +1,28 @@
 # Change log
 
-## v0.3.0 UNRELEASED
+## UNRELEASED
+
+### Changed
+
+* BREAKING: dropped Python 3.8 support
+* BREAKING: Unified interface to `winkler_score`, `absolute_coverage_difference` and `coverage`
+* DOCS: upgrade documentation for prediction interval evaluation.
+* ENV: pip installs `forecast-tools` from local python package in edit mode.
+
+### Added
+
+* Common validation input parameter function for `winkler_score`, `coverage`, and `absolute_coverage_difference`
+* Additional test suite for `winkler_score` and `coverage` functions focussing on input parameters.
+* `metrics.interval_score` kitchen sink function will return all interval scores (winkler, acd, coverage) by default or can be limited to selection.
+* `plotting` module: contains the interactive plotly function `plot_time_series`. Documentation also created.
+* ENV: added plotly to package requirements.
+
+### Fixed
+
+* PATCH: `boot_prediction_intervals` percentile estimation using `numpy` modified to remove deprecated parameter `interpolation`. Replaced with `method` parameter.
+* PATCH: fixed `data.load_emergency_dept` date parsing user warning. Added date format parameter to pandas read in.
+
+## v0.3.0 
 
 ### Changed
 

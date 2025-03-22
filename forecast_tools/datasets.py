@@ -24,6 +24,6 @@ def load_emergency_dept():
     dir_path = os.path.dirname(os.path.realpath(__file__))
     path = os.path.join(dir_path, PATH_ED)
     df = pd.read_csv(path, index_col='date', parse_dates=True,
-                     dayfirst=True)
+                     dayfirst=True, date_format="%d/%m/%y")
     df.index.freq = 'D'
     return df

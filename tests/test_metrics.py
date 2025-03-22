@@ -210,14 +210,15 @@ git
                           ([744.54, 773.22], [741.84], 0.2, 55.68),
                           ([744.54, 773.22], 745.0, 0.2, 28.68),
                           (np.array([744.54, 773.22]), 745.0, 0.2, 28.68),
-                          (pd.DataFrame([744.54, 773.22]), 745.0, 0.2, 28.68)])
+                          (pd.Series([744.54, 773.22]), 745.0, 0.2, 28.68),
+                          (pd.DataFrame([744.54, 773.22]).T, 745.0, 0.2, 28.68)])
 def test_winkler_score(y_intervals, y_test, alpha, expected):
     '''
     Test that the winkler score returns the correct value
 
     Tests one step forecasts only.
     '''
-    ws = m.winkler_score(y_intervals, y_test, alpha)
+    ws = m.winkler_score(y_test, y_intervals, alpha)
     assert pytest.approx(expected) == ws
 
 
@@ -240,7 +241,7 @@ def test_winkler_score_m_step():
     preds, intervals = model.fit_predict(train, HOLDOUT,
                                          return_predict_int=True)
 
-    ws = m.winkler_score(intervals[0], test, alpha=0.2)
+    ws = m.winkler_score(test, intervals[0], alpha=0.2)
 
     assert pytest.approx(expected, abs=0.01) == ws
 
@@ -249,7 +250,29 @@ def test_winkler_score_m_step():
                          [([744.54, 773.22], "741.84", 0.2)])
 def test_winkler_score_invalid_type(y_intervals, y_test, alpha):
     with pytest.raises(TypeError):
-        m.winkler_score(y_intervals, y_test, alpha)
+        m.winkler_score(y_test, y_intervals, alpha)
+
+
+@pytest.mark.parametrize("alpha", [-0.1, 0, 1, 1.1])
+def test_winkler_score_invalid_alpha(alpha):
+    """Test error thrown if invalid alpha passed to winkler score"""
+    with pytest.raises(ValueError):
+        m.winkler_score(741.84, [744.54, 773.22], alpha)
+
+
+def test_winkler_score_invalid_interval():
+    """Test that winkler catch incorrect lower > upper bound"""
+    with pytest.raises(ValueError):
+        m.winkler_score(741.84, [773.22, 744.54], 0.2)
+
+
+def test_winkler_score_empty_input():
+    with pytest.raises(ValueError):
+        m.winkler_score([], [], 0.2) == 0.0
+
+def test_winkler_score_mismatched_lengths():
+    with pytest.raises(ValueError):
+        m.winkler_score([741.84, 760, 770], [[744.54, 773.22], [750, 780]], 0.2)
 
 
 def test_acd():
@@ -262,5 +285,54 @@ def test_acd():
 
     y_true = np.array([37463, 40828, 56148, 45342, 43741, 45907])
 
-    acd = m.absolute_coverage_difference(y_true, intervals, target=0.95)
+    acd = m.absolute_coverage_difference(y_true, intervals, alpha=0.05)
     assert pytest.approx(acd, abs=0.01) == 0.12
+
+
+
+@pytest.mark.parametrize("pred_intervals, y_true, expected", [
+    # Floating point precision tests
+    ([[10.0, 15.0], [15.0, 20.0], [25.0, 30.0]], [10.0000001, 20.0, 29.9999999], 1.0),
+    
+    # Extreme values
+    (
+        [
+            [np.finfo(float).max - 1, np.finfo(float).max],
+            [np.finfo(float).min, np.finfo(float).min + 1]
+        ],
+        [np.finfo(float).max, np.finfo(float).min],
+        1.0
+    ),
+])
+def test_coverage_edge_cases(pred_intervals, y_true, expected):
+    """Test coverage with floating point precision issues and extreme values."""
+    result = m.coverage(y_true, pred_intervals)
+    assert pytest.approx(expected) == result
+
+@pytest.mark.parametrize("pred_intervals, y_true", [
+    # Invalid types
+    ("not an array", [10, 20, 30]),
+    ([[5, 15], [15, 25], [25, 35]], "not an array"),
+])
+def test_coverage_type_errors(pred_intervals, y_true):
+    """Test that coverage raises TypeError for invalid input types."""
+    with pytest.raises(TypeError):
+        m.coverage(y_true, pred_intervals)
+
+@pytest.mark.parametrize("pred_intervals, y_true", [
+    # Empty arrays
+    ([], []),
+    
+    # Mismatched lengths
+    ([[5, 15], [15, 25]], [10, 20, 30]),
+    
+    # Invalid intervals (lower > upper)
+    ([[15, 5], [25, 15], [35, 25]], [10, 20, 30]),
+    
+    # Wrong interval shape
+    ([[5, 15, 20], [15, 25, 30], [25, 35, 40]], [10, 20, 30]),
+])
+def test_coverage_value_errors(pred_intervals, y_true):
+    """Test that coverage raises ValueError for invalid inputs."""
+    with pytest.raises(ValueError):
+        m.coverage(y_true, pred_intervals)
