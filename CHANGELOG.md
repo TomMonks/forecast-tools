@@ -1,8 +1,8 @@
 # Change log
 
-## UNRELEASED
+## [v0.4.0 2025-03-22](https://github.com/TomMonks/forecast-tools/releases/tag/v0.4.0)
 
-### [v0.4.0 2025-03-22](https://github.com/TomMonks/forecast-tools/releases/tag/v0.4.0)
+### Changed
 
 * BREAKING: dropped Python 3.8 support
 * BREAKING: Unified interface to `winkler_score`, `absolute_coverage_difference` and `coverage`
