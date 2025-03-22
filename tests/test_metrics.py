@@ -42,19 +42,64 @@ def test_forecast_error_return_funcs(y_true, y_pred, metrics, expected):
     assert list(funcs_dict.keys()) == expected
 
 
-@pytest.mark.parametrize("y_pred, y_true, expected",
-                         [([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
-                          ([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], 6.0),
-                          ([103, 130, 132, 124, 124, 108],
-                           [129, 111, 122, 129, 110, 141], 17.833333),
-                          ([103, 130, 132, 124, 124, 108, 160, 160],
-                           [129, 111, 122, 129, 110, 141, 142, 143], 17.75)])
+@pytest.mark.parametrize(
+    "y_true, y_pred, expected",
+    [
+        # Basic test cases with lists
+        ([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], 0.0),
+        ([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], 6.0),
+        ([103, 130, 132, 124, 124, 108], [129, 111, 122, 129, 110, 141], 17.833333),
+        
+        # Different array-like data types
+        (np.array([1, 2, 3]), np.array([4, 5, 6]), 3.0),
+        (pd.Series([1, 2, 3]), [4, 5, 6], 3.0),
+        ([1, 2, 3], pd.Series([4, 5, 6]), 3.0),
+        (pd.DataFrame([1, 2, 3]), pd.DataFrame([4, 5, 6]), 3.0),
+        (pd.DataFrame([1, 2, 3]), pd.Series([4, 5, 6]), 3.0),
+        (pd.DataFrame([1, 2, 3]), np.array([4, 5, 6]), 3.0),
+        
+        # Float values
+        ([1.5, 2.5, 3.5], [1.0, 2.0, 3.0], 0.5),
+        
+        # Mixed types
+        ([1, 2, 3], [1.5, 2.5, 3.5], 0.5),
+        
+        # 2D arrays (should be flattened)
+        (np.array([[1, 2], [3, 4]]), np.array([[5, 6], [7, 8]]), 4.0),
+    ]
+)
 def test_mean_absolute_error(y_true, y_pred, expected):
     '''
-    test mean absolute error calculation
+    Test mean absolute error calculation with various input types
     '''
     error = m.mean_absolute_error(y_true, y_pred)
     assert pytest.approx(expected) == error
+
+
+@pytest.mark.parametrize(
+    "y_true, y_pred, exception",
+    [
+        # Different lengths
+        ([1, 2, 3], [1, 2], ValueError),
+        
+        # Empty arrays
+        ([], [], ValueError),
+        
+        # Non-numeric values
+        (["a", "b", "c"], [1, 2, 3], ValueError),
+        ([1, 2, 3], ["a", "b", "c"], ValueError),
+        
+        # Non-array-like objects
+        (123, [1, 2, 3], TypeError),
+        ([1, 2, 3], None, TypeError),
+    ]
+)
+def test_mean_absolute_error_exceptions(y_true, y_pred, exception):
+    '''
+    Test mean absolute error raises appropriate exceptions for invalid inputs
+    '''
+    with pytest.raises(exception):
+        m.mean_absolute_error(y_true, y_pred)
 
 
 @pytest.mark.parametrize("y_pred, y_true, expected",

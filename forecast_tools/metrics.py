@@ -26,27 +26,44 @@ from forecast_tools.baseline import SNaive
 
 def as_arrays(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Returns ground truth and predictions
-    values as numpy arrays.
-
+    Returns ground truth and predictions values as numpy arrays.
+    
     Parameters:
     --------
     y_true -- array-like
         actual observations from time series
     y_pred -- array-like
         the predictions
-
+    
     Returns:
     -------
     Tuple(np.array np.array)
-
-    Notes:
-    -----
-    Patched in v0.4.1 to flatten arrays. This handles edge case
-    where y_true and y_pred are different data structures e.g.
-    an array and a dataframe.
+    
+    Raises:
+    ------
+    ValueError
+        If inputs cannot be converted to arrays or have different lengths
+    TypeError
+        If inputs are not array-like
     """
-    return np.asarray(y_true).flatten(), np.asarray(y_pred).flatten()
+    if not hasattr(y_true, '__iter__') or not hasattr(y_pred, '__iter__'):
+        raise TypeError("Inputs must be iterable (array-like) objects")
+
+    try:
+        y_true_arr = np.asarray(y_true).flatten()
+        y_pred_arr = np.asarray(y_pred).flatten()
+    except ValueError as e:
+        raise ValueError(f"Inputs cannot be converted to arrays: {str(e)}")
+    
+    if len(y_true_arr) != len(y_pred_arr):
+        raise ValueError(f"Input arrays must have the same length. Got {len(y_true_arr)} and {len(y_pred_arr)}")
+    
+    if len(y_true_arr) == 0:
+        raise ValueError("Input arrays cannot be empty")
+        
+    return y_true_arr, y_pred_arr
+
+
 
 
 def mean_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
@@ -101,21 +118,32 @@ def mean_absolute_percentage_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike)
 def mean_absolute_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
     """
     Mean Absolute Error (MAE)
-
+    
     Parameters:
     --------
     y_true -- array-like
         actual observations from time series
     y_pred -- arraylike
         the predictions to evaluate
-
+    
     Returns:
     -------
     float,
         scalar value representing the MAE
+        
+    Raises:
+    ------
+    ValueError
+        If inputs cannot be converted to numeric arrays
     """
-    y_true, y_pred = as_arrays(y_true, y_pred)
-    return np.mean(np.abs((y_true - y_pred)))
+    y_true_arr, y_pred_arr = as_arrays(y_true, y_pred)
+    
+    # Check if arrays contain numeric data
+    if not np.issubdtype(y_true_arr.dtype, np.number) or not np.issubdtype(y_pred_arr.dtype, np.number):
+        raise ValueError("Input arrays must contain numeric values")
+        
+    return np.mean(np.abs((y_true_arr - y_pred_arr)))
+
 
 
 def mean_squared_error(y_true: npt.ArrayLike, y_pred: npt.ArrayLike) -> float:
