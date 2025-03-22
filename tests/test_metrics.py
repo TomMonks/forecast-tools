@@ -124,8 +124,14 @@ def test_mean_error(y_true, y_pred, expected):
                           ([103, 130, 132, 124, 124, 108],
                            [129, 111, 122, 129, 110, 141],
                            14.2460623711587),
-                          ([103, 130, 132, 124, 124, 108, 160, 160],
+                          (np.array([103, 130, 132, 124, 124, 108, 160, 160]),
+                           pd.DataFrame([129, 111, 122, 129, 110, 141, 142, 143]),
+                           13.7550678066365),
+                           (pd.Series([103, 130, 132, 124, 124, 108, 160, 160]),
                            [129, 111, 122, 129, 110, 141, 142, 143],
+                           13.7550678066365),
+                           (pd.Series([103, 130, 132, 124, 124, 108, 160, 160]),
+                           np.array([129, 111, 122, 129, 110, 141, 142, 143]),
                            13.7550678066365)])
 def test_mean_absolute_percentage_error(y_true, y_pred, expected):
     '''
@@ -133,6 +139,43 @@ def test_mean_absolute_percentage_error(y_true, y_pred, expected):
     '''
     error = m.mean_absolute_percentage_error(y_true, y_pred)
     assert pytest.approx(expected) == error
+
+
+# Additional tests for error cases
+@pytest.mark.parametrize("y_true, y_pred, exception", [
+    # Different lengths
+    ([100, 200, 300], [100, 200], ValueError),
+    
+    # Empty arrays
+    ([], [], ValueError),
+    
+    # Non-numeric values
+    (["a", "b", "c"], [1, 2, 3], ValueError),
+    ([1, 2, 3], ["a", "b", "c"], ValueError),
+    
+    # Non-array-like objects
+    (123, [1, 2, 3], TypeError),
+    ([1, 2, 3], None, TypeError),
+    
+    # Zeros in y_true (division by zero)
+    ([0, 1, 2], [0, 1, 2], ValueError),
+    ([1, 0, 2], [1, 0, 2], ValueError),
+])
+def test_mean_absolute_percentage_error_exceptions(y_true, y_pred, exception):
+    '''
+    Test mean absolute percentage error raises appropriate exceptions for invalid inputs
+    '''
+    with pytest.raises(exception):
+        m.mean_absolute_percentage_error(y_true, y_pred)
+
+
+# Test for warning with very small values
+def test_mean_absolute_percentage_error_warnings():
+    '''
+    Test warnings for very small values in y_true
+    '''
+    with pytest.warns(UserWarning):
+        m.mean_absolute_percentage_error([1e-11, 1, 2], [0, 1, 2])
 
 
 @pytest.mark.parametrize("y_pred, y_true, expected",
