@@ -112,7 +112,7 @@ class Forecast(ABC):
         return self.predict(horizon, return_predict_int=return_predict_int,
                             alpha=alpha)
 
-    def validate_training_data(self, train, min_length=1):
+    def validate_training_data(self, train, min_length=1, allow_nan=False):
         '''
         Checks the validity of training data for forecasting
         and raises exceptions if required.
@@ -122,8 +122,12 @@ class Forecast(ABC):
 
         Parameters:
         ---------
+        train : array-like
+            Training data.
         min_length: int optional (default=0)
-            minimum length of the time series.
+            Minimum length of the time series.
+        allow_nan : bool optional (default=False)
+            Whether missing values are permitted in training data.
 
         '''
 
@@ -135,14 +139,14 @@ class Forecast(ABC):
         elif not is_numeric(train):
             raise TypeError('Training data must be numeric')
 
-        elif np.isnan(np.asarray(train)).any():
+        elif not allow_nan and np.isnan(np.asarray(train)).any():
             raise TypeError(
                 'Training data contains at least one NaN. '
-                + 'Data myst all be floats')
+                + 'Data must all be floats')
         elif np.isinf(np.asarray(train)).any():
             raise TypeError(
                 'Training data contains at least one Infinite '
-                + 'value (np.Inf). Data myst all be floats')
+                + 'value (np.Inf). Data must all be floats')
 
     @abstractmethod
     def predict(self, horizon, return_predict_int=False, alpha=None):
@@ -335,18 +339,25 @@ class Naive1(Forecast):
 
     def fit(self, train):
         '''
-        Train the naive model
+        Train the naive model.
 
         Parameters:
         --------
-        train - array-like,
+        train : array-like,
             vector, series, or dataframe of the time series used for training.
             Values should be floats and not contain any np.nan or np.inf
         '''
 
-        self.validate_training_data(train)
+        self.validate_training_data(train, allow_nan=True)
 
         _train = np.asarray(train)
+
+        if np.isnan(_train[-1]):
+            raise TypeError(
+                'Naive1 cannot forecast because the final training '
+                'value is NaN.'
+            )
+
         self._pred = _train[-1]
         self._fitted = pd.DataFrame(_train)
 
@@ -357,6 +368,7 @@ class Naive1(Forecast):
         self._fitted.columns = ['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(periods=1)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
+        # NaN are excluded from the residual standard-error calculation
         self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
 
     def predict(self, horizon, return_predict_int=False, alpha=None):
@@ -511,7 +523,11 @@ class SNaive(Forecast):
             or np.inf
         '''
 
-        self.validate_training_data(train, min_length=self._period)
+        self.validate_training_data(
+            train,
+            min_length=self._period,
+            allow_nan=True
+        )
 
         # could refactor this to be more like Naive1's simpler implementation.
         if isinstance(train, (pd.Series)):
@@ -527,11 +543,19 @@ class SNaive(Forecast):
             _train = train.copy()
             self._fitted = pd.DataFrame(_train)
 
+
+        if np.isnan(self._f).any():
+            raise TypeError(
+                'SNaive cannot forecast because the final seasonal period '
+                'contains at least one NaN.'
+            )
+
         self._t = len(_train)
         self._fitted.columns = ['actual']
         self._fitted['pred'] = self._fitted['actual'].shift(self._period)
         self._fitted['resid'] = self._fitted['actual'] - self._fitted['pred']
 
+        # NaN are excluded from the residual standard-error calculation
         self._resid_std = np.sqrt(np.nanmean(np.square(self._fitted['resid'])))
 
     def predict(self, horizon, return_predict_int=False, alpha=None):

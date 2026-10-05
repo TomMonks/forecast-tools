@@ -1,0 +1,46 @@
+{
+  "projectName": "forecast-tools",
+  "projectOwner": "TomMonks",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "TomMonks",
+      "name": "Tom Monks",
+      "avatar_url": "https://avatars.githubusercontent.com/u/881493?v=4",
+      "profile": "https://experts.exeter.ac.uk/19244-thomas-monks",
+      "contributions": [
+        "bug",
+        "code",
+        "content",
+        "design",
+        "doc",
+        "example",
+        "ideas",
+        "infra",
+        "maintenance",
+        "test",
+        "tutorial"
+      ]
+    },
+    {
+      "login": "amyheather",
+      "name": "Amy Heather",
+      "avatar_url": "https://avatars.githubusercontent.com/u/92166537?v=4",
+      "profile": "https://www.linkedin.com/in/amyheather",
+      "contributions": [
+        "doc",
+        "bug",
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "linkToUsage": true
+}

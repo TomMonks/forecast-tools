@@ -8,6 +8,10 @@
 [![Python](https://img.shields.io/pypi/pyversions/forecast-tools)](https://pypi.org/project/forecasta-tools/)
 [![Read the Docs](https://readthedocs.org/projects/pip/badge/?version=latest)](https://tommonks.github.io/forecast-tools/)
 
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
  forecast-tools has been developed to support forecasting education and applied forecasting research.  It is MIT licensed and freely available to practitioners, students and researchers via PyPi.  There is a long term plan to make forecast-tools available via conda-forge.
 
  ## Vision for forecast-tools
@@ -78,3 +82,35 @@ hatch test --cover
 ```
 
 **All contributions are welcome and must include unit tests!**
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://experts.exeter.ac.uk/19244-thomas-monks"><img src="https://avatars.githubusercontent.com/u/881493?v=4?s=100" width="100px;" alt="Tom Monks"/><br /><sub><b>Tom Monks</b></sub></a><br /><a href="https://github.com/TomMonks/forecast-tools/issues?q=author%3ATomMonks" title="Bug reports">🐛</a> <a href="https://github.com/TomMonks/forecast-tools/commits?author=TomMonks" title="Code">💻</a> <a href="#content-TomMonks" title="Content">🖋</a> <a href="#design-TomMonks" title="Design">🎨</a> <a href="https://github.com/TomMonks/forecast-tools/commits?author=TomMonks" title="Documentation">📖</a> <a href="#example-TomMonks" title="Examples">💡</a> <a href="#ideas-TomMonks" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-TomMonks" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-TomMonks" title="Maintenance">🚧</a> <a href="https://github.com/TomMonks/forecast-tools/commits?author=TomMonks" title="Tests">⚠️</a> <a href="#tutorial-TomMonks" title="Tutorials">✅</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/amyheather"><img src="https://avatars.githubusercontent.com/u/92166537?v=4?s=100" width="100px;" alt="Amy Heather"/><br /><sub><b>Amy Heather</b></sub></a><br /><a href="https://github.com/TomMonks/forecast-tools/commits?author=amyheather" title="Documentation">📖</a> <a href="https://github.com/TomMonks/forecast-tools/issues?q=author%3Aamyheather" title="Bug reports">🐛</a> <a href="https://github.com/TomMonks/forecast-tools/commits?author=amyheather" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td align="center" size="13px" colspan="7">
+        <img src="https://raw.githubusercontent.com/all-contributors/all-contributors-cli/1b8533af435da9854653492b1327a23a4dbd0a10/assets/logo-small.svg">
+          <a href="https://all-contributors.js.org/docs/en/bot/usage">Add your contributions</a>
+        </img>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
